@@ -1,53 +1,8 @@
 /// Root Folder
-class RootFolder {
-  int id;
-  String name;
-  String description;
-  int user;
-  List<NasFile> files;
-  List<NasFolder> folders;
-  List<Parent> parents;
-  List<NasDocument> documents;
-  double totalSize;
 
-  RootFolder({
-    this.id,
-    this.name,
-    this.description,
-    this.files,
-    this.folders,
-    this.parents,
-    this.documents,
-    this.totalSize,
-  });
+class BaseElement {}
 
-  factory RootFolder.fromJson(Map<String, dynamic> json) => RootFolder(
-        id: json["id"],
-        name: json["name"],
-        description: json["description"],
-        files:
-            List<NasFile>.from(json["files"].map((x) => NasFile.fromJson(x))),
-        folders: List<NasFolder>.from(
-            json["folders"].map((x) => NasFolder.fromJson(x))),
-        documents: List<NasDocument>.from(
-            json["documents"].map((x) => NasDocument.fromJson(x))),
-        totalSize: json["total_size"].toDouble(),
-      );
-
-  Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": name,
-        "description": description,
-        "user": user,
-        "files": List<dynamic>.from(files.map((x) => x)),
-        "folders": List<dynamic>.from(folders.map((x) => x.toJson())),
-        "parents": List<dynamic>.from(parents.map((x) => x.toJson())),
-        "documents": List<dynamic>.from(documents.map((x) => x)),
-        "total_size": totalSize,
-      };
-}
-
-class NasFolder {
+class NasFolder extends BaseElement {
   int id;
   DateTime createdAt;
   String name;
@@ -125,7 +80,7 @@ class Parent {
       };
 }
 
-class NasDocument {
+class NasDocument extends BaseElement {
   int id;
   DateTime createdAt;
   String name;
@@ -169,7 +124,7 @@ class NasDocument {
       };
 }
 
-class NasFile {
+class NasFile extends BaseElement {
   int id;
   DateTime createdAt;
   int parent;

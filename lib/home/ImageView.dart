@@ -12,7 +12,11 @@ class ImageView extends StatelessWidget {
       appBar: AppBar(
         title: Text(this.name),
       ),
-      body: Image.network(this.url),
+      body: Center(
+          child: Image.network(
+        this.url,
+        fit: BoxFit.contain,
+      )),
     );
   }
 }

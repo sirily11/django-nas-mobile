@@ -1,16 +1,16 @@
 import 'package:dio/dio.dart';
 import 'package:django_nas_mobile/models/Folder.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-String folderUrl = "http://0.0.0.0:8000/api/folder/";
-String fileUrl = "http://0.0.0.0:8000/api/file/";
-String documentUrl = "http://0.0.0.0:8000/api/document/";
-String editorUrl = "http://0.0.0.0:8000/#/edit/";
+String folderUrl = "/api/folder/";
+String fileUrl = "/api/file/";
+String documentUrl = "/api/document/";
+String editorUrl = "/#/edit/";
 
 class NasProvider extends ChangeNotifier {
   NasFolder currentFolder;
   bool isLoading = false;
-
 
   void update() {
     notifyListeners();
@@ -31,9 +31,7 @@ class DataFetcher {
   }
 
   _getObject<T>(dynamic data) {
-    if (T == RootFolder) {
-      return RootFolder.fromJson(data);
-    } else if (T == NasFile) {
+    if (T == NasFile) {
       return NasFile.fromJson(data);
     } else if (T == NasDocument) {
       return NasDocument.fromJson(data);
@@ -45,9 +43,7 @@ class DataFetcher {
   }
 
   _toObject<T>(dynamic data) {
-    if (T == RootFolder) {
-      return RootFolder.fromJson(data);
-    } else if (T == NasFile) {
+    if (T == NasFile) {
       return NasFile.fromJson(data);
     } else if (T == NasDocument) {
       return NasDocument.fromJson(data);
@@ -58,10 +54,16 @@ class DataFetcher {
     }
   }
 
+  Future<void> _getURL() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    this.url = "${prefs.getString("url")}${this.url}";
+  }
+
   /// Fetch one object
   Future<T> fetchOne<T>({int id}) async {
     try {
       Response response;
+      await _getURL();
       if (id == null) {
         response = await this.networkProvider.get("$url");
       } else {
@@ -77,6 +79,7 @@ class DataFetcher {
   /// Fetch list of objects
   Future<List<T>> fetch<T>() async {
     try {
+      await _getURL();
       Response<List> response = await this.networkProvider.get("$url");
       List<T> data = response.data.map((d) => _getObject<T>(d)).toList();
 
@@ -90,6 +93,7 @@ class DataFetcher {
   /// update one object
   Future<T> update<T>(int id, dynamic data) async {
     try {
+      await _getURL();
       Response response =
           await this.networkProvider.patch("$url$id/", data: data);
       return _getObject<T>(response.data);
@@ -102,6 +106,7 @@ class DataFetcher {
   /// delete one object
   Future delete<T>(int id) async {
     try {
+      await _getURL();
       Response response = await this.networkProvider.delete("$url$id/");
       return;
     } catch (err) {
@@ -111,9 +116,12 @@ class DataFetcher {
   }
 
   /// create one object
-  Future<T> create<T>(Map<String, dynamic> data) async {
+  Future<T> create<T>(dynamic data, {ProgressCallback callback}) async {
     try {
-      Response response = await this.networkProvider.post("$url", data: data);
+      await _getURL();
+      Response response = await this
+          .networkProvider
+          .post("$url", data: data, onSendProgress: callback);
       return _getObject<T>(response.data);
     } catch (err) {
       print(err);

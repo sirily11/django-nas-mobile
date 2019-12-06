@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:django_nas_mobile/home/components/CreateNewDocumentView.dart';
 import 'package:django_nas_mobile/home/components/CreateNewFolderView.dart';
+import 'package:django_nas_mobile/models/NasProvider.dart';
 import 'package:django_nas_mobile/models/UploadProvider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,8 @@ class CreateNewButton extends StatelessWidget {
 
   void _onSelected(int selection, BuildContext context) async {
     UploadProvider uploadProvider = Provider.of(context);
+    NasProvider nasProvider = Provider.of(context);
+
     if (selection == 0) {
       Navigator.push(
         context,
@@ -31,13 +34,23 @@ class CreateNewButton extends StatelessWidget {
       );
     } else if (selection == 2) {
       List<File> files = await FilePicker.getMultiFile();
-      uploadProvider.addItems(files.map((f) => UploadItem(file: f)).toList());
+      var data = await uploadProvider.addItems(files
+          .map((f) => UploadItem(file: f, parent: nasProvider.currentFolder.id))
+          .toList());
+      nasProvider.currentFolder.files.addAll(data);
+      nasProvider.update();
     } else if (selection == 3) {
       var image = await ImagePicker.pickImage(source: ImageSource.gallery);
-      uploadProvider.addItem(UploadItem(file: image));
+      var data = await uploadProvider.addItem(
+          UploadItem(file: image, parent: nasProvider.currentFolder.id));
+      nasProvider.currentFolder.files.add(data);
+      nasProvider.update();
     } else {
       var video = await ImagePicker.pickVideo(source: ImageSource.gallery);
-      uploadProvider.addItem(UploadItem(file: video));
+      var data = await uploadProvider.addItem(
+          UploadItem(file: video, parent: nasProvider.currentFolder.id));
+      nasProvider.currentFolder.files.add(data);
+      nasProvider.update();
     }
   }
 

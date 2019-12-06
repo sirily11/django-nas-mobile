@@ -1,28 +1,58 @@
 import 'dart:io';
 
+import 'package:dio/dio.dart';
+import 'package:django_nas_mobile/models/Folder.dart';
+import 'package:django_nas_mobile/models/NasProvider.dart';
 import 'package:flutter/material.dart';
 
 class UploadItem {
   File file;
   double progress;
-
-  UploadItem({this.file, this.progress});
+  int parent;
+  UploadItem({@required this.file, this.progress, @required this.parent});
 }
 
 class UploadProvider extends ChangeNotifier {
   List<UploadItem> items = [];
 
-  addItem(UploadItem item) {
+  Future<NasFile> addItem(UploadItem item) async {
     items.add(item);
     notifyListeners();
+    return await uploadItem(item);
   }
 
-  addItems(List<UploadItem> items) {
-    items.addAll(items);
-  }
-
-  removeItem(UploadItem item) {
-    items.removeWhere((i) => i.file == item.file);
+  Future<List<NasFile>> addItems(List<UploadItem> items) async {
+    this.items.addAll(items);
     notifyListeners();
+    List<NasFile> l = [];
+    for (var i in items) {
+      var data = await this.uploadItem(i);
+      l.add(data);
+    }
+    return l;
+  }
+
+  Future<NasFile> uploadItem(UploadItem item) async {
+    FormData data = FormData.fromMap({
+      "parent": item.parent,
+      "file": await MultipartFile.fromFile(item.file.path)
+    });
+    var res = await DataFetcher(url: fileUrl).create<NasFile>(data,
+        callback: (count, total) {
+      double progress = (100 * (count / total));
+      item.progress = progress;
+      notifyListeners();
+    });
+    item.progress = 100;
+    notifyListeners();
+    return res;
+  }
+
+  /// Only remove the file which has been uploaded
+  removeItem(UploadItem item) {
+    if (item.progress == 100) {
+      items.removeWhere((i) => i.file == item.file);
+      notifyListeners();
+    }
   }
 }
