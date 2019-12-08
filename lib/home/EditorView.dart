@@ -6,6 +6,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:quill_delta/quill_delta.dart';
 import 'package:zefyr/zefyr.dart';
 import 'dart:convert';
+import 'package:django_nas_mobile/models/utils.dart';
 
 class EditorView extends StatefulWidget {
   final int id;
@@ -67,7 +68,7 @@ class EditorViewState extends State<EditorView> {
               _controller = jsonData != null
                   ? ZefyrController(
                       NotusDocument.fromJson(
-                        _convertFromQuil(jsonData),
+                        convertFromQuill(jsonData),
                       ),
                     )
                   : ZefyrController(
@@ -86,85 +87,10 @@ class EditorViewState extends State<EditorView> {
     );
   }
 
-  List<dynamic> _convertToQuill() {
-    List<dynamic> data = json.decode(json.encode(_controller.document));
-    for (var entry in data) {
-      if (entry.containsKey("attributes")) {
-        Map<String, dynamic> attibutes = entry['attributes'];
-        Map<String, dynamic> copy = Map.from(entry['attributes']);
-        attibutes.forEach((k, v) {
-          switch (k) {
-            case "i":
-              copy['italic'] = v;
-              break;
-            case "b":
-              copy['bold'] = v;
-              break;
-            case "a":
-              copy['link'] = v;
-              break;
-            case "heading":
-              copy['header'] = v;
-              break;
-
-            case "block":
-              if (v == "ol") {
-                copy['list'] = "ordered";
-              } else if (v == "ul") {
-                copy['list'] = 'bullet';
-              }
-              break;
-              break;
-          }
-        });
-        entry['attributes'] = copy;
-      }
-    }
-    return data;
-  }
-
-  List<dynamic> _convertFromQuil(List<dynamic> data) {
-    for (var entry in data) {
-      if (entry.containsKey("attributes")) {
-        Map<String, dynamic> attibutes = entry['attributes'];
-        Map<String, dynamic> copy = Map.from(entry['attributes']);
-        attibutes.forEach((k, v) {
-          switch (k) {
-            case "italic":
-              copy['i'] = v;
-              break;
-            case "bold":
-              copy['b'] = v;
-              break;
-            case "link":
-              copy['a'] = v;
-
-              break;
-            case "header":
-              copy['heading'] = v;
-              break;
-            case "list":
-              if (v == "ordered") {
-                copy['block'] = "ol";
-              } else {
-                copy['block'] = 'ul';
-              }
-              break;
-            default:
-              break;
-          }
-          copy.remove(k);
-        });
-        entry['attributes'] = copy;
-      }
-    }
-    return data;
-  }
-
   Future<void> _saveDocument() async {
     if (_controller != null) {
       try {
-        final contents = jsonEncode(_convertToQuill());
+        final contents = jsonEncode(convertToQuill(_controller.document));
         await DataFetcher(url: documentUrl)
             .update<NasDocument>(widget.id, {"content": contents});
         key.currentState.showSnackBar(
