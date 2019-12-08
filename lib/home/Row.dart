@@ -25,20 +25,11 @@ class ParentFolderRow extends StatelessWidget {
         var parentID = nasProvider.currentFolder.parent;
         try {
           if (data is NasFolder) {
-            var result = await DataFetcher(url: folderUrl)
-                .update<NasFolder>(data.id, {"parent": parentID});
-            nasProvider.currentFolder.folders
-                .removeWhere((f) => f.id == result.id);
+            await nasProvider.moveFolderBack(data, parentID);
           } else if (data is NasFile) {
-            var result = await DataFetcher(url: fileUrl)
-                .update<NasFile>(data.id, {"parent": parentID});
-            nasProvider.currentFolder.files
-                .removeWhere((f) => f.id == result.id);
+            await nasProvider.moveFileBack(data, parentID);
           } else if (data is NasDocument) {
-            var result = await DataFetcher(url: documentUrl)
-                .update<NasDocument>(data.id, {"parent": parentID});
-            nasProvider.currentFolder.documents
-                .removeWhere((d) => d.id == result.id);
+            await nasProvider.moveDocumentBack(data, parentID);
           } else {
             print("File type is not supported");
           }
@@ -108,9 +99,7 @@ class FileRow extends StatelessWidget {
           IconSlideAction(
             onTap: () async {
               NasProvider provider = Provider.of(context);
-              await DataFetcher(url: fileUrl).delete<NasFile>(file.id);
-              provider.currentFolder.files.removeWhere((f) => f.id == file.id);
-              provider.update();
+              await provider.deleteFile(file);
             },
             icon: Icons.delete,
             caption: "Delete",
@@ -130,9 +119,14 @@ class FileRow extends StatelessWidget {
               );
             } else if (VIDEOS
                 .contains(p.extension(file.filename).toLowerCase())) {
-              if (await canLaunch(file.file)) {
-                await launch(file.file);
-              }
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) {
+                  return VideoView(
+                    name: p.basename(file.filename),
+                    url: file.file,
+                  );
+                }),
+              );
             } else {
               if (await canLaunch(file.file)) {
                 await launch(file.file);
@@ -163,24 +157,14 @@ class FolderRow extends StatelessWidget {
         NasProvider nasProvider = Provider.of(context);
         try {
           if (data is NasFolder && data.id != folder.id) {
-            var result = await DataFetcher(url: folderUrl)
-                .update<NasFolder>(data.id, {"parent": folder.id});
-            nasProvider.currentFolder.folders
-                .removeWhere((f) => f.id == result.id);
+            await nasProvider.moveFolderTo(data, folder.id);
           } else if (data is NasFile) {
-            var result = await DataFetcher(url: fileUrl)
-                .update<NasFile>(data.id, {"parent": folder.id});
-            nasProvider.currentFolder.files
-                .removeWhere((f) => f.id == result.id);
+            await nasProvider.moveFileTo(data, folder.id);
           } else if (data is NasDocument) {
-            var result = await DataFetcher(url: documentUrl)
-                .update<NasDocument>(data.id, {"parent": folder.id});
-            nasProvider.currentFolder.documents
-                .removeWhere((d) => d.id == result.id);
+            await nasProvider.moveDocumentTo(data, folder.id);
           } else {
             print("File type is not supported");
           }
-          nasProvider.update();
         } catch (err) {
           showDialog(
             context: context,
@@ -221,10 +205,7 @@ class FolderRow extends StatelessWidget {
           IconSlideAction(
             onTap: () async {
               NasProvider provider = Provider.of(context);
-              await DataFetcher(url: folderUrl).delete<NasFolder>(folder.id);
-              provider.currentFolder.folders
-                  .removeWhere((f) => f.id == folder.id);
-              provider.update();
+              await provider.deleteFolder(folder);
             },
             icon: Icons.delete,
             caption: "Delete",
@@ -317,11 +298,7 @@ class DocumentRow extends StatelessWidget {
           IconSlideAction(
             onTap: () async {
               NasProvider provider = Provider.of(context);
-              await DataFetcher(url: documentUrl)
-                  .delete<NasDocument>(document.id);
-              provider.currentFolder.documents
-                  .removeWhere((d) => d.id == document.id);
-              provider.update();
+              await provider.deleteDocument(document);
             },
             icon: Icons.delete,
             caption: "Delete",

@@ -25,14 +25,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     Future.delayed(Duration(milliseconds: 30)).then((_) async {
       NasProvider provider = Provider.of(context);
-      provider.isLoading = true;
-      provider.update();
-      NasFolder folder = await DataFetcher(url: folderUrl)
-          .fetchOne<NasFolder>(id: widget.folderID);
-
-      provider.currentFolder = folder;
-      provider.isLoading = false;
-      provider.update();
+      await provider.goToNext(widget.folderID);
     });
   }
 
@@ -122,11 +115,7 @@ class _HomePageState extends State<HomePage> {
             ? IconButton(
                 color: Colors.black,
                 onPressed: () async {
-                  int parentID = provider.currentFolder.parent;
-                  var data = await DataFetcher(url: folderUrl)
-                      .fetchOne<NasFolder>(id: parentID);
-                  provider.currentFolder = data;
-                  provider.update();
+                  await provider.backToPrev();
                   Navigator.pop(context);
                 },
                 icon: Icon(Icons.arrow_back_ios),

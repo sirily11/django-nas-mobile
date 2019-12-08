@@ -35,10 +35,13 @@ class _CreateNewDocumentViewState extends State<CreateNewDocumentView> {
             IconButton(
               onPressed: () async {
                 try {
-                  NasDocument document = await DataFetcher(url: documentUrl)
-                      .create<NasDocument>(
-                          {"name": controller.text, "parent": widget.parent});
                   NasProvider provider = Provider.of(context);
+                  NasDocument document = await DataFetcher(url: documentUrl)
+                      .create<NasDocument>({
+                    "name": controller.text,
+                    "parent": provider.currentFolder.id
+                  });
+
                   provider.currentFolder.documents.add(document);
                   provider.update();
                   Navigator.pop(context);

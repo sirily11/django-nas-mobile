@@ -35,10 +35,12 @@ class _CreateNewFolderViewState extends State<CreateNewFolderView> {
             IconButton(
               onPressed: () async {
                 try {
-                  var data = await DataFetcher(url: folderUrl)
-                      .create<NasFolder>(
-                          {"name": controller.text, "parent": widget.parent});
                   NasProvider provider = Provider.of(context);
+                  var data = await DataFetcher(url: folderUrl)
+                      .create<NasFolder>({
+                    "name": controller.text,
+                    "parent": provider.currentFolder.id
+                  });
                   provider.currentFolder.folders.add(data);
                   provider.update();
                   Navigator.pop(context);

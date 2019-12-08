@@ -9,10 +9,126 @@ String documentUrl = "/api/document/";
 String editorUrl = "/#/edit/";
 
 class NasProvider extends ChangeNotifier {
+  List<NasFolder> parents = [];
   NasFolder currentFolder;
   bool isLoading = false;
 
   void update() {
+    notifyListeners();
+  }
+
+  /// Delete file.
+  /// [NasFile file] file you want to delete
+  Future<void> deleteFile(NasFile file) async {
+    try {
+      await DataFetcher(url: fileUrl).delete<NasFile>(file.id);
+      currentFolder.files.removeWhere((f) => f.id == file.id);
+    } catch (err) {} finally {
+      notifyListeners();
+    }
+  }
+
+  Future<void> deleteDocument(NasDocument document) async {
+    try {
+      await DataFetcher(url: documentUrl).delete<NasDocument>(document.id);
+      currentFolder.documents.removeWhere((d) => d.id == document.id);
+    } catch (err) {} finally {
+      notifyListeners();
+    }
+  }
+
+  Future<void> deleteFolder(NasFolder folder) async {
+    try {
+      await DataFetcher(url: folderUrl).delete<NasFolder>(folder.id);
+      currentFolder.folders.removeWhere((d) => d.id == folder.id);
+    } catch (err) {} finally {
+      notifyListeners();
+    }
+  }
+
+  /// Move Folder to its parent
+  /// If parent is null, then nothing would happen
+  Future<void> moveFolderBack(NasFolder folder, int parent) async {
+    try {
+      var response = await DataFetcher(url: folderUrl)
+          .update<NasFolder>(folder.id, {"parent": parent});
+      parents[parents.length - 2]?.folders?.add(response);
+      currentFolder.folders.removeWhere((f) => f.id == folder.id);
+      notifyListeners();
+    } catch (err) {}
+  }
+
+  /// Move File to its parent
+  /// If parent is null, then nothing would happen
+  Future<void> moveFileBack(NasFile file, int parent) async {
+    try {
+      var response = await DataFetcher(url: fileUrl)
+          .update<NasFile>(file.id, {"parent": parent});
+      parents[parents.length - 2]?.files?.add(response);
+      currentFolder.files.removeWhere((f) => f.id == file.id);
+      notifyListeners();
+    } catch (err) {}
+  }
+
+  /// Move Document to its parent
+  /// If parent is null, then nothing would happen
+  Future<void> moveDocumentBack(NasDocument document, int parent) async {
+    try {
+      var response = await DataFetcher(url: documentUrl)
+          .update<NasDocument>(document.id, {"parent": parent});
+      parents[parents.length - 2]?.documents?.add(response);
+      currentFolder.documents.removeWhere((d) => d.id == document.id);
+      notifyListeners();
+    } catch (err) {}
+  }
+
+  /// Move folder to current folder child
+  Future<void> moveFolderTo(NasFolder folder, int target) async {
+    try {
+      var response = await DataFetcher(url: folderUrl)
+          .update<NasFolder>(folder.id, {"parent": target});
+      currentFolder.folders.removeWhere((f) => f.id == folder.id);
+      notifyListeners();
+    } catch (err) {}
+  }
+
+  /// Move file to current folder child
+  Future<void> moveFileTo(NasFile file, int target) async {
+    try {
+      var response = await DataFetcher(url: fileUrl)
+          .update<NasFile>(file.id, {"parent": target});
+      currentFolder.files.removeWhere((f) => f.id == file.id);
+      notifyListeners();
+    } catch (err) {}
+  }
+
+  /// Move document to current folder child
+  Future<void> moveDocumentTo(NasDocument document, int target) async {
+    try {
+      var response = await DataFetcher(url: documentUrl)
+          .update<NasDocument>(document.id, {"parent": target});
+      currentFolder.documents.removeWhere((d) => d.id == document.id);
+      notifyListeners();
+    } catch (err) {}
+  }
+
+  Future<void> goToNext(int id) async {
+    try {
+      isLoading = true;
+      notifyListeners();
+      var folder =
+          await DataFetcher(url: folderUrl).fetchOne<NasFolder>(id: id);
+      currentFolder = folder;
+      parents.add(folder);
+    } catch (err) {} finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> backToPrev() async {
+    parents.removeLast();
+    currentFolder = parents.last;
     notifyListeners();
   }
 }
