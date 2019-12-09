@@ -25,6 +25,8 @@ class _SettingPageState extends State<SettingPage> {
 
   @override
   Widget build(BuildContext context) {
+    NasProvider provider = Provider.of(context);
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(
@@ -49,6 +51,17 @@ class _SettingPageState extends State<SettingPage> {
                     provider.currentFolder = data;
                     provider.isLoading = false;
                     provider.update();
+                    showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                              content: Text("Server set"),
+                              actions: <Widget>[
+                                FlatButton(
+                                  child: Text("ok"),
+                                  onPressed: () => Navigator.pop(context),
+                                )
+                              ],
+                            ));
                   } catch (err) {
                     showDialog(
                       context: context,

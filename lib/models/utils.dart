@@ -11,23 +11,25 @@ import 'package:zefyr/zefyr.dart';
 /// if size >= 1024 gb, then returns in TB
 /// if size >= 1024 TB, then returns in PB
 String getSize(double size) {
-  if (size >= pow(1024, 1)) {
+  if (size == 0) {
+    return "Empty";
+  } else if (size >= pow(1024, 1) && size < pow(1024, 2)) {
     String sizeStr = (size / pow(1024, 1)).toStringAsFixed(2);
     return "$sizeStr KB";
-  } else if (size >= pow(1024, 2)) {
+  } else if (size >= pow(1024, 2) && size < pow(1024, 3)) {
     String sizeStr = (size / pow(1024, 2)).toStringAsFixed(2);
     return "$sizeStr MB";
-  } else if (size >= pow(1024, 3)) {
+  } else if (size >= pow(1024, 3) && size < pow(1024, 4)) {
     String sizeStr = (size / pow(1024, 3)).toStringAsFixed(2);
     return "$sizeStr GB";
-  } else if (size >= pow(1024, 4)) {
+  } else if (size >= pow(1024, 4) && size < pow(1024, 5)) {
     String sizeStr = (size / pow(1024, 4)).toStringAsFixed(2);
     return "$sizeStr TB";
   } else if (size >= pow(1024, 5)) {
     String sizeStr = (size / pow(1024, 5)).toStringAsFixed(2);
     return "$sizeStr PB";
   }
-  return "$size bytes";
+  return "${size.toStringAsFixed(2)} bytes";
 }
 
 /// Convert quill data from Quill  to flutter quill data

@@ -4,6 +4,7 @@ import 'package:django_nas_mobile/home/ImageView.dart';
 import 'package:django_nas_mobile/home/VideoView.dart';
 import 'package:django_nas_mobile/models/Folder.dart';
 import 'package:django_nas_mobile/models/NasProvider.dart';
+import 'package:django_nas_mobile/models/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:path/path.dart' as p;
@@ -135,7 +136,7 @@ class FileRow extends StatelessWidget {
           },
           leading: _renderIcon(path: file.filename),
           title: Text(p.basename(file.filename)),
-          subtitle: Text("${(file.size / 1024 / 1024).toStringAsFixed(2)}MB"),
+          subtitle: Text(getSize(file.size)),
           trailing: IconButton(
             icon: Icon(Icons.more_horiz),
           ),
@@ -265,8 +266,7 @@ class FolderRow extends StatelessWidget {
             width: 40,
           ),
           title: Text(folder.name),
-          subtitle:
-              Text("${(folder.totalSize / 1024 / 1024).toStringAsFixed(2)}MB"),
+          subtitle: Text(getSize(folder.totalSize)),
           trailing: IconButton(
             icon: Icon(Icons.more_horiz),
           ),
