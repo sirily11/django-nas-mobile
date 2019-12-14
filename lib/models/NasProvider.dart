@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:dio/dio.dart';
 import 'package:django_nas_mobile/models/Folder.dart';
 import 'package:flutter/material.dart';
@@ -12,16 +14,34 @@ class NasProvider extends ChangeNotifier {
   List<NasFolder> parents = [];
   NasFolder currentFolder;
   bool isLoading = false;
+  Dio networkProvider;
+  SharedPreferences preferences;
+
+  NasProvider({Dio networkProvider, SharedPreferences preferences}) {
+    this.networkProvider = networkProvider ?? Dio();
+    this.preferences = preferences;
+  }
 
   void update() {
     notifyListeners();
+  }
+
+  /// sey base url
+  Future<void> setURL(String url) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString("url", url);
+    await this.fetchFolder(null);
   }
 
   /// Delete file.
   /// [NasFile file] file you want to delete
   Future<void> deleteFile(NasFile file) async {
     try {
-      await DataFetcher(url: fileUrl).delete<NasFile>(file.id);
+      await DataFetcher(
+              url: fileUrl,
+              networkProvider: this.networkProvider,
+              preferences: this.preferences)
+          .delete<NasFile>(file.id);
       currentFolder.files.removeWhere((f) => f.id == file.id);
     } catch (err) {} finally {
       notifyListeners();
@@ -30,7 +50,11 @@ class NasProvider extends ChangeNotifier {
 
   Future<void> deleteDocument(NasDocument document) async {
     try {
-      await DataFetcher(url: documentUrl).delete<NasDocument>(document.id);
+      await DataFetcher(
+              url: documentUrl,
+              networkProvider: this.networkProvider,
+              preferences: this.preferences)
+          .delete<NasDocument>(document.id);
       currentFolder.documents.removeWhere((d) => d.id == document.id);
     } catch (err) {} finally {
       notifyListeners();
@@ -39,7 +63,11 @@ class NasProvider extends ChangeNotifier {
 
   Future<void> deleteFolder(NasFolder folder) async {
     try {
-      await DataFetcher(url: folderUrl).delete<NasFolder>(folder.id);
+      await DataFetcher(
+              url: folderUrl,
+              networkProvider: this.networkProvider,
+              preferences: this.preferences)
+          .delete<NasFolder>(folder.id);
       currentFolder.folders.removeWhere((d) => d.id == folder.id);
     } catch (err) {} finally {
       notifyListeners();
@@ -50,7 +78,10 @@ class NasProvider extends ChangeNotifier {
   /// If parent is null, then nothing would happen
   Future<void> moveFolderBack(NasFolder folder, int parent) async {
     try {
-      var response = await DataFetcher(url: folderUrl)
+      var response = await DataFetcher(
+              url: folderUrl,
+              networkProvider: this.networkProvider,
+              preferences: this.preferences)
           .update<NasFolder>(folder.id, {"parent": parent});
       parents[parents.length - 2]?.folders?.add(response);
       currentFolder.folders.removeWhere((f) => f.id == folder.id);
@@ -62,7 +93,10 @@ class NasProvider extends ChangeNotifier {
   /// If parent is null, then nothing would happen
   Future<void> moveFileBack(NasFile file, int parent) async {
     try {
-      var response = await DataFetcher(url: fileUrl)
+      var response = await DataFetcher(
+              url: fileUrl,
+              networkProvider: this.networkProvider,
+              preferences: this.preferences)
           .update<NasFile>(file.id, {"parent": parent});
       parents[parents.length - 2]?.files?.add(response);
       currentFolder.files.removeWhere((f) => f.id == file.id);
@@ -74,7 +108,10 @@ class NasProvider extends ChangeNotifier {
   /// If parent is null, then nothing would happen
   Future<void> moveDocumentBack(NasDocument document, int parent) async {
     try {
-      var response = await DataFetcher(url: documentUrl)
+      var response = await DataFetcher(
+              url: documentUrl,
+              networkProvider: this.networkProvider,
+              preferences: this.preferences)
           .update<NasDocument>(document.id, {"parent": parent});
       parents[parents.length - 2]?.documents?.add(response);
       currentFolder.documents.removeWhere((d) => d.id == document.id);
@@ -85,7 +122,10 @@ class NasProvider extends ChangeNotifier {
   /// Move folder to current folder child
   Future<void> moveFolderTo(NasFolder folder, int target) async {
     try {
-      var response = await DataFetcher(url: folderUrl)
+      var response = await DataFetcher(
+              url: folderUrl,
+              networkProvider: this.networkProvider,
+              preferences: this.preferences)
           .update<NasFolder>(folder.id, {"parent": target});
       currentFolder.folders.removeWhere((f) => f.id == folder.id);
       notifyListeners();
@@ -95,7 +135,10 @@ class NasProvider extends ChangeNotifier {
   /// Move file to current folder child
   Future<void> moveFileTo(NasFile file, int target) async {
     try {
-      var response = await DataFetcher(url: fileUrl)
+      var response = await DataFetcher(
+              url: fileUrl,
+              networkProvider: this.networkProvider,
+              preferences: this.preferences)
           .update<NasFile>(file.id, {"parent": target});
       currentFolder.files.removeWhere((f) => f.id == file.id);
       notifyListeners();
@@ -105,19 +148,27 @@ class NasProvider extends ChangeNotifier {
   /// Move document to current folder child
   Future<void> moveDocumentTo(NasDocument document, int target) async {
     try {
-      var response = await DataFetcher(url: documentUrl)
+      var response = await DataFetcher(
+              url: documentUrl,
+              networkProvider: this.networkProvider,
+              preferences: this.preferences)
           .update<NasDocument>(document.id, {"parent": target});
       currentFolder.documents.removeWhere((d) => d.id == document.id);
       notifyListeners();
     } catch (err) {}
   }
 
-  Future<void> goToNext(int id) async {
+  /// fetch folder
+  /// if [id] is null, then fetch root folder
+  Future<void> fetchFolder(int id) async {
     try {
       isLoading = true;
       notifyListeners();
-      var folder =
-          await DataFetcher(url: folderUrl).fetchOne<NasFolder>(id: id);
+      var folder = await DataFetcher(
+              url: folderUrl,
+              networkProvider: this.networkProvider,
+              preferences: this.preferences)
+          .fetchOne<NasFolder>(id: id);
       currentFolder = folder;
       parents.add(folder);
     } catch (err) {} finally {
@@ -140,9 +191,15 @@ class DataFetcher {
 
   /// Network provider
   Dio networkProvider;
+  //
+  SharedPreferences preferences;
 
-  DataFetcher({@required String url, Dio networkProvider}) {
+  DataFetcher(
+      {@required String url,
+      Dio networkProvider,
+      SharedPreferences preferences}) {
     this.networkProvider = networkProvider ?? Dio();
+    this.preferences = preferences ?? null;
     this.url = url;
   }
 
@@ -171,8 +228,10 @@ class DataFetcher {
   }
 
   Future<void> _getURL() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    this.url = "${prefs.getString("url")}${this.url}";
+    if (this.preferences == null) {
+      this.preferences = await SharedPreferences.getInstance();
+    }
+    this.url = "${this.preferences.getString("url") ?? ""}${this.url}";
   }
 
   /// Fetch one object

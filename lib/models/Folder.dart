@@ -135,32 +135,33 @@ class NasFile extends BaseElement {
   String file;
   String objectType;
   String filename;
+  String transcodeFilepath;
 
-  NasFile({
-    this.id,
-    this.createdAt,
-    this.parent,
-    this.description,
-    this.user,
-    this.size,
-    this.modifiedAt,
-    this.file,
-    this.objectType,
-    this.filename,
-  });
+  NasFile(
+      {this.id,
+      this.createdAt,
+      this.parent,
+      this.description,
+      this.user,
+      this.size,
+      this.modifiedAt,
+      this.file,
+      this.objectType,
+      this.filename,
+      this.transcodeFilepath});
 
   factory NasFile.fromJson(Map<String, dynamic> json) => NasFile(
-        id: json["id"],
-        createdAt: DateTime.parse(json["created_at"]),
-        parent: json["parent"],
-        description: json["description"],
-        user: json["user"],
-        size: json["size"].toDouble(),
-        modifiedAt: DateTime.parse(json["modified_at"]),
-        file: json["file"],
-        objectType: json["object_type"],
-        filename: json["filename"],
-      );
+      id: json["id"],
+      createdAt: DateTime.parse(json["created_at"]),
+      parent: json["parent"],
+      description: json["description"],
+      user: json["user"],
+      size: json["size"].toDouble(),
+      modifiedAt: DateTime.parse(json["modified_at"]),
+      file: json["file"],
+      objectType: json["object_type"],
+      filename: json["filename"],
+      transcodeFilepath: json['transcode_filepath']);
 
   Map<String, dynamic> toJson() => {
         "id": id,

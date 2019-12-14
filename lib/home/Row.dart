@@ -120,11 +120,26 @@ class FileRow extends StatelessWidget {
               );
             } else if (VIDEOS
                 .contains(p.extension(file.filename).toLowerCase())) {
+              if (file.transcodeFilepath == null) {
+                showDialog(
+                  context: context,
+                  builder: (c) => AlertDialog(
+                    content: Text("Playback is not ready"),
+                    actions: <Widget>[
+                      FlatButton(
+                        child: Text("OK"),
+                        onPressed: () => Navigator.pop(context),
+                      )
+                    ],
+                  ),
+                );
+                return;
+              }
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (context) {
                   return VideoView(
                     name: p.basename(file.filename),
-                    url: file.file,
+                    url: file.transcodeFilepath ?? "",
                   );
                 }),
               );

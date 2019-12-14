@@ -25,7 +25,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     Future.delayed(Duration(milliseconds: 30)).then((_) async {
       NasProvider provider = Provider.of(context);
-      await provider.goToNext(widget.folderID);
+      await provider.fetchFolder(widget.folderID);
     });
   }
 

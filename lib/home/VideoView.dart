@@ -19,13 +19,10 @@ class _VideoViewState extends State<VideoView> {
   @override
   void initState() {
     super.initState();
-    _videoPlayerController1 = VideoPlayerController.network(widget.url);
-    _chewieController = ChewieController(
-      videoPlayerController: _videoPlayerController1,
-      aspectRatio: 3 / 2,
-      autoPlay: true,
-      looping: false,
-    );
+    _videoPlayerController1 = VideoPlayerController.network(widget.url)
+      ..initialize().then((_) {
+        setState(() {});
+      });
   }
 
   @override
@@ -45,12 +42,29 @@ class _VideoViewState extends State<VideoView> {
         children: <Widget>[
           Expanded(
             child: Center(
-              child: Chewie(
-                controller: _chewieController,
-              ),
+              child: _videoPlayerController1.value.initialized
+                  ? AspectRatio(
+                      aspectRatio: _videoPlayerController1.value.aspectRatio,
+                      child: VideoPlayer(_videoPlayerController1),
+                    )
+                  : Container(),
             ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          setState(() {
+            _videoPlayerController1.value.isPlaying
+                ? _videoPlayerController1.pause()
+                : _videoPlayerController1.play();
+          });
+        },
+        child: Icon(
+          _videoPlayerController1.value.isPlaying
+              ? Icons.pause
+              : Icons.play_arrow,
+        ),
       ),
     );
   }

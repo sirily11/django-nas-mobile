@@ -42,15 +42,8 @@ class _SettingPageState extends State<SettingPage> {
                 child: Text("Submit"),
                 onPressed: () async {
                   try {
-                    SharedPreferences prefs =
-                        await SharedPreferences.getInstance();
-                    prefs.setString("url", controller.text);
                     NasProvider provider = Provider.of(context);
-                    var data =
-                        await DataFetcher(url: folderUrl).fetchOne<NasFolder>();
-                    provider.currentFolder = data;
-                    provider.isLoading = false;
-                    provider.update();
+                    await provider.setURL(controller.text);
                     showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
