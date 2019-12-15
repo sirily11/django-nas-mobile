@@ -30,6 +30,9 @@ class NasProvider extends ChangeNotifier {
       } else if (Platform.isMacOS) {
         Hive.init(Directory.current.path);
       }
+      Hive.openBox('settings').then((box) {
+        this.box = box;
+      });
     }
   }
 
@@ -37,13 +40,12 @@ class NasProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// sey base url
+  /// set base url
   Future<void> setURL(String url) async {
-    // SharedPreferences prefs = await SharedPreferences.getInstance();
-    // prefs.setString("url", url);
-    var box = await Hive.openBox('settings');
-    box.put("url", url);
+    this.box.put("url", url);
+    currentFolder = null;
     await this.fetchFolder(null);
+    parents = [];
   }
 
   /// Delete file.

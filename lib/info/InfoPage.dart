@@ -26,7 +26,7 @@ class InfoPage extends StatelessWidget {
           InfoCard(
             cardName: "Disk",
             title: "Used",
-            title2: "Free",
+            title2: "Total",
             data1: getSize(info.disk.used.toDouble()),
             data2: getSize(info.disk.total.toDouble()),
             unit: "",
@@ -34,7 +34,7 @@ class InfoPage extends StatelessWidget {
           InfoCard(
             cardName: "Memory",
             title: "Used",
-            title2: "Free",
+            title2: "Total",
             data1: getSize(info.memory.used.toDouble()),
             data2: getSize(info.memory.total.toDouble()),
             unit: "",

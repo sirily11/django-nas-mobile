@@ -72,22 +72,26 @@ class FileRow extends StatelessWidget {
     if (IMAGES.contains(p.extension(path).toLowerCase())) {
       return Image.asset(
         "assets/icons/picture.png",
+        key: Key("image-$path"),
         width: 40,
       );
     } else if (VIDEOS.contains(p.extension(path).toLowerCase())) {
       return file.cover != null
           ? Image.network(
               file.cover,
+              key: Key("video-$path"),
               width: 40,
               fit: BoxFit.cover,
             )
           : Image.asset(
               "assets/icons/player.png",
+              key: Key("video-$path"),
               width: 40,
             );
     }
     return Image.asset(
       "assets/icons/file.png",
+      key: Key("file-$path"),
       width: 40,
     );
   }

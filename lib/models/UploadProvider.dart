@@ -9,6 +9,7 @@ class UploadItem {
   File file;
   double progress;
   int parent;
+  bool isDone = false;
   UploadItem({@required this.file, this.progress, @required this.parent});
 }
 
@@ -39,18 +40,20 @@ class UploadProvider extends ChangeNotifier {
     });
     var res = await DataFetcher(url: fileUrl).create<NasFile>(data,
         callback: (count, total) {
-      double progress = (100 * (count / total));
+      double progress = (count / total);
+
       item.progress = progress;
       notifyListeners();
     });
-    item.progress = 100;
+    item.progress = 1;
+    item.isDone = true;
     notifyListeners();
     return res;
   }
 
   /// Only remove the file which has been uploaded
   removeItem(UploadItem item) {
-    if (item.progress == 100) {
+    if (item.isDone) {
       items.removeWhere((i) => i.file == item.file);
       notifyListeners();
     }

@@ -38,7 +38,6 @@ class _SettingPageState extends State<SettingPage> {
 
   @override
   Widget build(BuildContext context) {
-    NasProvider provider = Provider.of(context);
 
     return Padding(
       padding: const EdgeInsets.all(8.0),

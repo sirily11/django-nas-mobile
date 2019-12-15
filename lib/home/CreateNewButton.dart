@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:django_nas_mobile/PlatformWidget.dart';
 import 'package:django_nas_mobile/home/components/CreateNewDocumentView.dart';
 import 'package:django_nas_mobile/home/components/CreateNewFolderView.dart';
 import 'package:django_nas_mobile/models/NasProvider.dart';
@@ -8,6 +8,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:file_chooser/file_chooser.dart';
 
 class CreateNewButton extends StatelessWidget {
   final Color color;
@@ -56,8 +57,49 @@ class CreateNewButton extends StatelessWidget {
     }
   }
 
+  void _onSelectedDesktop(int selection, BuildContext context) async {
+    UploadProvider uploadProvider = Provider.of(context);
+    NasProvider nasProvider = Provider.of(context);
+
+    if (selection == 0) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) {
+          return CreateNewFolderView();
+        }),
+      );
+    } else if (selection == 1) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) {
+          return CreateNewDocumentView();
+        }),
+      );
+    } else if (selection == 2) {
+      FileChooserResult result =
+          await showOpenPanel(allowsMultipleSelection: true);
+      if (!result.canceled) {
+        List<File> files = result.paths.map((p) => File(p)).toList();
+        var data = await uploadProvider.addItems(files
+            .map((f) =>
+                UploadItem(file: f, parent: nasProvider.currentFolder.id))
+            .toList());
+        nasProvider.currentFolder.files.addAll(data);
+        nasProvider.update();
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    return PlatformWidget(
+      desktop: buildPopupMenuButtonDesktop(context),
+      largeScreen: buildPopupMenuButtonDesktop(context),
+      mobile: buildPopupMenuButtonMobile(context),
+    );
+  }
+
+  PopupMenuButton<int> buildPopupMenuButtonMobile(BuildContext context) {
     return PopupMenuButton<int>(
       onSelected: (int selection) {
         this._onSelected(selection, context);
@@ -84,6 +126,34 @@ class CreateNewButton extends StatelessWidget {
             value: 4,
             child: Text("Upload video"),
           )
+        ];
+      },
+      icon: Icon(
+        Icons.add,
+        color: this.color,
+      ),
+    );
+  }
+
+  PopupMenuButton<int> buildPopupMenuButtonDesktop(BuildContext context) {
+    return PopupMenuButton<int>(
+      onSelected: (int selection) {
+        this._onSelectedDesktop(selection, context);
+      },
+      itemBuilder: (context) {
+        return [
+          PopupMenuItem(
+            value: 0,
+            child: Text("create new folder"),
+          ),
+          PopupMenuItem(
+            value: 1,
+            child: Text("create new document"),
+          ),
+          PopupMenuItem(
+            value: 2,
+            child: Text("Upload files"),
+          ),
         ];
       },
       icon: Icon(

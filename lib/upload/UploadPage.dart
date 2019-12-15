@@ -29,6 +29,12 @@ class UploadPage extends StatelessWidget {
             ),
           ],
           child: ListTile(
+            trailing: item.isDone
+                ? Icon(
+                    Icons.done,
+                    color: Colors.green,
+                  )
+                : null,
             leading: Icon(Icons.insert_drive_file),
             title: Text(p.basename(item.file.path)),
             subtitle: LinearProgressIndicator(

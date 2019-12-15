@@ -8,7 +8,10 @@ import 'package:django_nas_mobile/models/NasProvider.dart';
 
 class MockClient extends Mock implements Dio {}
 
-class MockBox extends Mock implements Box {}
+class MockBox extends Mock implements Box {
+  @override
+  bool get isOpen => true;
+}
 
 void main() {
   group("Data Fetcher Test", () {
@@ -223,7 +226,6 @@ void main() {
       when(client.patch("$folderUrl${folders[0]['id']}/")).thenAnswer(
         (_) async => Response<Map<String, dynamic>>(data: folders[1]),
       );
-
       provider = NasProvider(networkProvider: client, box: box);
     });
 
@@ -243,6 +245,32 @@ void main() {
       expect(provider.currentFolder.name, folders[0]['name']);
       expect(provider.isLoading, false);
       expect(provider.parents.length, 2);
+    });
+
+    test("Get URL", () async {
+      Box testBox = MockBox();
+      Dio testDio = MockClient();
+
+      when(testDio.get(any)).thenAnswer(
+        (_) async => Response<Map<String, dynamic>>(
+          data: folders[0],
+        ),
+      );
+      when(testBox.get(any)).thenReturn("testbase");
+
+      DataFetcher dataFetcher =
+          DataFetcher(box: testBox, url: "/test", networkProvider: testDio);
+      await dataFetcher.fetchOne<NasFolder>();
+      expect(dataFetcher.url, "testbase/test");
+    });
+
+    test("Set URL", () async {
+      provider.currentFolder = NasFolder.fromJson(folders[1]);
+      provider.parents.add(NasFolder.fromJson(folders[0]));
+      await provider.setURL("abc");
+      // clear parents
+      expect(provider.parents.length, 0);
+      verify(box.put(any, any)).called(1);
     });
   });
 }
