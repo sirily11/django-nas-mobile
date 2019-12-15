@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:django_nas_mobile/models/Folder.dart';
 import 'package:django_nas_mobile/models/NasProvider.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -16,11 +20,22 @@ class _SettingPageState extends State<SettingPage> {
   void initState() {
     super.initState();
     controller = TextEditingController();
-    SharedPreferences.getInstance().then((prefs) {
-      setState(() {
-        controller = TextEditingController(text: prefs.getString("url"));
+    if (Platform.isIOS || Platform.isAndroid) {
+      getApplicationDocumentsDirectory().then((dir) async {
+        Hive.init(dir.path);
+        var box = await Hive.openBox("settings");
+        setState(() {
+          controller = TextEditingController(text: box.get("url"));
+        });
       });
-    });
+    } else if (Platform.isMacOS) {
+      Hive.init(Directory.current.path);
+      Hive.openBox("settings").then((box) {
+        setState(() {
+          controller = TextEditingController(text: box.get("url"));
+        });
+      });
+    }
   }
 
   @override

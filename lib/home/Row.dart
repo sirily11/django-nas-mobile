@@ -75,10 +75,16 @@ class FileRow extends StatelessWidget {
         width: 40,
       );
     } else if (VIDEOS.contains(p.extension(path).toLowerCase())) {
-      return Image.asset(
-        "assets/icons/player.png",
-        width: 40,
-      );
+      return file.cover != null
+          ? Image.network(
+              file.cover,
+              width: 40,
+              fit: BoxFit.cover,
+            )
+          : Image.asset(
+              "assets/icons/player.png",
+              width: 40,
+            );
     }
     return Image.asset(
       "assets/icons/file.png",
@@ -120,29 +126,9 @@ class FileRow extends StatelessWidget {
               );
             } else if (VIDEOS
                 .contains(p.extension(file.filename).toLowerCase())) {
-              if (file.transcodeFilepath == null) {
-                showDialog(
-                  context: context,
-                  builder: (c) => AlertDialog(
-                    content: Text("Playback is not ready"),
-                    actions: <Widget>[
-                      FlatButton(
-                        child: Text("OK"),
-                        onPressed: () => Navigator.pop(context),
-                      )
-                    ],
-                  ),
-                );
-                return;
+              if (await canLaunch(file.file)) {
+                await launch(file.file);
               }
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) {
-                  return VideoView(
-                    name: p.basename(file.filename),
-                    url: file.transcodeFilepath ?? "",
-                  );
-                }),
-              );
             } else {
               if (await canLaunch(file.file)) {
                 await launch(file.file);

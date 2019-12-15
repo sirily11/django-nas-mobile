@@ -1,9 +1,10 @@
-import 'dart:ffi';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:django_nas_mobile/models/Folder.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
 
 String folderUrl = "/api/folder/";
 String fileUrl = "/api/file/";
@@ -15,11 +16,20 @@ class NasProvider extends ChangeNotifier {
   NasFolder currentFolder;
   bool isLoading = false;
   Dio networkProvider;
-  SharedPreferences preferences;
+  Box box;
 
-  NasProvider({Dio networkProvider, SharedPreferences preferences}) {
+  NasProvider({Dio networkProvider, Box box}) {
     this.networkProvider = networkProvider ?? Dio();
-    this.preferences = preferences;
+    this.box = box;
+    if (box == null) {
+      if (Platform.isIOS || Platform.isAndroid) {
+        getApplicationDocumentsDirectory().then((path) {
+          Hive.init(path.path);
+        });
+      } else if (Platform.isMacOS) {
+        Hive.init(Directory.current.path);
+      }
+    }
   }
 
   void update() {
@@ -28,8 +38,10 @@ class NasProvider extends ChangeNotifier {
 
   /// sey base url
   Future<void> setURL(String url) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString("url", url);
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
+    // prefs.setString("url", url);
+    var box = await Hive.openBox('settings');
+    box.put("url", url);
     await this.fetchFolder(null);
   }
 
@@ -40,7 +52,7 @@ class NasProvider extends ChangeNotifier {
       await DataFetcher(
               url: fileUrl,
               networkProvider: this.networkProvider,
-              preferences: this.preferences)
+              box: this.box)
           .delete<NasFile>(file.id);
       currentFolder.files.removeWhere((f) => f.id == file.id);
     } catch (err) {} finally {
@@ -53,7 +65,7 @@ class NasProvider extends ChangeNotifier {
       await DataFetcher(
               url: documentUrl,
               networkProvider: this.networkProvider,
-              preferences: this.preferences)
+              box: this.box)
           .delete<NasDocument>(document.id);
       currentFolder.documents.removeWhere((d) => d.id == document.id);
     } catch (err) {} finally {
@@ -66,7 +78,7 @@ class NasProvider extends ChangeNotifier {
       await DataFetcher(
               url: folderUrl,
               networkProvider: this.networkProvider,
-              preferences: this.preferences)
+              box: this.box)
           .delete<NasFolder>(folder.id);
       currentFolder.folders.removeWhere((d) => d.id == folder.id);
     } catch (err) {} finally {
@@ -81,7 +93,7 @@ class NasProvider extends ChangeNotifier {
       var response = await DataFetcher(
               url: folderUrl,
               networkProvider: this.networkProvider,
-              preferences: this.preferences)
+              box: this.box)
           .update<NasFolder>(folder.id, {"parent": parent});
       parents[parents.length - 2]?.folders?.add(response);
       currentFolder.folders.removeWhere((f) => f.id == folder.id);
@@ -96,7 +108,7 @@ class NasProvider extends ChangeNotifier {
       var response = await DataFetcher(
               url: fileUrl,
               networkProvider: this.networkProvider,
-              preferences: this.preferences)
+              box: this.box)
           .update<NasFile>(file.id, {"parent": parent});
       parents[parents.length - 2]?.files?.add(response);
       currentFolder.files.removeWhere((f) => f.id == file.id);
@@ -111,7 +123,7 @@ class NasProvider extends ChangeNotifier {
       var response = await DataFetcher(
               url: documentUrl,
               networkProvider: this.networkProvider,
-              preferences: this.preferences)
+              box: this.box)
           .update<NasDocument>(document.id, {"parent": parent});
       parents[parents.length - 2]?.documents?.add(response);
       currentFolder.documents.removeWhere((d) => d.id == document.id);
@@ -125,7 +137,7 @@ class NasProvider extends ChangeNotifier {
       var response = await DataFetcher(
               url: folderUrl,
               networkProvider: this.networkProvider,
-              preferences: this.preferences)
+              box: this.box)
           .update<NasFolder>(folder.id, {"parent": target});
       currentFolder.folders.removeWhere((f) => f.id == folder.id);
       notifyListeners();
@@ -138,7 +150,7 @@ class NasProvider extends ChangeNotifier {
       var response = await DataFetcher(
               url: fileUrl,
               networkProvider: this.networkProvider,
-              preferences: this.preferences)
+              box: this.box)
           .update<NasFile>(file.id, {"parent": target});
       currentFolder.files.removeWhere((f) => f.id == file.id);
       notifyListeners();
@@ -151,7 +163,7 @@ class NasProvider extends ChangeNotifier {
       var response = await DataFetcher(
               url: documentUrl,
               networkProvider: this.networkProvider,
-              preferences: this.preferences)
+              box: this.box)
           .update<NasDocument>(document.id, {"parent": target});
       currentFolder.documents.removeWhere((d) => d.id == document.id);
       notifyListeners();
@@ -167,7 +179,7 @@ class NasProvider extends ChangeNotifier {
       var folder = await DataFetcher(
               url: folderUrl,
               networkProvider: this.networkProvider,
-              preferences: this.preferences)
+              box: this.box)
           .fetchOne<NasFolder>(id: id);
       currentFolder = folder;
       parents.add(folder);
@@ -191,15 +203,11 @@ class DataFetcher {
 
   /// Network provider
   Dio networkProvider;
-  //
-  SharedPreferences preferences;
+  Box box;
 
-  DataFetcher(
-      {@required String url,
-      Dio networkProvider,
-      SharedPreferences preferences}) {
+  DataFetcher({@required String url, Dio networkProvider, Box box}) {
     this.networkProvider = networkProvider ?? Dio();
-    this.preferences = preferences ?? null;
+    this.box = box ?? null;
     this.url = url;
   }
 
@@ -228,10 +236,17 @@ class DataFetcher {
   }
 
   Future<void> _getURL() async {
-    if (this.preferences == null) {
-      this.preferences = await SharedPreferences.getInstance();
+    if (this.box == null) {
+      if (Platform.isIOS || Platform.isAndroid) {
+        var dir = await getApplicationDocumentsDirectory();
+        Hive.init(dir.path);
+      } else if (Platform.isMacOS) {
+        Hive.init(Directory.current.path);
+      }
+      this.box = await Hive.openBox("settings");
     }
-    this.url = "${this.preferences.getString("url") ?? ""}${this.url}";
+    var base = this.box.get("url") ?? "";
+    this.url = "${base}${this.url}";
   }
 
   /// Fetch one object

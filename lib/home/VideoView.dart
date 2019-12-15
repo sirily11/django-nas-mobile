@@ -1,6 +1,7 @@
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class VideoView extends StatefulWidget {
   final String name;
@@ -37,34 +38,6 @@ class _VideoViewState extends State<VideoView> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.name),
-      ),
-      body: Column(
-        children: <Widget>[
-          Expanded(
-            child: Center(
-              child: _videoPlayerController1.value.initialized
-                  ? AspectRatio(
-                      aspectRatio: _videoPlayerController1.value.aspectRatio,
-                      child: VideoPlayer(_videoPlayerController1),
-                    )
-                  : Container(),
-            ),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          setState(() {
-            _videoPlayerController1.value.isPlaying
-                ? _videoPlayerController1.pause()
-                : _videoPlayerController1.play();
-          });
-        },
-        child: Icon(
-          _videoPlayerController1.value.isPlaying
-              ? Icons.pause
-              : Icons.play_arrow,
-        ),
       ),
     );
   }

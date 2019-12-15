@@ -136,19 +136,22 @@ class NasFile extends BaseElement {
   String objectType;
   String filename;
   String transcodeFilepath;
+  String cover;
 
-  NasFile(
-      {this.id,
-      this.createdAt,
-      this.parent,
-      this.description,
-      this.user,
-      this.size,
-      this.modifiedAt,
-      this.file,
-      this.objectType,
-      this.filename,
-      this.transcodeFilepath});
+  NasFile({
+    this.id,
+    this.createdAt,
+    this.parent,
+    this.description,
+    this.user,
+    this.size,
+    this.modifiedAt,
+    this.file,
+    this.objectType,
+    this.filename,
+    this.transcodeFilepath,
+    this.cover,
+  });
 
   factory NasFile.fromJson(Map<String, dynamic> json) => NasFile(
       id: json["id"],
@@ -161,6 +164,7 @@ class NasFile extends BaseElement {
       file: json["file"],
       objectType: json["object_type"],
       filename: json["filename"],
+      cover: json['cover'],
       transcodeFilepath: json['transcode_filepath']);
 
   Map<String, dynamic> toJson() => {

@@ -38,7 +38,7 @@ class EditorViewState extends State<EditorView> {
           icon: Icon(Icons.arrow_back_ios),
           onPressed: () async {
             try {
-              await this._saveDocument();
+              this._saveDocument();
             } catch (err) {} finally {
               Navigator.of(context).pop();
             }

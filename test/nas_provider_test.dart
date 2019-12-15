@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:django_nas_mobile/models/Folder.dart';
+import 'package:hive/hive.dart';
 import 'package:mockito/mockito.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test/test.dart';
@@ -7,7 +8,7 @@ import 'package:django_nas_mobile/models/NasProvider.dart';
 
 class MockClient extends Mock implements Dio {}
 
-class MockPreference extends Mock implements SharedPreferences {}
+class MockBox extends Mock implements Box {}
 
 void main() {
   group("Data Fetcher Test", () {
@@ -75,10 +76,10 @@ void main() {
       }
     ];
     Dio client = MockClient();
-    SharedPreferences preferences = MockPreference();
+    Box box = MockBox();
 
     setUpAll(() async {
-      when(preferences.getString(any)).thenReturn("");
+      when(box.get(any)).thenReturn("");
 
       when(client.get(folderUrl)).thenAnswer(
         (_) async => Response<Map<String, dynamic>>(
@@ -107,9 +108,9 @@ void main() {
     });
 
     test("Test get root", () async {
-      NasFolder root = await DataFetcher(
-              url: folderUrl, networkProvider: client, preferences: preferences)
-          .fetchOne<NasFolder>();
+      NasFolder root =
+          await DataFetcher(url: folderUrl, networkProvider: client, box: box)
+              .fetchOne<NasFolder>();
       expect(root.folders.length, folders.length);
       expect(root.files.length, files.length);
       expect(root.documents.length, documents.length);
@@ -119,7 +120,7 @@ void main() {
       NasFolder child = await DataFetcher(
               url: "$folderUrl${folders[0]['id']}",
               networkProvider: client,
-              preferences: preferences)
+              box: box)
           .fetchOne<NasFolder>();
       expect(child.folders.length, folders.length);
       expect(child.files.length, files.length);
@@ -192,11 +193,11 @@ void main() {
       }
     ];
     Dio client = MockClient();
-    SharedPreferences preferences = MockPreference();
+    Box box = MockBox();
     NasProvider provider;
 
     setUp(() async {
-      when(preferences.getString(any)).thenReturn("");
+      when(box.get(any)).thenReturn("");
 
       when(client.get(folderUrl)).thenAnswer(
         (_) async => Response<Map<String, dynamic>>(
@@ -223,7 +224,7 @@ void main() {
         (_) async => Response<Map<String, dynamic>>(data: folders[1]),
       );
 
-      provider = NasProvider(networkProvider: client, preferences: preferences);
+      provider = NasProvider(networkProvider: client, box: box);
     });
 
     test("Fetch root", () async {
