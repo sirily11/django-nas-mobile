@@ -10,6 +10,7 @@ String folderUrl = "/api/folder/";
 String fileUrl = "/api/file/";
 String documentUrl = "/api/document/";
 String editorUrl = "/#/edit/";
+String systemUrl = "/system/";
 
 class NasProvider extends ChangeNotifier {
   List<NasFolder> parents = [];

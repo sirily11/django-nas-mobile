@@ -1,5 +1,9 @@
+import 'dart:io';
+
+import 'package:django_nas_mobile/PlatformWidget.dart';
 import 'package:django_nas_mobile/home/CreateNewButton.dart';
 import 'package:django_nas_mobile/home/Row.dart';
+import 'package:django_nas_mobile/info/InfoPage.dart';
 import 'package:django_nas_mobile/models/Folder.dart';
 import 'package:django_nas_mobile/models/NasProvider.dart';
 import 'package:django_nas_mobile/settings/SettingPage.dart';
@@ -37,6 +41,9 @@ class _HomePageState extends State<HomePage> {
 
       case 2:
         return SettingPage();
+
+      case 3:
+        return InfoPage();
       default:
         return _buildMainBody();
     }
@@ -104,9 +111,62 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget _buildSideBar() {
+    List<IconData> icons = [
+      Icons.home,
+      Icons.file_upload,
+      Icons.settings,
+      Icons.info
+    ];
+
+    return Padding(
+      padding: const EdgeInsets.only(right: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: ["Home", "Upload", "Settings", "Info"]
+            .asMap()
+            .map(
+              (i, t) => MapEntry(
+                i,
+                MaterialButton(
+                  height: 100,
+                  onPressed: () => setState(
+                    () {
+                      currentIndex = i;
+                    },
+                  ),
+                  child: Column(
+                    children: <Widget>[
+                      Icon(
+                        icons[i],
+                        color: currentIndex == i
+                            ? Theme.of(context).primaryColor
+                            : null,
+                      ),
+                      Text(
+                        t,
+                        style: TextStyle(
+                            color: currentIndex == i
+                                ? Theme.of(context).primaryColor
+                                : null),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            )
+            .values
+            .toList(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    Widget body = _buildBody();
+    Widget body = Padding(
+      padding: EdgeInsets.only(right: 20),
+      child: _buildBody(),
+    );
     NasProvider provider = Provider.of(context);
 
     return Scaffold(
@@ -133,31 +193,51 @@ class _HomePageState extends State<HomePage> {
           style: Theme.of(context).textTheme.title,
         ),
       ),
-      body: body,
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: currentIndex,
-        onTap: (index) {
-          setState(
-            () {
-              currentIndex = index;
-            },
-          );
-        },
-        items: [
-          BottomNavigationBarItem(
-            title: Text("Files"),
-            icon: Icon(Icons.insert_drive_file),
-          ),
-          BottomNavigationBarItem(
-            title: Text("Uploads"),
-            icon: Icon(Icons.file_upload),
-          ),
-          BottomNavigationBarItem(
-            title: Text("Settings"),
-            icon: Icon(Icons.settings),
-          )
-        ],
+      body: PlatformWidget(
+        largeScreen: Row(
+          children: <Widget>[
+            Expanded(
+              child: _buildSideBar(),
+              flex: 1,
+            ),
+            Expanded(
+              child: body,
+              flex: 9,
+            )
+          ],
+        ),
+        mobile: body,
       ),
+      bottomNavigationBar: Platform.isIOS || Platform.isAndroid
+          ? BottomNavigationBar(
+              currentIndex: currentIndex,
+              onTap: (index) {
+                setState(
+                  () {
+                    currentIndex = index;
+                  },
+                );
+              },
+              items: [
+                BottomNavigationBarItem(
+                  title: Text("Files"),
+                  icon: Icon(Icons.insert_drive_file),
+                ),
+                BottomNavigationBarItem(
+                  title: Text("Uploads"),
+                  icon: Icon(Icons.file_upload),
+                ),
+                BottomNavigationBarItem(
+                  title: Text("Settings"),
+                  icon: Icon(Icons.settings),
+                ),
+                BottomNavigationBarItem(
+                  title: Text("Info"),
+                  icon: Icon(Icons.info),
+                )
+              ],
+            )
+          : null,
     );
   }
 }
