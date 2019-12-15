@@ -78,7 +78,7 @@ class SystemProvider with ChangeNotifier {
           await this.networkProvider.get("${box.get("url")}$systemUrl");
       this.addData(SystemInfo.fromJson(response.data));
     } catch (err) {
-      this.error = err;
+      this.error = err.toString();
     } finally {
       notifyListeners();
     }

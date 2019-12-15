@@ -26,13 +26,16 @@ class NasProvider extends ChangeNotifier {
       if (Platform.isIOS || Platform.isAndroid) {
         getApplicationDocumentsDirectory().then((path) {
           Hive.init(path.path);
+          Hive.openBox('settings').then((box) {
+            this.box = box;
+          });
         });
       } else if (Platform.isMacOS) {
         Hive.init(Directory.current.path);
+        Hive.openBox('settings').then((box) {
+          this.box = box;
+        });
       }
-      Hive.openBox('settings').then((box) {
-        this.box = box;
-      });
     }
   }
 

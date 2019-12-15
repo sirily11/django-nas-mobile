@@ -14,7 +14,7 @@ class PlatformWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (ctx, constrains) {
-        if (Platform.isMacOS || constrains.maxWidth > 600) {
+        if (Platform.isMacOS) {
           return largeScreen;
         }
         return mobile;

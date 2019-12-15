@@ -141,14 +141,14 @@ class _HomePageState extends State<HomePage> {
                         icons[i],
                         color: currentIndex == i
                             ? Theme.of(context).primaryColor
-                            : null,
+                            : Theme.of(context).unselectedWidgetColor,
                       ),
                       Text(
                         t,
                         style: TextStyle(
                             color: currentIndex == i
                                 ? Theme.of(context).primaryColor
-                                : null),
+                                : Theme.of(context).unselectedWidgetColor),
                       )
                     ],
                   ),
@@ -163,9 +163,16 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    Widget body = Padding(
-      padding: EdgeInsets.only(right: 20),
-      child: _buildBody(),
+    Widget body = PlatformWidget(
+      largeScreen: Padding(
+        padding: EdgeInsets.only(right: 20),
+        child: _buildBody(),
+      ),
+      desktop: Padding(
+        padding: EdgeInsets.only(right: 20),
+        child: _buildBody(),
+      ),
+      mobile: _buildBody(),
     );
     NasProvider provider = Provider.of(context);
 
@@ -210,6 +217,8 @@ class _HomePageState extends State<HomePage> {
       ),
       bottomNavigationBar: Platform.isIOS || Platform.isAndroid
           ? BottomNavigationBar(
+              unselectedItemColor: Theme.of(context).unselectedWidgetColor,
+              selectedItemColor: Theme.of(context).primaryColor,
               currentIndex: currentIndex,
               onTap: (index) {
                 setState(
