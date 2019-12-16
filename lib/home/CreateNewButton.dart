@@ -35,15 +35,19 @@ class CreateNewButton extends StatelessWidget {
       );
     } else if (selection == 2) {
       List<File> files = await FilePicker.getMultiFile();
-      var data = await uploadProvider.addItems(files
-          .map((f) => UploadItem(file: f, parent: nasProvider.currentFolder.id))
-          .toList());
+      var data = await uploadProvider.addItems(
+          files
+              .map((f) =>
+                  UploadItem(file: f, parent: nasProvider.currentFolder.id))
+              .toList(),
+          baseURL: nasProvider.baseURL);
       nasProvider.currentFolder.files.addAll(data);
       nasProvider.update();
     } else if (selection == 3) {
       var image = await ImagePicker.pickImage(source: ImageSource.gallery);
       var data = await uploadProvider.addItem(
-          UploadItem(file: image, parent: nasProvider.currentFolder.id));
+          UploadItem(file: image, parent: nasProvider.currentFolder.id),
+          baseURL: nasProvider.baseURL);
       nasProvider.currentFolder.files.add(data);
       nasProvider.update();
     } else {
@@ -51,7 +55,8 @@ class CreateNewButton extends StatelessWidget {
         source: ImageSource.gallery,
       );
       var data = await uploadProvider.addItem(
-          UploadItem(file: video, parent: nasProvider.currentFolder.id));
+          UploadItem(file: video, parent: nasProvider.currentFolder.id),
+          baseURL: nasProvider.baseURL);
       nasProvider.currentFolder.files.add(data);
       nasProvider.update();
     }
@@ -80,10 +85,12 @@ class CreateNewButton extends StatelessWidget {
           await showOpenPanel(allowsMultipleSelection: true);
       if (!result.canceled) {
         List<File> files = result.paths.map((p) => File(p)).toList();
-        var data = await uploadProvider.addItems(files
-            .map((f) =>
-                UploadItem(file: f, parent: nasProvider.currentFolder.id))
-            .toList());
+        var data = await uploadProvider.addItems(
+            files
+                .map((f) =>
+                    UploadItem(file: f, parent: nasProvider.currentFolder.id))
+                .toList(),
+            baseURL: nasProvider.baseURL);
         nasProvider.currentFolder.files.addAll(data);
         nasProvider.update();
       }

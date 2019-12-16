@@ -27,8 +27,11 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration(milliseconds: 30)).then((_) async {
+    Future.delayed(Duration(milliseconds: 20)).then((_) async {
       NasProvider provider = Provider.of(context);
+      if (provider.box == null) {
+        await provider.initBox();
+      }
       await provider.fetchFolder(widget.folderID);
     });
   }
@@ -66,10 +69,7 @@ class _HomePageState extends State<HomePage> {
     return RefreshIndicator(
       onRefresh: () async {
         NasProvider provider = Provider.of(context);
-        var data = await DataFetcher(url: folderUrl)
-            .fetchOne<NasFolder>(id: provider.currentFolder.id);
-        provider.currentFolder = data;
-        provider.update();
+        await provider.fetchFolder(provider.currentFolder.id);
       },
       child: ListView.builder(
         itemCount: length + 1,

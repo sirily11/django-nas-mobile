@@ -1,7 +1,6 @@
 import 'package:django_nas_mobile/home/EditorView.dart';
 import 'package:django_nas_mobile/home/HomePage.dart';
 import 'package:django_nas_mobile/home/ImageView.dart';
-import 'package:django_nas_mobile/home/VideoView.dart';
 import 'package:django_nas_mobile/models/Folder.dart';
 import 'package:django_nas_mobile/models/NasProvider.dart';
 import 'package:django_nas_mobile/models/utils.dart';
@@ -233,14 +232,7 @@ class FolderRow extends StatelessWidget {
                     FlatButton(
                       onPressed: () async {
                         NasProvider provider = Provider.of(context);
-                        var data = await DataFetcher(url: folderUrl)
-                            .update<NasFolder>(
-                                folder.id, {"name": controller.text});
-                        var f = provider.currentFolder.folders.firstWhere(
-                            (f) => f.id == folder.id,
-                            orElse: () => null);
-                        f.name = controller.text;
-                        provider.update();
+                        await provider.updateFolder(controller.text, folder.id);
                         Navigator.pop(context);
                       },
                       child: Text("OK"),
@@ -325,14 +317,8 @@ class DocumentRow extends StatelessWidget {
                     FlatButton(
                       onPressed: () async {
                         NasProvider provider = Provider.of(context);
-                        var data = await DataFetcher(url: documentUrl)
-                            .update<NasDocument>(
-                                document.id, {"name": controller.text});
-                        var d = provider.currentFolder.documents.firstWhere(
-                            (d) => d.id == document.id,
-                            orElse: () => null);
-                        d.name = controller.text;
-                        provider.update();
+                        await provider.updateDocumentName(
+                            controller.text, document.id);
                         Navigator.pop(context);
                       },
                       child: Text("OK"),

@@ -1,6 +1,7 @@
 import 'package:django_nas_mobile/models/Folder.dart';
 import 'package:django_nas_mobile/models/NasProvider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:zefyr/zefyr.dart';
 import 'dart:convert';
 import 'package:django_nas_mobile/models/utils.dart';
@@ -25,6 +26,7 @@ class EditorViewState extends State<EditorView> {
 
   @override
   Widget build(BuildContext context) {
+    NasProvider provider = Provider.of(context);
     // Note that the editor requires special `ZefyrScaffold` widget to be
     // one of its parents.
     return Scaffold(
@@ -51,7 +53,11 @@ class EditorViewState extends State<EditorView> {
         ],
       ),
       body: FutureBuilder<NasDocument>(
-          future: DataFetcher(url: documentUrl).fetchOne(id: widget.id),
+          future: DataFetcher(
+                  url: documentUrl,
+                  baseURL: provider.baseURL,
+                  networkProvider: provider.networkProvider)
+              .fetchOne(id: widget.id),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Text("Connection error");
@@ -88,8 +94,8 @@ class EditorViewState extends State<EditorView> {
     if (_controller != null) {
       try {
         final contents = jsonEncode(convertToQuill(_controller.document));
-        await DataFetcher(url: documentUrl)
-            .update<NasDocument>(widget.id, {"content": contents});
+        NasProvider provider = Provider.of(context);
+        provider.updateDocument(contents, widget.id);
         key.currentState.showSnackBar(
           SnackBar(
             content: Text("All changes saved"),

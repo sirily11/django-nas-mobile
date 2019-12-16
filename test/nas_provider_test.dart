@@ -111,9 +111,9 @@ void main() {
     });
 
     test("Test get root", () async {
-      NasFolder root =
-          await DataFetcher(url: folderUrl, networkProvider: client, box: box)
-              .fetchOne<NasFolder>();
+      NasFolder root = await DataFetcher(
+              url: folderUrl, networkProvider: client, baseURL: "")
+          .fetchOne<NasFolder>();
       expect(root.folders.length, folders.length);
       expect(root.files.length, files.length);
       expect(root.documents.length, documents.length);
@@ -123,7 +123,7 @@ void main() {
       NasFolder child = await DataFetcher(
               url: "$folderUrl${folders[0]['id']}",
               networkProvider: client,
-              box: box)
+              baseURL: "")
           .fetchOne<NasFolder>();
       expect(child.folders.length, folders.length);
       expect(child.files.length, files.length);
@@ -256,10 +256,9 @@ void main() {
           data: folders[0],
         ),
       );
-      when(testBox.get(any)).thenReturn("testbase");
 
-      DataFetcher dataFetcher =
-          DataFetcher(box: testBox, url: "/test", networkProvider: testDio);
+      DataFetcher dataFetcher = DataFetcher(
+          baseURL: "testbase", url: "/test", networkProvider: testDio);
       await dataFetcher.fetchOne<NasFolder>();
       expect(dataFetcher.url, "testbase/test");
     });
@@ -270,7 +269,18 @@ void main() {
       await provider.setURL("abc");
       // clear parents
       expect(provider.parents.length, 0);
+      expect(provider.baseURL, "abc");
       verify(box.put(any, any)).called(1);
+    });
+
+    test("Init testing", () async {
+      Box testBox = MockBox();
+      when(testBox.get(any)).thenReturn("abc");
+
+      NasProvider provider = NasProvider(box: testBox, networkProvider: client);
+      await Future.delayed(Duration(milliseconds: 50), () {
+        expect(provider.baseURL, "abc");
+      });
     });
   });
 }

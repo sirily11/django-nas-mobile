@@ -36,14 +36,7 @@ class _CreateNewDocumentViewState extends State<CreateNewDocumentView> {
               onPressed: () async {
                 try {
                   NasProvider provider = Provider.of(context);
-                  NasDocument document = await DataFetcher(url: documentUrl)
-                      .create<NasDocument>({
-                    "name": controller.text,
-                    "parent": provider.currentFolder.id
-                  });
-
-                  provider.currentFolder.documents.add(document);
-                  provider.update();
+                  await provider.createNewDocument(controller.text);
                   Navigator.pop(context);
                 } catch (err) {
                   showDialog(

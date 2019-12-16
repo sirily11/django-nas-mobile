@@ -18,27 +18,16 @@ class _SettingPageState extends State<SettingPage> {
   void initState() {
     super.initState();
     controller = TextEditingController();
-    if (Platform.isIOS || Platform.isAndroid) {
-      getApplicationDocumentsDirectory().then((dir) async {
-        Hive.init(dir.path);
-        var box = await Hive.openBox("settings");
-        setState(() {
-          controller = TextEditingController(text: box.get("url"));
-        });
+    Future.delayed(Duration(milliseconds: 30), () {
+      NasProvider provider = Provider.of(context);
+      setState(() {
+        controller = TextEditingController(text: provider.baseURL);
       });
-    } else if (Platform.isMacOS) {
-      Hive.init(Directory.current.path);
-      Hive.openBox("settings").then((box) {
-        setState(() {
-          controller = TextEditingController(text: box.get("url"));
-        });
-      });
-    }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Container(

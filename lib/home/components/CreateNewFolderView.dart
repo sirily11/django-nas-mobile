@@ -36,13 +36,7 @@ class _CreateNewFolderViewState extends State<CreateNewFolderView> {
               onPressed: () async {
                 try {
                   NasProvider provider = Provider.of(context);
-                  var data = await DataFetcher(url: folderUrl)
-                      .create<NasFolder>({
-                    "name": controller.text,
-                    "parent": provider.currentFolder.id
-                  });
-                  provider.currentFolder.folders.add(data);
-                  provider.update();
+                  await provider.createNewFolder(controller.text);
                   Navigator.pop(context);
                 } catch (err) {
                   showDialog(

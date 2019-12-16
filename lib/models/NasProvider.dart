@@ -18,24 +18,28 @@ class NasProvider extends ChangeNotifier {
   bool isLoading = false;
   Dio networkProvider;
   Box box;
+  String baseURL;
 
   NasProvider({Dio networkProvider, Box box}) {
     this.networkProvider = networkProvider ?? Dio();
     this.box = box;
     if (box == null) {
-      if (Platform.isIOS || Platform.isAndroid) {
-        getApplicationDocumentsDirectory().then((path) {
-          Hive.init(path.path);
-          Hive.openBox('settings').then((box) {
-            this.box = box;
-          });
-        });
-      } else if (Platform.isMacOS) {
-        Hive.init(Directory.current.path);
-        Hive.openBox('settings').then((box) {
-          this.box = box;
-        });
-      }
+      this.initBox().then((_) {
+        this.baseURL = this.box.get("url");
+      });
+    } else {
+      this.baseURL = this.box.get("url");
+    }
+  }
+
+  Future<void> initBox() async {
+    if (Platform.isIOS || Platform.isAndroid) {
+      var path = await getApplicationDocumentsDirectory();
+      Hive.init(path.path);
+      this.box = await Hive.openBox('settings');
+    } else if (Platform.isMacOS) {
+      Hive.init(Directory.current.path);
+      this.box = await Hive.openBox('settings');
     }
   }
 
@@ -47,6 +51,7 @@ class NasProvider extends ChangeNotifier {
   Future<void> setURL(String url) async {
     this.box.put("url", url);
     currentFolder = null;
+    this.baseURL = url;
     await this.fetchFolder(null);
     parents = [];
   }
@@ -58,9 +63,14 @@ class NasProvider extends ChangeNotifier {
       await DataFetcher(
               url: fileUrl,
               networkProvider: this.networkProvider,
-              box: this.box)
+              baseURL: baseURL)
           .delete<NasFile>(file.id);
       currentFolder.files.removeWhere((f) => f.id == file.id);
+      var parnentFolder = parents.last.folders
+          .firstWhere((f) => f.id == currentFolder.id, orElse: () => null);
+      if (parnentFolder != null) {
+        parnentFolder.totalSize -= file.size;
+      }
     } catch (err) {} finally {
       notifyListeners();
     }
@@ -71,7 +81,7 @@ class NasProvider extends ChangeNotifier {
       await DataFetcher(
               url: documentUrl,
               networkProvider: this.networkProvider,
-              box: this.box)
+              baseURL: baseURL)
           .delete<NasDocument>(document.id);
       currentFolder.documents.removeWhere((d) => d.id == document.id);
     } catch (err) {} finally {
@@ -84,9 +94,14 @@ class NasProvider extends ChangeNotifier {
       await DataFetcher(
               url: folderUrl,
               networkProvider: this.networkProvider,
-              box: this.box)
+              baseURL: baseURL)
           .delete<NasFolder>(folder.id);
       currentFolder.folders.removeWhere((d) => d.id == folder.id);
+      var parnentFolder = parents.last.folders
+          .firstWhere((f) => f.id == currentFolder.id, orElse: () => null);
+      if (parnentFolder != null) {
+        parnentFolder.totalSize -= folder.totalSize;
+      }
     } catch (err) {} finally {
       notifyListeners();
     }
@@ -99,10 +114,14 @@ class NasProvider extends ChangeNotifier {
       var response = await DataFetcher(
               url: folderUrl,
               networkProvider: this.networkProvider,
-              box: this.box)
+              baseURL: baseURL)
           .update<NasFolder>(folder.id, {"parent": parent});
       parents[parents.length - 2]?.folders?.add(response);
       currentFolder.folders.removeWhere((f) => f.id == folder.id);
+      var parnentFolder = parents[parents.length - 2]
+          .folders
+          .firstWhere((f) => f.id == currentFolder.id);
+      parnentFolder.totalSize -= folder.totalSize;
       notifyListeners();
     } catch (err) {}
   }
@@ -114,10 +133,14 @@ class NasProvider extends ChangeNotifier {
       var response = await DataFetcher(
               url: fileUrl,
               networkProvider: this.networkProvider,
-              box: this.box)
+              baseURL: baseURL)
           .update<NasFile>(file.id, {"parent": parent});
       parents[parents.length - 2]?.files?.add(response);
       currentFolder.files.removeWhere((f) => f.id == file.id);
+      var parnentFolder = parents[parents.length - 2]
+          .folders
+          .firstWhere((f) => f.id == currentFolder.id);
+      parnentFolder.totalSize -= file.size;
       notifyListeners();
     } catch (err) {}
   }
@@ -129,7 +152,7 @@ class NasProvider extends ChangeNotifier {
       var response = await DataFetcher(
               url: documentUrl,
               networkProvider: this.networkProvider,
-              box: this.box)
+              baseURL: baseURL)
           .update<NasDocument>(document.id, {"parent": parent});
       parents[parents.length - 2]?.documents?.add(response);
       currentFolder.documents.removeWhere((d) => d.id == document.id);
@@ -143,9 +166,11 @@ class NasProvider extends ChangeNotifier {
       var response = await DataFetcher(
               url: folderUrl,
               networkProvider: this.networkProvider,
-              box: this.box)
+              baseURL: baseURL)
           .update<NasFolder>(folder.id, {"parent": target});
       currentFolder.folders.removeWhere((f) => f.id == folder.id);
+      currentFolder.folders.firstWhere((f) => f.id == target).totalSize +=
+          response.totalSize;
       notifyListeners();
     } catch (err) {}
   }
@@ -156,9 +181,12 @@ class NasProvider extends ChangeNotifier {
       var response = await DataFetcher(
               url: fileUrl,
               networkProvider: this.networkProvider,
-              box: this.box)
+              baseURL: baseURL)
           .update<NasFile>(file.id, {"parent": target});
       currentFolder.files.removeWhere((f) => f.id == file.id);
+      currentFolder.folders.firstWhere((f) => f.id == target).totalSize +=
+          response.size;
+
       notifyListeners();
     } catch (err) {}
   }
@@ -169,7 +197,7 @@ class NasProvider extends ChangeNotifier {
       var response = await DataFetcher(
               url: documentUrl,
               networkProvider: this.networkProvider,
-              box: this.box)
+              baseURL: baseURL)
           .update<NasDocument>(document.id, {"parent": target});
       currentFolder.documents.removeWhere((d) => d.id == document.id);
       notifyListeners();
@@ -185,7 +213,7 @@ class NasProvider extends ChangeNotifier {
       var folder = await DataFetcher(
               url: folderUrl,
               networkProvider: this.networkProvider,
-              box: this.box)
+              baseURL: baseURL)
           .fetchOne<NasFolder>(id: id);
       currentFolder = folder;
       parents.add(folder);
@@ -200,20 +228,71 @@ class NasProvider extends ChangeNotifier {
     currentFolder = parents.last;
     notifyListeners();
   }
+
+  Future<void> createNewFolder(String name) async {
+    var data = await DataFetcher(
+            baseURL: this.baseURL,
+            url: folderUrl,
+            networkProvider: this.networkProvider)
+        .create<NasFolder>({"name": name, "parent": currentFolder.id});
+    this.currentFolder.folders.add(data);
+    notifyListeners();
+  }
+
+  Future<void> createNewDocument(String name) async {
+    var data = await DataFetcher(
+            baseURL: this.baseURL,
+            url: documentUrl,
+            networkProvider: this.networkProvider)
+        .create<NasDocument>({"name": name, "parent": currentFolder.id});
+    this.currentFolder.documents.add(data);
+    notifyListeners();
+  }
+
+  Future<void> updateFolder(String name, int id) async {
+    var data = await DataFetcher(
+            baseURL: this.baseURL,
+            url: folderUrl,
+            networkProvider: this.networkProvider)
+        .update<NasFolder>(id, {"name": name});
+    this.currentFolder.folders.firstWhere((f) => f.id == id).name = name;
+    notifyListeners();
+  }
+
+  Future<void> updateDocumentName(String name, int id) async {
+    var data = await DataFetcher(
+            baseURL: this.baseURL,
+            url: documentUrl,
+            networkProvider: this.networkProvider)
+        .update<NasDocument>(id, {"name": name});
+    this.currentFolder.documents.firstWhere((f) => f.id == id).name = data.name;
+    notifyListeners();
+  }
+
+  Future<void> updateDocument(dynamic content, int id) async {
+    var data = await DataFetcher(
+            baseURL: this.baseURL,
+            url: documentUrl,
+            networkProvider: this.networkProvider)
+        .update<NasDocument>(id, {"content": content});
+    var document = this.currentFolder.documents.firstWhere((f) => f.id == id);
+    document = data;
+    notifyListeners();
+  }
 }
 
 /// Fetch data from api
 class DataFetcher {
   /// API URL
   String url;
+  final String baseURL;
 
   /// Network provider
   Dio networkProvider;
-  Box box;
 
-  DataFetcher({@required String url, Dio networkProvider, Box box}) {
+  DataFetcher(
+      {@required String url, Dio networkProvider, @required this.baseURL}) {
     this.networkProvider = networkProvider ?? Dio();
-    this.box = box ?? null;
     this.url = url;
   }
 
@@ -242,17 +321,7 @@ class DataFetcher {
   }
 
   Future<void> _getURL() async {
-    if (this.box == null) {
-      if (Platform.isIOS || Platform.isAndroid) {
-        var dir = await getApplicationDocumentsDirectory();
-        Hive.init(dir.path);
-      } else if (Platform.isMacOS) {
-        Hive.init(Directory.current.path);
-      }
-      this.box = await Hive.openBox("settings");
-    }
-    var base = this.box.get("url") ?? "";
-    this.url = "${base}${this.url}";
+    this.url = "$baseURL${this.url}";
   }
 
   /// Fetch one object

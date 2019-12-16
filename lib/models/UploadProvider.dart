@@ -16,30 +16,32 @@ class UploadItem {
 class UploadProvider extends ChangeNotifier {
   List<UploadItem> items = [];
 
-  Future<NasFile> addItem(UploadItem item) async {
+  Future<NasFile> addItem(UploadItem item, {@required String baseURL}) async {
     items.add(item);
     notifyListeners();
-    return await uploadItem(item);
+    return await uploadItem(item, baseURL: baseURL);
   }
 
-  Future<List<NasFile>> addItems(List<UploadItem> items) async {
+  Future<List<NasFile>> addItems(List<UploadItem> items,
+      {@required String baseURL}) async {
     this.items.addAll(items);
     notifyListeners();
     List<NasFile> l = [];
     for (var i in items) {
-      var data = await this.uploadItem(i);
+      var data = await this.uploadItem(i, baseURL: baseURL);
       l.add(data);
     }
     return l;
   }
 
-  Future<NasFile> uploadItem(UploadItem item) async {
+  Future<NasFile> uploadItem(UploadItem item,
+      {@required String baseURL}) async {
     FormData data = FormData.fromMap({
       "parent": item.parent,
       "file": await MultipartFile.fromFile(item.file.path)
     });
-    var res = await DataFetcher(url: fileUrl).create<NasFile>(data,
-        callback: (count, total) {
+    var res = await DataFetcher(url: fileUrl, baseURL: baseURL)
+        .create<NasFile>(data, callback: (count, total) {
       double progress = (count / total);
 
       item.progress = progress;
