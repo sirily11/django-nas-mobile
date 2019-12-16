@@ -15,21 +15,40 @@ class UploadItem {
 
 class UploadProvider extends ChangeNotifier {
   List<UploadItem> items = [];
+  bool onlyNotUploadItem = false;
+  bool _pause = false;
 
+  bool get pause => this._pause;
+
+  set pause(bool p) {
+    this._pause = p;
+    notifyListeners();
+  }
+
+  /// upload item
   Future<NasFile> addItem(UploadItem item, {@required String baseURL}) async {
     items.add(item);
     notifyListeners();
     return await uploadItem(item, baseURL: baseURL);
   }
 
+  /// upload multiple items
   Future<List<NasFile>> addItems(List<UploadItem> items,
       {@required String baseURL}) async {
     this.items.addAll(items);
     notifyListeners();
     List<NasFile> l = [];
     for (var i in items) {
-      var data = await this.uploadItem(i, baseURL: baseURL);
-      l.add(data);
+      if (pause) {
+        await Future.doWhile(() async {
+          await Future.delayed(Duration(milliseconds: 100));
+          return this._pause;
+        });
+      }
+      if (!_pause) {
+        var data = await this.uploadItem(i, baseURL: baseURL);
+        l.add(data);
+      }
     }
     return l;
   }
@@ -55,9 +74,14 @@ class UploadProvider extends ChangeNotifier {
 
   /// Only remove the file which has been uploaded
   removeItem(UploadItem item) {
-    if (item.isDone) {
+    if (item.progress == null || item.isDone) {
       items.removeWhere((i) => i.file == item.file);
       notifyListeners();
     }
+  }
+
+  removeAllItem() {
+    items.removeWhere((i) => i.isDone == true);
+    notifyListeners();
   }
 }

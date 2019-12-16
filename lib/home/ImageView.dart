@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:photo_view/photo_view.dart';
 
 class ImageView extends StatelessWidget {
   final String name;
@@ -13,10 +14,10 @@ class ImageView extends StatelessWidget {
         title: Text(this.name),
       ),
       body: Center(
-          child: Image.network(
-        this.url,
-        fit: BoxFit.contain,
-      )),
+        child: PhotoView(
+          imageProvider: NetworkImage(this.url),
+        ),
+      ),
     );
   }
 }

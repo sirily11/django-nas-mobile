@@ -69,7 +69,7 @@ class _HomePageState extends State<HomePage> {
     return RefreshIndicator(
       onRefresh: () async {
         NasProvider provider = Provider.of(context);
-        await provider.fetchFolder(provider.currentFolder.id);
+        await provider.refresh(provider.currentFolder.id);
       },
       child: ListView.builder(
         itemCount: length + 1,

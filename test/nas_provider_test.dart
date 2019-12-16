@@ -282,5 +282,26 @@ void main() {
         expect(provider.baseURL, "abc");
       });
     });
+
+    test("Refresh test", () async {
+      NasFolder folder1 = NasFolder(name: "1", id: 1);
+      NasFolder folder2 = NasFolder(name: "2", id: 2);
+      when(client.get("${folderUrl}2/")).thenAnswer(
+        (_) async => Response<Map<String, dynamic>>(
+          data: {
+            "id": 2,
+            "name": "2",
+          },
+        ),
+      );
+
+      provider.parents = [folder1, folder2];
+      provider.currentFolder = folder2;
+      await provider.refresh(2);
+      expect(provider.parents.length, 2);
+      expect(provider.parents[1].id, 2);
+      expect(provider.currentFolder.id, 2);
+      expect(provider.parents[0].id, 1);
+    });
   });
 }

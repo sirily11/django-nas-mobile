@@ -204,6 +204,21 @@ class NasProvider extends ChangeNotifier {
     } catch (err) {}
   }
 
+  Future<void> refresh(int id) async {
+    try {
+      notifyListeners();
+      var folder = await DataFetcher(
+              url: folderUrl,
+              networkProvider: this.networkProvider,
+              baseURL: baseURL)
+          .fetchOne<NasFolder>(id: id);
+      currentFolder = folder;
+      parents.last = folder;
+    } catch (err) {} finally {
+      notifyListeners();
+    }
+  }
+
   /// fetch folder
   /// if [id] is null, then fetch root folder
   Future<void> fetchFolder(int id) async {
