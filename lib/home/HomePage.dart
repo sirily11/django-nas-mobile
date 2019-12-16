@@ -120,44 +120,47 @@ class _HomePageState extends State<HomePage> {
       Icons.info
     ];
 
-    return Padding(
-      padding: const EdgeInsets.only(right: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: ["Home", "Upload", "Settings", "Info"]
-            .asMap()
-            .map(
-              (i, t) => MapEntry(
-                i,
-                MaterialButton(
-                  height: 100,
-                  onPressed: () => setState(
-                    () {
-                      currentIndex = i;
-                    },
-                  ),
-                  child: Column(
-                    children: <Widget>[
-                      Icon(
-                        icons[i],
-                        color: currentIndex == i
-                            ? Theme.of(context).primaryColor
-                            : Theme.of(context).unselectedWidgetColor,
-                      ),
-                      Text(
-                        t,
-                        style: TextStyle(
-                            color: currentIndex == i
-                                ? Theme.of(context).primaryColor
-                                : Theme.of(context).unselectedWidgetColor),
-                      )
-                    ],
+    return Hero(
+      tag: Key("sidebar"),
+      child: Padding(
+        padding: const EdgeInsets.only(right: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: ["Home", "Upload", "Settings", "Info"]
+              .asMap()
+              .map(
+                (i, t) => MapEntry(
+                  i,
+                  MaterialButton(
+                    height: 100,
+                    onPressed: () => setState(
+                      () {
+                        currentIndex = i;
+                      },
+                    ),
+                    child: Column(
+                      children: <Widget>[
+                        Icon(
+                          icons[i],
+                          color: currentIndex == i
+                              ? Theme.of(context).primaryColor
+                              : Theme.of(context).unselectedWidgetColor,
+                        ),
+                        Text(
+                          t,
+                          style: TextStyle(
+                              color: currentIndex == i
+                                  ? Theme.of(context).primaryColor
+                                  : Theme.of(context).unselectedWidgetColor),
+                        )
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            )
-            .values
-            .toList(),
+              )
+              .values
+              .toList(),
+        ),
       ),
     );
   }
@@ -256,6 +259,7 @@ class _HomePageState extends State<HomePage> {
           duration: Duration(milliseconds: 300),
           child: provider.items.length > 0 && currentIndex == 0
               ? TotalUploadProgress(
+                  key: Key("homepage-progress"),
                   right: 40,
                 )
               : Container(),

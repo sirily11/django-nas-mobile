@@ -50,7 +50,9 @@ class UploadPage extends StatelessWidget {
             );
           },
         ),
-        TotalUploadProgress()
+        TotalUploadProgress(
+          key: Key("uploadpage-progess"),
+        )
       ],
     );
   }
@@ -58,7 +60,8 @@ class UploadPage extends StatelessWidget {
 
 class TotalUploadProgress extends StatelessWidget {
   final double right;
-  const TotalUploadProgress({Key key, this.right = 20}) : super(key: key);
+  const TotalUploadProgress({@required Key key, this.right = 20})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -72,67 +75,70 @@ class TotalUploadProgress extends StatelessWidget {
     return Positioned(
       bottom: 20,
       right: this.right,
-      child: Container(
-        child: Card(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-            child: Row(
-              children: <Widget>[
-                AnimatedContainer(
-                  duration: Duration(milliseconds: 10),
-                  child: progress != null
-                      ? Padding(
-                          padding: const EdgeInsets.only(right: 10),
-                          child: Container(
-                            width: 15,
-                            height: 15,
-                            child: CircularProgressIndicator(
-                              value: progress ?? 0,
-                              strokeWidth: 3,
+      child: Hero(
+        tag: key,
+        child: Container(
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              child: Row(
+                children: <Widget>[
+                  AnimatedContainer(
+                    duration: Duration(milliseconds: 10),
+                    child: progress != null
+                        ? Padding(
+                            padding: const EdgeInsets.only(right: 10),
+                            child: Container(
+                              width: 15,
+                              height: 15,
+                              child: CircularProgressIndicator(
+                                value: progress ?? 0,
+                                strokeWidth: 3,
+                              ),
                             ),
-                          ),
-                        )
-                      : Container(),
-                ),
-                Text("Upload Progress: $numberFinished/$totalNumber"),
-                IconButton(
-                  tooltip: !uploadProvider.onlyNotUploadItem
-                      ? "Hide not upload items"
-                      : "Show all items",
-                  onPressed: () {
-                    uploadProvider.onlyNotUploadItem =
-                        !uploadProvider.onlyNotUploadItem;
-                    //TODO: change this by adding private variable
-                    uploadProvider.notifyListeners();
-                  },
-                  icon: Icon(
-                    !uploadProvider.onlyNotUploadItem
-                        ? Icons.visibility
-                        : Icons.visibility_off,
-                    color: Theme.of(context).primaryColor,
+                          )
+                        : Container(),
                   ),
-                ),
-                IconButton(
-                  tooltip: "Pause Upload",
-                  onPressed: () {
-                    uploadProvider.pause = !uploadProvider.pause;
-                  },
-                  icon: Icon(
-                    uploadProvider.pause ? Icons.play_arrow : Icons.pause,
-                    color: Theme.of(context).accentColor,
+                  Text("Upload Progress: $numberFinished/$totalNumber"),
+                  IconButton(
+                    tooltip: !uploadProvider.onlyNotUploadItem
+                        ? "Hide not upload items"
+                        : "Show all items",
+                    onPressed: () {
+                      uploadProvider.onlyNotUploadItem =
+                          !uploadProvider.onlyNotUploadItem;
+                      //TODO: change this by adding private variable
+                      uploadProvider.notifyListeners();
+                    },
+                    icon: Icon(
+                      !uploadProvider.onlyNotUploadItem
+                          ? Icons.visibility
+                          : Icons.visibility_off,
+                      color: Theme.of(context).primaryColor,
+                    ),
                   ),
-                ),
-                IconButton(
-                  tooltip: "Clear All Finished",
-                  icon: Icon(
-                    Icons.clear,
-                    color: Theme.of(context).primaryColor,
+                  IconButton(
+                    tooltip: "Pause Upload",
+                    onPressed: () {
+                      uploadProvider.pause = !uploadProvider.pause;
+                    },
+                    icon: Icon(
+                      uploadProvider.pause ? Icons.play_arrow : Icons.pause,
+                      color: Theme.of(context).accentColor,
+                    ),
                   ),
-                  onPressed: () {
-                    uploadProvider.removeAllItem();
-                  },
-                ),
-              ],
+                  IconButton(
+                    tooltip: "Clear All Finished",
+                    icon: Icon(
+                      Icons.clear,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                    onPressed: () {
+                      uploadProvider.removeAllItem();
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),
