@@ -6,6 +6,7 @@ import 'package:django_nas_mobile/home/Row.dart';
 import 'package:django_nas_mobile/info/InfoPage.dart';
 import 'package:django_nas_mobile/models/Folder.dart';
 import 'package:django_nas_mobile/models/NasProvider.dart';
+import 'package:django_nas_mobile/models/UploadProvider.dart';
 import 'package:django_nas_mobile/settings/SettingPage.dart';
 import 'package:django_nas_mobile/upload/UploadPage.dart';
 import 'package:flutter/material.dart';
@@ -164,14 +165,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     Widget body = PlatformWidget(
-      largeScreen: Padding(
-        padding: EdgeInsets.only(right: 20),
-        child: _buildBody(),
-      ),
-      desktop: Padding(
-        padding: EdgeInsets.only(right: 20),
-        child: _buildBody(),
-      ),
+      largeScreen: buildDesktop(),
       mobile: _buildBody(),
     );
     NasProvider provider = Provider.of(context);
@@ -247,6 +241,26 @@ class _HomePageState extends State<HomePage> {
               ],
             )
           : null,
+    );
+  }
+
+  Widget buildDesktop() {
+    UploadProvider provider = Provider.of(context);
+    return Stack(
+      children: <Widget>[
+        Padding(
+          padding: EdgeInsets.only(right: 20),
+          child: _buildBody(),
+        ),
+        AnimatedContainer(
+          duration: Duration(milliseconds: 300),
+          child: provider.items.length > 0 && currentIndex == 0
+              ? TotalUploadProgress(
+                  right: 40,
+                )
+              : Container(),
+        )
+      ],
     );
   }
 }
