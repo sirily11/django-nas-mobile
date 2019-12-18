@@ -19,6 +19,7 @@ jobs:
       - run: flutter pub get
       - run: flutter channel master
       - run: flutter upgrade
+      - run: flutter config --enable-macos-desktop
       - run: flutter build macos
       - run: tar -cf build/macos/Build/Products/Release/django_nas_mobile.tar.gz build/macos/Build/Products/Release/django_nas_mobile.app
       - name: Release
