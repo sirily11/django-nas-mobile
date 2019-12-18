@@ -13,6 +13,9 @@ String editorUrl = "/#/edit/";
 String systemUrl = "/system/";
 
 class NasProvider extends ChangeNotifier {
+  /// List of parents of current folder
+  /// If current folder's path is [a > b > c],
+  /// then content of parents is [a, b]
   List<NasFolder> parents = [];
   NasFolder currentFolder;
   bool isLoading = false;

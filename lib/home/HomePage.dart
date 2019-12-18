@@ -106,8 +106,8 @@ class _HomePageState extends State<HomePage> {
                   icon: Icon(Icons.insert_drive_file),
                 ),
                 BottomNavigationBarItem(
-                  title: Text("Uploads"),
-                  icon: Icon(Icons.file_upload),
+                  title: Text("Transfer"),
+                  icon: Icon(Icons.queue),
                 ),
                 BottomNavigationBarItem(
                   title: Text("Settings"),

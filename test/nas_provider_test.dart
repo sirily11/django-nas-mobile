@@ -303,5 +303,117 @@ void main() {
       expect(provider.currentFolder.id, 2);
       expect(provider.parents[0].id, 1);
     });
+
+    test("Delete file in root", () async {
+      NasFile fileToBeDeleted = NasFile(file: "abc", id: 4);
+      NasFolder currentFolder = NasFolder(files: [fileToBeDeleted]);
+
+      when(client.delete("${fileUrl}4/")).thenAnswer(
+        (_) async => Response<Map<String, dynamic>>(
+          data: {
+            "id": 4,
+            "name": "abc",
+          },
+        ),
+      );
+
+      NasProvider provider = NasProvider(box: box, networkProvider: client);
+      provider.currentFolder = currentFolder;
+      await provider.deleteFile(fileToBeDeleted);
+      expect(provider.currentFolder.files.length, 0);
+      expect(provider.parents.length, 0);
+    });
+
+    test("Delete file not in root", () async {
+      NasFile fileToBeDeleted = NasFile(file: "abc", id: 4, size: 20);
+      NasFile otherFile = NasFile(file: "cde", id: 5, size: 40);
+      NasFolder childFolder =
+          NasFolder(files: [fileToBeDeleted], totalSize: 40);
+      NasFolder rootFolder =
+          NasFolder(folders: [childFolder], files: [otherFile]);
+
+      when(client.delete("${fileUrl}4/")).thenAnswer(
+        (_) async => Response<Map<String, dynamic>>(
+          data: {
+            "id": 4,
+            "name": "abc",
+          },
+        ),
+      );
+
+      NasProvider provider = NasProvider(box: box, networkProvider: client);
+      provider.currentFolder = childFolder;
+      provider.parents = [rootFolder];
+      await provider.deleteFile(fileToBeDeleted);
+      expect(provider.currentFolder.files.length, 0);
+      expect(provider.parents[0].folders.first.totalSize, 20.0);
+      expect(provider.parents[0].files.length, 1);
+    });
+
+    test("Delete document", () async {
+      NasDocument document = NasDocument(id: 4, name: "abc");
+      NasFolder currentFolder = NasFolder(documents: [document]);
+      when(client.delete("${documentUrl}4/")).thenAnswer(
+        (_) async => Response<Map<String, dynamic>>(
+          data: {
+            "id": 4,
+            "name": "abc",
+          },
+        ),
+      );
+      NasProvider provider = NasProvider(box: box, networkProvider: client);
+      provider.currentFolder = currentFolder;
+      expect(provider.currentFolder.documents.length, 1);
+      await provider.deleteDocument(document);
+      expect(provider.currentFolder.documents.length, 0);
+    });
+
+    test("Delete folder in root", () async {
+      NasFolder folderTobeDeleted = NasFolder(name: "abc", id: 4);
+      NasFolder currentFolder = NasFolder(folders: [folderTobeDeleted]);
+
+      when(client.delete("${folderUrl}4/")).thenAnswer(
+        (_) async => Response<Map<String, dynamic>>(
+          data: {
+            "id": 4,
+            "name": "abc",
+          },
+        ),
+      );
+
+      NasProvider provider = NasProvider(box: box, networkProvider: client);
+      provider.currentFolder = currentFolder;
+      expect(provider.currentFolder.folders.length, 1);
+      await provider.deleteFolder(folderTobeDeleted);
+      expect(provider.currentFolder.folders.length, 0);
+    });
+
+    test("Delete folder not in root", () async {
+      NasFolder folderTobeDeleted =
+          NasFolder(name: "abc", id: 4, totalSize: 20);
+      NasFolder childFolder = NasFolder(
+          name: "cde", id: 5, totalSize: 40, folders: [folderTobeDeleted]);
+      NasFolder rootFolder = NasFolder(folders: [childFolder]);
+
+      when(client.delete("${folderUrl}4/")).thenAnswer(
+        (_) async => Response<Map<String, dynamic>>(
+          data: {
+            "id": 4,
+            "name": "abc",
+          },
+        ),
+      );
+
+      NasProvider provider = NasProvider(box: box, networkProvider: client);
+      provider.currentFolder = childFolder;
+      provider.parents = [rootFolder];
+      expect(provider.currentFolder.folders.length, 1);
+      expect(provider.parents.length, 1);
+      expect(provider.parents[0].folders.length, 1);
+      await provider.deleteFolder(folderTobeDeleted);
+      expect(provider.currentFolder.folders.length, 0);
+      expect(provider.parents[0].folders.length, 1);
+      expect(provider.parents[0].folders[0].totalSize, 20);
+    });
   });
 }

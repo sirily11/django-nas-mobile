@@ -24,7 +24,7 @@ class DesktopView extends StatelessWidget {
     return Row(
       children: <Widget>[
         Expanded(
-          flex: 1,
+          flex: 2,
           child: DesktopSidebar(),
         ),
         Expanded(
