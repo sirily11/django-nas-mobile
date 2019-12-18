@@ -60,7 +60,15 @@ class UploadPage extends StatelessWidget {
 
 class TotalUploadProgress extends StatelessWidget {
   final double right;
-  const TotalUploadProgress({@required Key key, this.right = 20})
+  final double bottom;
+  final double width;
+  final double elevation;
+  const TotalUploadProgress(
+      {@required Key key,
+      this.right = 20,
+      this.bottom = 20,
+      this.width,
+      this.elevation = 1.0})
       : super(key: key);
 
   @override
@@ -72,18 +80,22 @@ class TotalUploadProgress extends StatelessWidget {
     final double progress = uploadProvider.items
         .firstWhere((i) => !i.isDone, orElse: () => null)
         ?.progress;
+
     return Positioned(
-      bottom: 20,
+      bottom: this.bottom,
+      width: this.width,
       right: this.right,
       child: Hero(
         tag: key,
         child: Container(
           child: Card(
+            elevation: this.elevation,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  AnimatedContainer(
+                  AnimatedSwitcher(
                     duration: Duration(milliseconds: 10),
                     child: progress != null
                         ? Padding(

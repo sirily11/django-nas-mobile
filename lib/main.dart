@@ -1,4 +1,5 @@
 import 'package:django_nas_mobile/models/NasProvider.dart';
+import 'package:django_nas_mobile/models/SelectionProvider.dart';
 import 'package:django_nas_mobile/models/SystemProvider.dart';
 import 'package:django_nas_mobile/models/UploadProvider.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +23,9 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           builder: (_) => SystemProvider(),
+        ),
+        ChangeNotifierProvider(
+          builder: (_) => SelectionProvider(),
         )
       ],
       child: MaterialApp(

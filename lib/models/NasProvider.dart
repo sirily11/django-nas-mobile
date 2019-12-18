@@ -294,6 +294,24 @@ class NasProvider extends ChangeNotifier {
     document = data;
     notifyListeners();
   }
+
+  void addFile(NasFile file, int parent) async {
+    var folder =
+        this.parents.firstWhere((p) => p.id == parent, orElse: () => null);
+    if (folder != null) {
+      folder.files.add(file);
+    }
+    notifyListeners();
+  }
+
+  void addFiles(List<NasFile> files, int parent) {
+    var folder =
+        this.parents.firstWhere((p) => p.id == parent, orElse: () => null);
+    if (folder != null) {
+      folder.files.addAll(files);
+    }
+    notifyListeners();
+  }
 }
 
 /// Fetch data from api

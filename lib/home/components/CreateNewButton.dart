@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:django_nas_mobile/PlatformWidget.dart';
-import 'package:django_nas_mobile/home/components/CreateNewDocumentView.dart';
-import 'package:django_nas_mobile/home/components/CreateNewFolderView.dart';
+import 'package:django_nas_mobile/home/components/CreateNewDialog.dart';
 import 'package:django_nas_mobile/models/NasProvider.dart';
 import 'package:django_nas_mobile/models/UploadProvider.dart';
 import 'package:file_picker/file_picker.dart';
@@ -18,47 +17,67 @@ class CreateNewButton extends StatelessWidget {
   void _onSelected(int selection, BuildContext context) async {
     UploadProvider uploadProvider = Provider.of(context);
     NasProvider nasProvider = Provider.of(context);
-
+    // new folder
     if (selection == 0) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) {
-          return CreateNewFolderView();
-        }),
+      TextEditingController controller = TextEditingController();
+      showDialog(
+        context: context,
+        builder: (context) => CreateNewDialog(
+          editingController: controller,
+          title: "Folder",
+          fieldName: "Folder Name",
+          onSubmit: () async {
+            await nasProvider.createNewFolder(controller.text);
+          },
+        ),
       );
-    } else if (selection == 1) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) {
-          return CreateNewDocumentView();
-        }),
+    }
+    // new document
+    else if (selection == 1) {
+      TextEditingController controller = TextEditingController();
+      showDialog(
+        context: context,
+        builder: (context) => CreateNewDialog(
+          editingController: controller,
+          title: "Document",
+          fieldName: "Document Name",
+          onSubmit: () async {
+            await nasProvider.createNewDocument(controller.text);
+          },
+        ),
       );
     } else if (selection == 2) {
       List<File> files = await FilePicker.getMultiFile();
+      if (files == null) {
+        return;
+      }
+      int parent = nasProvider.currentFolder.id;
       var data = await uploadProvider.addItems(
-          files
-              .map((f) =>
-                  UploadItem(file: f, parent: nasProvider.currentFolder.id))
-              .toList(),
+          files.map((f) => UploadItem(file: f, parent: parent)).toList(),
           baseURL: nasProvider.baseURL);
-      nasProvider.currentFolder.files.addAll(data);
-      nasProvider.update();
+      nasProvider.addFiles(data, data[0].parent);
     } else if (selection == 3) {
       var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+      if (image == null) {
+        return;
+      }
+      int parent = nasProvider.currentFolder.id;
       var data = await uploadProvider.addItem(
-          UploadItem(file: image, parent: nasProvider.currentFolder.id),
+          UploadItem(file: image, parent: parent),
           baseURL: nasProvider.baseURL);
-      nasProvider.currentFolder.files.add(data);
-      nasProvider.update();
+      nasProvider.addFile(data, data.parent);
     } else {
       var video = await ImagePicker.pickVideo(
         source: ImageSource.gallery,
       );
+      if (video == null) {
+        return;
+      }
+      int parent = nasProvider.currentFolder.id;
       var data = await uploadProvider.addItem(
-          UploadItem(file: video, parent: nasProvider.currentFolder.id),
+          UploadItem(file: video, parent: parent),
           baseURL: nasProvider.baseURL);
-      nasProvider.currentFolder.files.add(data);
-      nasProvider.update();
+      nasProvider.addFile(data, data.parent);
     }
   }
 
@@ -67,32 +86,41 @@ class CreateNewButton extends StatelessWidget {
     NasProvider nasProvider = Provider.of(context);
 
     if (selection == 0) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) {
-          return CreateNewFolderView();
-        }),
+      TextEditingController controller = TextEditingController();
+      showDialog(
+        context: context,
+        builder: (context) => CreateNewDialog(
+          editingController: controller,
+          title: "Folder",
+          fieldName: "Folder Name",
+          onSubmit: () async {
+            await nasProvider.createNewFolder(controller.text);
+          },
+        ),
       );
     } else if (selection == 1) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) {
-          return CreateNewDocumentView();
-        }),
+      TextEditingController controller = TextEditingController();
+      showDialog(
+        context: context,
+        builder: (context) => CreateNewDialog(
+          editingController: controller,
+          title: "Document",
+          fieldName: "Document Name",
+          onSubmit: () async {
+            await nasProvider.createNewDocument(controller.text);
+          },
+        ),
       );
     } else if (selection == 2) {
       FileChooserResult result =
           await showOpenPanel(allowsMultipleSelection: true);
       if (!result.canceled) {
         List<File> files = result.paths.map((p) => File(p)).toList();
+        int parent = nasProvider.currentFolder.id;
         var data = await uploadProvider.addItems(
-            files
-                .map((f) =>
-                    UploadItem(file: f, parent: nasProvider.currentFolder.id))
-                .toList(),
+            files.map((f) => UploadItem(file: f, parent: parent)).toList(),
             baseURL: nasProvider.baseURL);
-        nasProvider.currentFolder.files.addAll(data);
-        nasProvider.update();
+        nasProvider.addFiles(data, data[0].parent);
       }
     }
   }
@@ -101,7 +129,7 @@ class CreateNewButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return PlatformWidget(
       desktop: buildPopupMenuButtonDesktop(context),
-      largeScreen: buildPopupMenuButtonDesktop(context),
+      largeScreen: buildPopupMenuButtonMobile(context),
       mobile: buildPopupMenuButtonMobile(context),
     );
   }

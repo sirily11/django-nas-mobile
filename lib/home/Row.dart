@@ -1,6 +1,7 @@
-import 'package:django_nas_mobile/home/EditorView.dart';
+
 import 'package:django_nas_mobile/home/HomePage.dart';
-import 'package:django_nas_mobile/home/ImageView.dart';
+import 'package:django_nas_mobile/home/views/EditorView.dart';
+import 'package:django_nas_mobile/home/views/ImageView.dart';
 import 'package:django_nas_mobile/models/Folder.dart';
 import 'package:django_nas_mobile/models/NasProvider.dart';
 import 'package:django_nas_mobile/models/utils.dart';
