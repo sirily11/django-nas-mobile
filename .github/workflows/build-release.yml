@@ -1,0 +1,32 @@
+on:
+    push:
+      # Sequence of patterns matched against refs/tags
+      tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+  
+  name: Upload Release Asset
+  
+  jobs:
+    build:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v1
+        - uses: actions/setup-java@v1
+          with:
+            java-version: "12.x"
+        - uses: subosito/flutter-action@v1
+          with:
+            channel: stable
+        - run: flutter pub get
+        - run: flutter channel master
+        - run: flutter upgrade
+        - run: flutter build macos
+        - run: tar -cf build/macos/Build/Products/Release/django_nas_mobile.tar.gz build/macos/Build/Products/Release/django_nas_mobile.app
+        - name: Release
+          uses: softprops/action-gh-release@v1
+          if: startsWith(github.ref, 'refs/tags/')
+          with:
+            files: |
+              build/macos/Build/Products/Release/django_nas_mobile.tar.gz
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
