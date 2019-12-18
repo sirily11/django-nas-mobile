@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:django_nas_mobile/PlatformWidget.dart';
 import 'package:django_nas_mobile/home/components/CreateNewDialog.dart';
 import 'package:django_nas_mobile/models/NasProvider.dart';
-import 'package:django_nas_mobile/models/UploadProvider.dart';
+import 'package:django_nas_mobile/models/UploadDownloadProvider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -15,7 +15,7 @@ class CreateNewButton extends StatelessWidget {
   CreateNewButton({this.color});
 
   void _onSelected(int selection, BuildContext context) async {
-    UploadProvider uploadProvider = Provider.of(context);
+    UploadDownloadProvider uploadProvider = Provider.of(context);
     NasProvider nasProvider = Provider.of(context);
     // new folder
     if (selection == 0) {
@@ -53,7 +53,9 @@ class CreateNewButton extends StatelessWidget {
       }
       int parent = nasProvider.currentFolder.id;
       var data = await uploadProvider.addItems(
-          files.map((f) => UploadItem(file: f, parent: parent)).toList(),
+          files
+              .map((f) => UploadDownloadItem(file: f, parent: parent))
+              .toList(),
           baseURL: nasProvider.baseURL);
       nasProvider.addFiles(data, data[0].parent);
     } else if (selection == 3) {
@@ -63,7 +65,7 @@ class CreateNewButton extends StatelessWidget {
       }
       int parent = nasProvider.currentFolder.id;
       var data = await uploadProvider.addItem(
-          UploadItem(file: image, parent: parent),
+          UploadDownloadItem(file: image, parent: parent),
           baseURL: nasProvider.baseURL);
       nasProvider.addFile(data, data.parent);
     } else {
@@ -75,14 +77,14 @@ class CreateNewButton extends StatelessWidget {
       }
       int parent = nasProvider.currentFolder.id;
       var data = await uploadProvider.addItem(
-          UploadItem(file: video, parent: parent),
+          UploadDownloadItem(file: video, parent: parent),
           baseURL: nasProvider.baseURL);
       nasProvider.addFile(data, data.parent);
     }
   }
 
   void _onSelectedDesktop(int selection, BuildContext context) async {
-    UploadProvider uploadProvider = Provider.of(context);
+    UploadDownloadProvider uploadProvider = Provider.of(context);
     NasProvider nasProvider = Provider.of(context);
 
     if (selection == 0) {
@@ -118,7 +120,9 @@ class CreateNewButton extends StatelessWidget {
         List<File> files = result.paths.map((p) => File(p)).toList();
         int parent = nasProvider.currentFolder.id;
         var data = await uploadProvider.addItems(
-            files.map((f) => UploadItem(file: f, parent: parent)).toList(),
+            files
+                .map((f) => UploadDownloadItem(file: f, parent: parent))
+                .toList(),
             baseURL: nasProvider.baseURL);
         nasProvider.addFiles(data, data[0].parent);
       }

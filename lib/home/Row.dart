@@ -1,15 +1,21 @@
+import 'dart:io';
 
 import 'package:django_nas_mobile/home/HomePage.dart';
+import 'package:django_nas_mobile/home/components/ConfirmDialog.dart';
 import 'package:django_nas_mobile/home/views/EditorView.dart';
 import 'package:django_nas_mobile/home/views/ImageView.dart';
 import 'package:django_nas_mobile/models/Folder.dart';
 import 'package:django_nas_mobile/models/NasProvider.dart';
+import 'package:django_nas_mobile/models/UploadDownloadProvider.dart';
 import 'package:django_nas_mobile/models/utils.dart';
+import 'package:file_chooser/file_chooser.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:path/path.dart' as p;
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import 'components/ErrorDialog.dart';
 
 enum IconType { folder, file, document, image, video }
 const IMAGES = ['.jpg', '.png', 'bpm', '.gif'];
@@ -38,14 +44,9 @@ class ParentFolderRow extends StatelessWidget {
         } catch (err) {
           showDialog(
             context: context,
-            builder: (ctx) => AlertDialog(
-              content: Text("$err"),
-              actions: <Widget>[
-                FlatButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text("OK"),
-                )
-              ],
+            builder: (ctx) => ErrorDialog(
+              error: err.toString(),
+              title: "Move file/folder error",
             ),
           );
         }
@@ -109,13 +110,49 @@ class FileRow extends StatelessWidget {
         secondaryActions: <Widget>[
           IconSlideAction(
             onTap: () async {
-              NasProvider provider = Provider.of(context);
-              await provider.deleteFile(file);
+              showDialog(
+                context: context,
+                builder: (ctx) => ConfirmDialog(
+                  title: "Do you want to delete this file",
+                  content: "You cannot undo this action",
+                  onConfirm: () async {
+                    NasProvider provider = Provider.of(context);
+                    await provider.deleteFile(file);
+                  },
+                ),
+              );
             },
             icon: Icons.delete,
             caption: "Delete",
             color: Colors.red,
           ),
+          if (Platform.isMacOS)
+            IconSlideAction(
+              onTap: () async {
+                FileChooserResult chooserResult = await showSavePanel(
+                  suggestedFileName: p.basename(file.file),
+                );
+                if (!chooserResult.canceled) {
+                  try {
+                    UploadDownloadProvider uploadDownloadProvider =
+                        Provider.of(context);
+                    await uploadDownloadProvider.downloadItem(
+                        file.file, chooserResult.paths[0]);
+                  } catch (err) {
+                    showDialog(
+                      context: context,
+                      builder: (ctx) => ErrorDialog(
+                        title: "Download Error",
+                        error: err.toString(),
+                      ),
+                    );
+                  }
+                }
+              },
+              icon: Icons.file_download,
+              caption: "Download",
+              color: Colors.blue,
+            )
         ],
         child: ListTile(
           onTap: () async {
@@ -174,14 +211,9 @@ class FolderRow extends StatelessWidget {
         } catch (err) {
           showDialog(
             context: context,
-            builder: (ctx) => AlertDialog(
-              content: Text("$err"),
-              actions: <Widget>[
-                FlatButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text("OK"),
-                )
-              ],
+            builder: (ctx) => ErrorDialog(
+              error: err.toString(),
+              title: "Move folder error",
             ),
           );
         }
@@ -210,8 +242,17 @@ class FolderRow extends StatelessWidget {
         secondaryActions: <Widget>[
           IconSlideAction(
             onTap: () async {
-              NasProvider provider = Provider.of(context);
-              await provider.deleteFolder(folder);
+              showDialog(
+                context: context,
+                builder: (ctx) => ConfirmDialog(
+                  title: "Do you want to delete this folder",
+                  content: "You cannot undo this action",
+                  onConfirm: () async {
+                    NasProvider provider = Provider.of(context);
+                    await provider.deleteFolder(folder);
+                  },
+                ),
+              );
             },
             icon: Icons.delete,
             caption: "Delete",
@@ -295,8 +336,17 @@ class DocumentRow extends StatelessWidget {
         secondaryActions: <Widget>[
           IconSlideAction(
             onTap: () async {
-              NasProvider provider = Provider.of(context);
-              await provider.deleteDocument(document);
+              showDialog(
+                context: context,
+                builder: (ctx) => ConfirmDialog(
+                  title: "Do you want to delete this document",
+                  content: "You cannot undo this action",
+                  onConfirm: () async {
+                    NasProvider provider = Provider.of(context);
+                    await provider.deleteDocument(document);
+                  },
+                ),
+              );
             },
             icon: Icons.delete,
             caption: "Delete",

@@ -1,10 +1,34 @@
+import 'dart:async';
+
 import 'package:django_nas_mobile/models/SystemProvider.dart';
 import 'package:django_nas_mobile/models/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:provider/provider.dart';
 
-class InfoPage extends StatelessWidget {
+class InfoPage extends StatefulWidget {
+  @override
+  _InfoPageState createState() => _InfoPageState();
+}
+
+class _InfoPageState extends State<InfoPage> {
+  Timer timer;
+
+  @override
+  void initState() {
+    super.initState();
+    timer = Timer.periodic(Duration(seconds: 20), (timer) async {
+      SystemProvider systemProvider = Provider.of(context);
+      await systemProvider.getData();
+    });
+  }
+
+  @override
+  void dispose() {
+    timer.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     SystemProvider systemProvider = Provider.of(context);

@@ -1,4 +1,4 @@
-import 'package:django_nas_mobile/models/UploadProvider.dart';
+import 'package:django_nas_mobile/models/UploadDownloadProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
@@ -7,7 +7,7 @@ import 'package:path/path.dart' as p;
 class UploadPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    UploadProvider uploadProvider = Provider.of(context);
+    UploadDownloadProvider uploadProvider = Provider.of(context);
 
     return Stack(
       children: <Widget>[
@@ -19,7 +19,7 @@ class UploadPage extends StatelessWidget {
               ? uploadProvider.items.where((i) => !i.isDone).toList().length
               : uploadProvider.items.length,
           itemBuilder: (context, index) {
-            UploadItem item = uploadProvider.onlyNotUploadItem
+            UploadDownloadItem item = uploadProvider.onlyNotUploadItem
                 ? uploadProvider.items.where((i) => !i.isDone).toList()[index]
                 : uploadProvider.items[index];
             return Slidable(
@@ -41,7 +41,9 @@ class UploadPage extends StatelessWidget {
                         color: Colors.green,
                       )
                     : null,
-                leading: Icon(Icons.insert_drive_file),
+                leading: Icon(item.isUpload
+                    ? Icons.insert_drive_file
+                    : Icons.file_download),
                 title: Text(p.basename(item.file.path)),
                 subtitle: LinearProgressIndicator(
                   value: item.progress ?? 0,
@@ -73,7 +75,7 @@ class TotalUploadProgress extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    UploadProvider uploadProvider = Provider.of(context);
+    UploadDownloadProvider uploadProvider = Provider.of(context);
     final int totalNumber = uploadProvider.items.length;
     final int numberFinished =
         uploadProvider.items.where((i) => i.isDone).length;
@@ -111,10 +113,10 @@ class TotalUploadProgress extends StatelessWidget {
                           )
                         : Container(),
                   ),
-                  Text("Upload Progress: $numberFinished/$totalNumber"),
+                  Text("Transfer Progress: $numberFinished/$totalNumber"),
                   IconButton(
                     tooltip: !uploadProvider.onlyNotUploadItem
-                        ? "Hide not upload items"
+                        ? "Hide not in progress items"
                         : "Show all items",
                     onPressed: () {
                       uploadProvider.onlyNotUploadItem =

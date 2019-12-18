@@ -60,9 +60,7 @@ class SystemProvider with ChangeNotifier {
   SystemProvider({Dio dio}) {
     this.networkProvider = dio ?? Dio();
     this.getData();
-    Timer.periodic(Duration(seconds: 20), (timer) async {
-      await this.getData();
-    });
+   
   }
 
   Future<void> getData() async {

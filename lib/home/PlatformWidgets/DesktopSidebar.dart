@@ -8,7 +8,7 @@ class DesktopSidebar extends StatelessWidget {
     SelectionProvider selectionProvider = Provider.of(context);
     List<IconData> icons = [
       Icons.home,
-      Icons.file_upload,
+      Icons.queue,
       Icons.settings,
       Icons.info
     ];
@@ -18,7 +18,7 @@ class DesktopSidebar extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.only(right: 10),
         child: ListView(
-          children: ["Home", "Upload", "Settings", "Info"]
+          children: ["Home", "Transfer", "Settings", "Info"]
               .asMap()
               .map(
                 (i, t) => MapEntry(

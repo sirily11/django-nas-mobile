@@ -1,11 +1,12 @@
 import 'package:django_nas_mobile/models/NasProvider.dart';
 import 'package:django_nas_mobile/models/SelectionProvider.dart';
 import 'package:django_nas_mobile/models/SystemProvider.dart';
-import 'package:django_nas_mobile/models/UploadProvider.dart';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'home/HomePage.dart';
+import 'models/UploadDownloadProvider.dart';
 
 void main() => runApp(MyApp());
 
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
           builder: (_) => NasProvider(),
         ),
         ChangeNotifierProvider(
-          builder: (_) => UploadProvider(),
+          builder: (_) => UploadDownloadProvider(),
         ),
         ChangeNotifierProvider(
           builder: (_) => SystemProvider(),
