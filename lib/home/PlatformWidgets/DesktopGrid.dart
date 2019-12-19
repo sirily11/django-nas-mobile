@@ -22,7 +22,7 @@ class DesktopFileGrid extends StatelessWidget {
     int numberPerRow = (MediaQuery.of(context).size.width / 160).round();
 
     return AnimatedSwitcher(
-      duration: Duration(milliseconds: 200),
+      duration: Duration(milliseconds: 100),
       child: currentFolder == null
           ? LoadingShimmerList()
           : GestureDetector(

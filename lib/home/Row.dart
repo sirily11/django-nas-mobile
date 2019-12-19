@@ -30,10 +30,10 @@ class ParentFolderRow extends StatelessWidget {
       onAccept: (data) async {
         NasProvider nasProvider = Provider.of(context);
         try {
-          await onDragEnd(
+          await onDragMoveTo(
               data: data,
               nasProvider: nasProvider,
-              element: nasProvider.currentFolder);
+              element: BaseElement(id: nasProvider.currentFolder.parent));
         } catch (err) {
           showDialog(
             context: context,
@@ -192,7 +192,7 @@ class FolderRow extends StatelessWidget {
       onAccept: (data) async {
         NasProvider nasProvider = Provider.of(context);
         try {
-          await onDragEnd(
+          await onDragMoveTo(
               data: data, nasProvider: nasProvider, element: folder);
         } catch (err) {
           showDialog(

@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:django_nas_mobile/models/Folder.dart';
 import 'package:django_nas_mobile/models/NasProvider.dart';
+import 'package:flutter/material.dart';
 import 'package:zefyr/zefyr.dart';
 
 /// get string representation of size
@@ -114,14 +115,52 @@ List<dynamic> convertToQuill(NotusDocument document) {
 
 /// Call this function on Drag target
 /// Will move element into folder
-Future onDragEnd(
-    {BaseElement data, NasProvider nasProvider, BaseElement element}) async {
+Future onDragMoveTo(
+    {@required BaseElement data,
+    @required NasProvider nasProvider,
+    @required BaseElement element}) async {
+  if (data == element) {
+    return;
+  }
   if (data is NasFolder && data.id != element.id) {
     await nasProvider.moveFolderTo(data, element.id);
   } else if (data is NasFile) {
     await nasProvider.moveFileTo(data, element.id);
   } else if (data is NasDocument) {
     await nasProvider.moveDocumentTo(data, element.id);
+  } else {
+    print("File type is not supported");
+  }
+}
+
+/// Drag and remove the data based on type of data
+Future onDragRemove(
+    {@required BaseElement data, @required NasProvider nasProvider}) async {
+  if (data is NasFolder) {
+    await nasProvider.deleteFolder(data);
+  } else if (data is NasFile) {
+    await nasProvider.deleteFile(data);
+  } else if (data is NasDocument) {
+    await nasProvider.deleteDocument(data);
+  } else {
+    print("File type is not supported");
+  }
+}
+
+/// Drag and move back the data
+Future onDragMoveBack(
+    {@required BaseElement data,
+    @required NasProvider nasProvider,
+    @required BaseElement element}) async {
+  if (data == element) {
+    return;
+  }
+  if (data is NasFolder) {
+    await nasProvider.moveFolderBack(data, element.id);
+  } else if (data is NasFile) {
+    await nasProvider.moveFileBack(data, element.id);
+  } else if (data is NasDocument) {
+    await nasProvider.moveDocumentBack(data, element.id);
   } else {
     print("File type is not supported");
   }

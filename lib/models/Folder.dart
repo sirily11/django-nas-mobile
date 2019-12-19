@@ -2,6 +2,7 @@
 
 class BaseElement {
   int id;
+  BaseElement({this.id});
 }
 
 class NasFolder extends BaseElement {

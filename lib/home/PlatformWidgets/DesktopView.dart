@@ -1,4 +1,5 @@
 import 'package:django_nas_mobile/home/PlatformWidgets/DesktopSidebar.dart';
+import 'package:django_nas_mobile/home/PlatformWidgets/components/DesktopToolbar.dart';
 import 'package:django_nas_mobile/models/SelectionProvider.dart';
 import 'package:django_nas_mobile/models/UploadDownloadProvider.dart';
 import 'package:django_nas_mobile/upload/UploadPage.dart';
@@ -32,6 +33,7 @@ class DesktopView extends StatelessWidget {
           child: Stack(
             children: <Widget>[
               body,
+              DesktopToolbar(),
               show
                   ? TotalUploadProgress(
                       key: Key("homepage-progress"),

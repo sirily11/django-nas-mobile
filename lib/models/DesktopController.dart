@@ -3,6 +3,12 @@ import 'package:flutter/material.dart';
 
 class DesktopController with ChangeNotifier {
   BaseElement _selectedElement;
+  BaseElement _dragElement;
+
+  set dragElement(BaseElement element) {
+    _dragElement = element;
+    notifyListeners();
+  }
 
   set selectedElement(BaseElement ele) {
     _selectedElement = ele;
@@ -10,4 +16,6 @@ class DesktopController with ChangeNotifier {
   }
 
   get selectedElement => _selectedElement;
+
+  get dragElement => _dragElement;
 }
