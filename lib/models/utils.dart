@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:django_nas_mobile/models/Folder.dart';
+import 'package:django_nas_mobile/models/NasProvider.dart';
 import 'package:zefyr/zefyr.dart';
 
 /// get string representation of size
@@ -108,4 +110,19 @@ List<dynamic> convertToQuill(NotusDocument document) {
     }
   }
   return data;
+}
+
+/// Call this function on Drag target
+/// Will move element into folder
+Future onDragEnd(
+    {BaseElement data, NasProvider nasProvider, BaseElement element}) async {
+  if (data is NasFolder && data.id != element.id) {
+    await nasProvider.moveFolderTo(data, element.id);
+  } else if (data is NasFile) {
+    await nasProvider.moveFileTo(data, element.id);
+  } else if (data is NasDocument) {
+    await nasProvider.moveDocumentTo(data, element.id);
+  } else {
+    print("File type is not supported");
+  }
 }

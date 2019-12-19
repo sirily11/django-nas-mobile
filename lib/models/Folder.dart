@@ -1,6 +1,8 @@
 /// Root Folder
 
-class BaseElement {}
+class BaseElement {
+  int id;
+}
 
 class NasFolder extends BaseElement {
   int id;

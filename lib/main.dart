@@ -1,3 +1,4 @@
+import 'package:django_nas_mobile/models/DesktopController.dart';
 import 'package:django_nas_mobile/models/NasProvider.dart';
 import 'package:django_nas_mobile/models/SelectionProvider.dart';
 import 'package:django_nas_mobile/models/SystemProvider.dart';
@@ -27,6 +28,9 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           builder: (_) => SelectionProvider(),
+        ),
+        ChangeNotifierProvider(
+          builder: (_) => DesktopController(),
         )
       ],
       child: MaterialApp(

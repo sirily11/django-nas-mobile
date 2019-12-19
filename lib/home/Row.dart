@@ -29,18 +29,11 @@ class ParentFolderRow extends StatelessWidget {
     return DragTarget<BaseElement>(
       onAccept: (data) async {
         NasProvider nasProvider = Provider.of(context);
-        var parentID = nasProvider.currentFolder.parent;
         try {
-          if (data is NasFolder) {
-            await nasProvider.moveFolderBack(data, parentID);
-          } else if (data is NasFile) {
-            await nasProvider.moveFileBack(data, parentID);
-          } else if (data is NasDocument) {
-            await nasProvider.moveDocumentBack(data, parentID);
-          } else {
-            print("File type is not supported");
-          }
-          nasProvider.update();
+          await onDragEnd(
+              data: data,
+              nasProvider: nasProvider,
+              element: nasProvider.currentFolder);
         } catch (err) {
           showDialog(
             context: context,
@@ -199,15 +192,8 @@ class FolderRow extends StatelessWidget {
       onAccept: (data) async {
         NasProvider nasProvider = Provider.of(context);
         try {
-          if (data is NasFolder && data.id != folder.id) {
-            await nasProvider.moveFolderTo(data, folder.id);
-          } else if (data is NasFile) {
-            await nasProvider.moveFileTo(data, folder.id);
-          } else if (data is NasDocument) {
-            await nasProvider.moveDocumentTo(data, folder.id);
-          } else {
-            print("File type is not supported");
-          }
+          await onDragEnd(
+              data: data, nasProvider: nasProvider, element: folder);
         } catch (err) {
           showDialog(
             context: context,

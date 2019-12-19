@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:django_nas_mobile/PlatformWidget.dart';
 import 'package:django_nas_mobile/home/FileList.dart';
+import 'package:django_nas_mobile/home/PlatformWidgets/DesktopGrid.dart';
 import 'package:django_nas_mobile/home/PlatformWidgets/DesktopView.dart';
 import 'package:django_nas_mobile/home/PlatformWidgets/MobileView.dart';
 import 'package:django_nas_mobile/home/components/CreateNewButton.dart';
@@ -50,7 +51,11 @@ class _HomePageState extends State<HomePage> {
       case 3:
         return InfoPage();
       default:
-        return FileListWidget();
+        return PlatformWidget(
+          desktop: DesktopFileGrid(),
+          largeScreen: DesktopFileGrid(),
+          mobile: FileListWidget(),
+        );
     }
   }
 
