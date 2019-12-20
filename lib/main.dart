@@ -34,9 +34,14 @@ class MyApp extends StatelessWidget {
         )
       ],
       child: MaterialApp(
+          debugShowCheckedModeBanner: false,
           title: 'Flutter Demo',
-          // darkTheme: ThemeData.dark(),
-          theme: ThemeData(primarySwatch: Colors.blue),
+          themeMode: ThemeMode.system,
+          darkTheme: ThemeData.dark().copyWith(
+              primaryColor: Colors.orange,
+              appBarTheme: AppBarTheme().copyWith(color: Colors.grey[900])),
+          theme: ThemeData(
+              primarySwatch: Colors.blue, primaryColor: Colors.orange),
           home: HomePage()),
     );
   }

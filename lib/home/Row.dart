@@ -62,41 +62,13 @@ class FileRow extends StatelessWidget {
 
   FileRow({@required this.file});
 
-  Widget _renderIcon({String path}) {
-    if (IMAGES.contains(p.extension(path).toLowerCase())) {
-      return Image.asset(
-        "assets/icons/picture.png",
-        key: Key("image-$path"),
-        width: 40,
-      );
-    } else if (VIDEOS.contains(p.extension(path).toLowerCase())) {
-      return file.cover != null
-          ? Image.network(
-              file.cover,
-              key: Key("video-$path"),
-              width: 40,
-              fit: BoxFit.cover,
-            )
-          : Image.asset(
-              "assets/icons/player.png",
-              key: Key("video-$path"),
-              width: 40,
-            );
-    }
-    return Image.asset(
-      "assets/icons/file.png",
-      key: Key("file-$path"),
-      width: 40,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return LongPressDraggable<BaseElement>(
       data: file,
       feedback: OnDraggingWidget(
         title: p.basename(file.filename),
-        icon: _renderIcon(path: file.filename),
+        icon: renderMobileIcon(path: file.filename, file: file),
       ),
       child: Slidable(
         actionPane: SlidableDrawerActionPane(),
@@ -149,27 +121,9 @@ class FileRow extends StatelessWidget {
         ],
         child: ListTile(
           onTap: () async {
-            if (IMAGES.contains(p.extension(file.filename).toLowerCase())) {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) {
-                  return ImageView(
-                    name: p.basename(file.filename),
-                    url: file.file,
-                  );
-                }),
-              );
-            } else if (VIDEOS
-                .contains(p.extension(file.filename).toLowerCase())) {
-              if (await canLaunch(file.file)) {
-                await launch(file.file);
-              }
-            } else {
-              if (await canLaunch(file.file)) {
-                await launch(file.file);
-              }
-            }
+            await onFileTap(context: context, file: file);
           },
-          leading: _renderIcon(path: file.filename),
+          leading: renderMobileIcon(path: file.filename, file: file),
           title: Text(p.basename(file.filename)),
           subtitle: Text(getSize(file.size)),
           trailing: IconButton(

@@ -19,6 +19,15 @@ class ConfirmDialog extends StatelessWidget {
       content: Text("$content"),
       actions: <Widget>[
         FlatButton(
+          child: Text("Cancel"),
+          onPressed: () async {
+            if (onCancel != null) {
+              await onCancel();
+            }
+            Navigator.pop(context);
+          },
+        ),
+        FlatButton(
           child: Text("OK"),
           onPressed: () async {
             if (onConfirm != null) {
@@ -27,15 +36,6 @@ class ConfirmDialog extends StatelessWidget {
             Navigator.pop(context);
           },
         ),
-        FlatButton(
-          child: Text("Cancel"),
-          onPressed: () async {
-            if (onCancel != null) {
-              await onCancel();
-            }
-            Navigator.pop(context);
-          },
-        )
       ],
     );
   }

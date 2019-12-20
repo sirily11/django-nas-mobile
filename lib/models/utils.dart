@@ -1,10 +1,16 @@
 import 'dart:convert';
 import 'dart:math';
 
+import 'package:django_nas_mobile/home/Row.dart';
+import 'package:django_nas_mobile/home/components/UpdateDialog.dart';
+import 'package:django_nas_mobile/home/views/ImageView.dart';
+import 'package:django_nas_mobile/models/DesktopController.dart';
 import 'package:django_nas_mobile/models/Folder.dart';
 import 'package:django_nas_mobile/models/NasProvider.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:zefyr/zefyr.dart';
+import 'package:path/path.dart' as p;
 
 /// get string representation of size
 /// [size] size of file in bytes
@@ -118,6 +124,7 @@ List<dynamic> convertToQuill(NotusDocument document) {
 Future onDragMoveTo(
     {@required BaseElement data,
     @required NasProvider nasProvider,
+    @required DesktopController desktopController,
     @required BaseElement element}) async {
   if (data == element) {
     return;
@@ -131,11 +138,14 @@ Future onDragMoveTo(
   } else {
     print("File type is not supported");
   }
+  desktopController.selectedElement = null;
 }
 
 /// Drag and remove the data based on type of data
 Future onDragRemove(
-    {@required BaseElement data, @required NasProvider nasProvider}) async {
+    {@required BaseElement data,
+    @required NasProvider nasProvider,
+    @required DesktopController desktopController}) async {
   if (data is NasFolder) {
     await nasProvider.deleteFolder(data);
   } else if (data is NasFile) {
@@ -145,12 +155,14 @@ Future onDragRemove(
   } else {
     print("File type is not supported");
   }
+  desktopController.selectedElement = null;
 }
 
 /// Drag and move back the data
 Future onDragMoveBack(
     {@required BaseElement data,
     @required NasProvider nasProvider,
+    @required DesktopController desktopController,
     @required BaseElement element}) async {
   if (data == element) {
     return;
@@ -164,4 +176,81 @@ Future onDragMoveBack(
   } else {
     print("File type is not supported");
   }
+  desktopController.selectedElement = null;
+}
+
+Future onDragRename(
+    {@required BaseElement data,
+    NasProvider nasProvider,
+    BuildContext context,
+    @required DesktopController desktopController}) async {
+  TextEditingController controller = TextEditingController(text: data.name);
+  showDialog(
+    context: context,
+    builder: (c) => UpdateDialog(
+      title: "Name",
+      editingController: controller,
+      fieldName: "Name",
+      onSubmit: () async {
+        if (data is NasFolder) {
+          await nasProvider.updateFolder(controller.text, data.id);
+        } else if (data is NasDocument) {
+          await nasProvider.updateDocumentName(controller.text, data.id);
+        } else {
+          throw ("File type is not supported");
+        }
+        desktopController.selectedElement = null;
+      },
+    ),
+  );
+}
+
+Future<void> onFileTap({@required NasFile file, BuildContext context}) async {
+  if (IMAGES.contains(p.extension(file.filename).toLowerCase())) {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) {
+        return ImageView(
+          name: p.basename(file.filename),
+          url: file.file,
+        );
+      }),
+    );
+  } else if (VIDEOS.contains(p.extension(file.filename).toLowerCase())) {
+    if (await canLaunch(file.file)) {
+      await launch(file.file);
+    }
+  } else {
+    if (await canLaunch(file.file)) {
+      await launch(file.file);
+    }
+  }
+}
+
+Widget renderMobileIcon(
+    {@required String path, @required NasFile file, double size = 40}) {
+  if (IMAGES.contains(p.extension(path).toLowerCase())) {
+    return Image.asset(
+      "assets/icons/picture.png",
+      key: Key("image-$path"),
+      width: size,
+    );
+  } else if (VIDEOS.contains(p.extension(path).toLowerCase())) {
+    return file.cover != null
+        ? Image.network(
+            file.cover,
+            key: Key("video-nc-$path"),
+            width: size,
+            fit: BoxFit.cover,
+          )
+        : Image.asset(
+            "assets/icons/player.png",
+            key: Key("video-$path"),
+            width: size,
+          );
+  }
+  return Image.asset(
+    "assets/icons/file.png",
+    key: Key("file-$path"),
+    width: size,
+  );
 }

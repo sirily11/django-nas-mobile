@@ -6,7 +6,9 @@ import 'package:django_nas_mobile/home/PlatformWidgets/DesktopGrid.dart';
 import 'package:django_nas_mobile/home/PlatformWidgets/DesktopView.dart';
 import 'package:django_nas_mobile/home/PlatformWidgets/MobileView.dart';
 import 'package:django_nas_mobile/home/components/CreateNewButton.dart';
+import 'package:django_nas_mobile/home/components/SearchDelegate.dart';
 import 'package:django_nas_mobile/info/InfoPage.dart';
+import 'package:django_nas_mobile/models/DesktopController.dart';
 import 'package:django_nas_mobile/models/NasProvider.dart';
 import 'package:django_nas_mobile/models/SelectionProvider.dart';
 import 'package:django_nas_mobile/settings/SettingPage.dart';
@@ -33,6 +35,7 @@ class _HomePageState extends State<HomePage> {
       if (provider.box == null) {
         await provider.initBox();
       }
+
       await provider.fetchFolder(widget.folderID);
     });
   }
@@ -51,11 +54,18 @@ class _HomePageState extends State<HomePage> {
       case 3:
         return InfoPage();
       default:
-        return PlatformWidget(
-          desktop: DesktopFileGrid(),
-          largeScreen: DesktopFileGrid(),
-          mobile: FileListWidget(),
-        );
+        return FutureBuilder<bool>(
+            future: Future.delayed(Duration(milliseconds: 50), () => true),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) {
+                return Container();
+              }
+              return PlatformWidget(
+                desktop: DesktopFileGrid(),
+                largeScreen: DesktopFileGrid(),
+                mobile: FileListWidget(),
+              );
+            });
     }
   }
 
@@ -76,8 +86,10 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         leading: widget.folderID != null
             ? IconButton(
-                color: Colors.black,
+                color: Theme.of(context).textTheme.button.color,
                 onPressed: () async {
+                  DesktopController controller = Provider.of(context);
+                  controller.selectedElement = null;
                   await provider.backToPrev();
                   Navigator.pop(context);
                 },
@@ -85,9 +97,25 @@ class _HomePageState extends State<HomePage> {
               )
             : null,
         actions: <Widget>[
+          IconButton(
+            color: Theme.of(context).textTheme.button.color,
+            icon: Icon(Icons.refresh),
+            onPressed: () async {
+              NasProvider nasProvider = Provider.of(context);
+              nasProvider.isLoading = true;
+              nasProvider.refresh(nasProvider.currentFolder.id);
+            },
+          ),
+          IconButton(
+            color: Theme.of(context).textTheme.button.color,
+            icon: Icon(Icons.search),
+            onPressed: () {
+              showSearch(context: context, delegate: FileSearch());
+            },
+          ),
           CreateNewButton(
-            color: Colors.black,
-          )
+            color: Theme.of(context).textTheme.button.color,
+          ),
         ],
         elevation: 0,
         backgroundColor: Colors.transparent,

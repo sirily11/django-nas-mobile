@@ -2,6 +2,7 @@
 
 class BaseElement {
   int id;
+  String name;
   BaseElement({this.id});
 }
 

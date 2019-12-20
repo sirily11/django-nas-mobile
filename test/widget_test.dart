@@ -15,6 +15,8 @@ import 'package:django_nas_mobile/main.dart';
 
 void main() {
   group("Row Test", () {
+    final TestWidgetsFlutterBinding binding =
+        TestWidgetsFlutterBinding.ensureInitialized();
     testWidgets("Video File test", (tester) async {
       await tester.pumpWidget(
         MaterialApp(

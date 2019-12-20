@@ -35,6 +35,8 @@ class NasProvider extends ChangeNotifier {
     }
   }
 
+  
+
   Future<void> initBox() async {
     if (Platform.isIOS || Platform.isAndroid) {
       var path = await getApplicationDocumentsDirectory();
@@ -218,8 +220,20 @@ class NasProvider extends ChangeNotifier {
       currentFolder = folder;
       parents.last = folder;
     } catch (err) {} finally {
+      isLoading = false;
       notifyListeners();
     }
+  }
+
+  Future<List<NasFile>> search(String keyword) async {
+    try {
+      List<NasFile> files = await DataFetcher(
+              url: fileUrl,
+              networkProvider: this.networkProvider,
+              baseURL: baseURL)
+          .search<NasFile>(keyword);
+      return files;
+    } catch (err) {}
   }
 
   /// fetch folder
@@ -236,6 +250,7 @@ class NasProvider extends ChangeNotifier {
       currentFolder = folder;
       parents.add(folder);
     } catch (err) {} finally {
+      await Future.delayed(Duration(milliseconds: 200));
       isLoading = false;
       notifyListeners();
     }
@@ -383,6 +398,20 @@ class DataFetcher {
       await _getURL();
       Response<List> response = await this.networkProvider.get("$url");
       List<T> data = response.data.map((d) => _getObject<T>(d)).toList();
+
+      return data;
+    } catch (err) {
+      print(err);
+      rethrow;
+    }
+  }
+
+  Future<List<T>> search<T>(String keyword) async {
+    try {
+      await _getURL();
+      Response<List> response =
+          await this.networkProvider.get("$url?search=$keyword");
+      List<T> data = response.data.map((d) => _getObject<T>(d) as T).toList();
 
       return data;
     } catch (err) {

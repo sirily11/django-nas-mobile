@@ -4,6 +4,7 @@ import 'package:django_nas_mobile/models/DesktopController.dart';
 import 'package:django_nas_mobile/models/Folder.dart';
 import 'package:django_nas_mobile/models/NasProvider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:provider/provider.dart';
 
 class DesktopFileGrid extends StatelessWidget {
@@ -19,24 +20,39 @@ class DesktopFileGrid extends StatelessWidget {
           currentFolder.folders.length +
           currentFolder.files.length;
     }
-    int numberPerRow = (MediaQuery.of(context).size.width / 160).round();
+    int numberPerRow = (MediaQuery.of(context).size.width / 170).round();
 
     return AnimatedSwitcher(
       duration: Duration(milliseconds: 100),
-      child: currentFolder == null
-          ? LoadingShimmerList()
+      child: nasProvider.isLoading
+          ? Center(child: Image.asset("assets/icons/animat-code-color.gif"))
           : GestureDetector(
-              onTap: () {
-                controller.selectedElement = null;
-              },
-              child: GridView.builder(
+              child: StaggeredGridView.countBuilder(
                 itemCount: length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: numberPerRow),
+                crossAxisCount: 10,
+                staggeredTileBuilder: (int index) =>
+                    new StaggeredTile.count(2, 2),
                 itemBuilder: (context, index) {
                   if (index >= 0 && index < currentFolder.folders.length) {
                     return DesktopFolderItem(
                       folder: currentFolder.folders[index],
+                    );
+                  } else if (index >= currentFolder.folders.length &&
+                      index <
+                          currentFolder.documents.length +
+                              currentFolder.folders.length) {
+                    int prevIndex = currentFolder.folders.length;
+                    return DesktopDocumentItem(
+                      document: currentFolder.documents[index - prevIndex],
+                    );
+                  } else if (index >=
+                          currentFolder.documents.length +
+                              currentFolder.folders.length &&
+                      index < length) {
+                    int prevIndex = currentFolder.folders.length +
+                        currentFolder.documents.length;
+                    return DesktopFileItem(
+                      file: currentFolder.files[index - prevIndex],
                     );
                   }
 
