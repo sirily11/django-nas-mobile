@@ -1,4 +1,5 @@
 import 'package:django_nas_mobile/models/UploadDownloadProvider.dart';
+import 'package:django_nas_mobile/models/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
@@ -40,14 +41,28 @@ class UploadPage extends StatelessWidget {
                         Icons.done,
                         color: Colors.green,
                       )
-                    : null,
-                leading: Icon(item.isUpload
-                    ? Icons.insert_drive_file
-                    : Icons.file_download),
-                title: Text(p.basename(item.file.path)),
-                subtitle: LinearProgressIndicator(
-                  value: item.progress ?? 0,
+                    : Icon(
+                        Icons.clear,
+                        color: Theme.of(context).disabledColor,
+                      ),
+                leading: Stack(
+                  children: <Widget>[
+                    CircularProgressIndicator(
+                      value: item.progress ?? 0,
+                    ),
+                    Positioned.fill(
+                      child: Align(
+                        child: Text(
+                          "${((item.progress ?? 0) * 100).toStringAsFixed(0)}%",
+                          style: TextStyle(fontSize: 10),
+                        ),
+                      ),
+                    )
+                  ],
                 ),
+                title: Text(p.basename(item.file.path)),
+                subtitle: Text(
+                    "${getSize(item.current.toDouble())}/${getSize(item?.total?.toDouble())}"),
               ),
             );
           },
@@ -138,7 +153,7 @@ class TotalUploadProgress extends StatelessWidget {
                     },
                     icon: Icon(
                       uploadProvider.pause ? Icons.play_arrow : Icons.pause,
-                      color: Theme.of(context).accentColor,
+                      color: Theme.of(context).primaryColor,
                     ),
                   ),
                   IconButton(

@@ -84,7 +84,7 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: widget.folderID != null
+        leading: widget.folderID != null && selectionProvider.currentIndex == 0
             ? IconButton(
                 color: Theme.of(context).textTheme.button.color,
                 onPressed: () async {
@@ -95,7 +95,11 @@ class _HomePageState extends State<HomePage> {
                 },
                 icon: Icon(Icons.arrow_back_ios),
               )
-            : null,
+            : IconButton(
+                color: Theme.of(context).textTheme.button.color,
+                onPressed: null,
+                icon: Icon(Icons.arrow_back_ios),
+              ),
         actions: <Widget>[
           IconButton(
             color: Theme.of(context).textTheme.button.color,
@@ -125,34 +129,50 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       body: body,
-      bottomNavigationBar: Platform.isIOS || Platform.isAndroid
-          ? BottomNavigationBar(
-              unselectedItemColor: Theme.of(context).unselectedWidgetColor,
-              selectedItemColor: Theme.of(context).primaryColor,
-              currentIndex: selectionProvider.currentIndex,
-              onTap: (index) {
-                selectionProvider.currentIndex = index;
-              },
-              items: [
-                BottomNavigationBarItem(
-                  title: Text("Files"),
-                  icon: Icon(Icons.insert_drive_file),
-                ),
-                BottomNavigationBarItem(
-                  title: Text("Transfer"),
-                  icon: Icon(Icons.queue),
-                ),
-                BottomNavigationBarItem(
-                  title: Text("Settings"),
-                  icon: Icon(Icons.settings),
-                ),
-                BottomNavigationBarItem(
-                  title: Text("Info"),
-                  icon: Icon(Icons.info),
-                )
-              ],
-            )
-          : null,
+      bottomNavigationBar: PlatformWidget(
+        desktop: Container(
+          height: 0,
+        ),
+        mobile: MobileButtonNavigationBar(),
+        largeScreen: Container(
+          height: 0,
+        ),
+      ),
+    );
+  }
+}
+
+class MobileButtonNavigationBar extends StatelessWidget {
+  const MobileButtonNavigationBar({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    SelectionProvider selectionProvider = Provider.of(context);
+    return BottomNavigationBar(
+      unselectedItemColor: Theme.of(context).unselectedWidgetColor,
+      selectedItemColor: Theme.of(context).primaryColor,
+      currentIndex: selectionProvider.currentIndex,
+      onTap: (index) {
+        selectionProvider.currentIndex = index;
+      },
+      items: [
+        BottomNavigationBarItem(
+          title: Text("Files"),
+          icon: Icon(Icons.insert_drive_file),
+        ),
+        BottomNavigationBarItem(
+          title: Text("Transfer"),
+          icon: Icon(Icons.queue),
+        ),
+        BottomNavigationBarItem(
+          title: Text("Settings"),
+          icon: Icon(Icons.settings),
+        ),
+        BottomNavigationBarItem(
+          title: Text("Info"),
+          icon: Icon(Icons.info),
+        )
+      ],
     );
   }
 }

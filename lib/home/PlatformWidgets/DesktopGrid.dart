@@ -20,7 +20,7 @@ class DesktopFileGrid extends StatelessWidget {
           currentFolder.folders.length +
           currentFolder.files.length;
     }
-    int numberPerRow = (MediaQuery.of(context).size.width / 170).round();
+    int numberPerRow = (MediaQuery.of(context).size.height / 400).round();
 
     return AnimatedSwitcher(
       duration: Duration(milliseconds: 100),
@@ -30,8 +30,7 @@ class DesktopFileGrid extends StatelessWidget {
               child: StaggeredGridView.countBuilder(
                 itemCount: length,
                 crossAxisCount: 10,
-                staggeredTileBuilder: (int index) =>
-                    new StaggeredTile.count(2, 2),
+                staggeredTileBuilder: (int index) => new StaggeredTile.fit(2),
                 itemBuilder: (context, index) {
                   if (index >= 0 && index < currentFolder.folders.length) {
                     return DesktopFolderItem(

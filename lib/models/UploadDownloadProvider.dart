@@ -13,6 +13,21 @@ class UploadDownloadItem {
   int parent;
   bool isDone = false;
   bool isUpload;
+  int total = 0;
+  int current = 0;
+  double _speed = 0;
+  DateTime _time = DateTime.now();
+
+  set speed(double difference) {
+    DateTime now = DateTime.now();
+    Duration duration = now.difference(_time);
+    _time = now;
+    _speed = (difference / duration.inMicroseconds) * 100000;
+  }
+
+  double get speed => _speed;
+
+  computeSpeed() {}
   UploadDownloadItem(
       {this.file,
       this.progress,
@@ -77,6 +92,9 @@ class UploadDownloadProvider extends ChangeNotifier {
       notifyListeners();
       await networkProvider.download(url, savePath,
           onReceiveProgress: (received, total) {
+        item.total = total;
+        item.speed = (received - item.current).toDouble();
+        item.current = received;
         double progress = (received / total);
         item.progress = progress;
         notifyListeners();
@@ -114,7 +132,9 @@ class UploadDownloadProvider extends ChangeNotifier {
             url: fileUrl, baseURL: baseURL, networkProvider: networkProvider)
         .create<NasFile>(data, callback: (count, total) {
       double progress = (count / total);
-
+      item.total = total;
+      item.speed = (count - item.current).toDouble();
+      item.current = count;
       item.progress = progress;
       notifyListeners();
     });

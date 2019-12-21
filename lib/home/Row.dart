@@ -4,6 +4,7 @@ import 'package:django_nas_mobile/home/HomePage.dart';
 import 'package:django_nas_mobile/home/components/ConfirmDialog.dart';
 import 'package:django_nas_mobile/home/views/EditorView.dart';
 import 'package:django_nas_mobile/home/views/ImageView.dart';
+import 'package:django_nas_mobile/models/DesktopController.dart';
 import 'package:django_nas_mobile/models/Folder.dart';
 import 'package:django_nas_mobile/models/NasProvider.dart';
 import 'package:django_nas_mobile/models/UploadDownloadProvider.dart';
@@ -29,9 +30,11 @@ class ParentFolderRow extends StatelessWidget {
     return DragTarget<BaseElement>(
       onAccept: (data) async {
         NasProvider nasProvider = Provider.of(context);
+        DesktopController desktopController = Provider.of(context);
         try {
-          await onDragMoveTo(
+          await onDragMoveBack(
               data: data,
+              desktopController: desktopController,
               nasProvider: nasProvider,
               element: BaseElement(id: nasProvider.currentFolder.parent));
         } catch (err) {
@@ -94,25 +97,8 @@ class FileRow extends StatelessWidget {
           if (Platform.isMacOS)
             IconSlideAction(
               onTap: () async {
-                FileChooserResult chooserResult = await showSavePanel(
-                  suggestedFileName: p.basename(file.file),
-                );
-                if (!chooserResult.canceled) {
-                  try {
-                    UploadDownloadProvider uploadDownloadProvider =
-                        Provider.of(context);
-                    await uploadDownloadProvider.downloadItem(
-                        file.file, chooserResult.paths[0]);
-                  } catch (err) {
-                    showDialog(
-                      context: context,
-                      builder: (ctx) => ErrorDialog(
-                        title: "Download Error",
-                        error: err.toString(),
-                      ),
-                    );
-                  }
-                }
+                await downloadFile(context,
+                    uploadDownloadProvider: Provider.of(context), file: file);
               },
               icon: Icons.file_download,
               caption: "Download",

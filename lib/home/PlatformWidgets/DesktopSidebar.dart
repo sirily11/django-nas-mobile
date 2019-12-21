@@ -15,42 +15,39 @@ class DesktopSidebar extends StatelessWidget {
 
     return Hero(
       tag: Key("sidebar"),
-      child: Padding(
-        padding: const EdgeInsets.only(right: 10),
-        child: ListView(
-          children: ["Home", "Transfer", "Settings", "Info"]
-              .asMap()
-              .map(
-                (i, t) => MapEntry(
-                  i,
-                  MaterialButton(
-                    height: 100,
-                    onPressed: () async {
-                      selectionProvider.currentIndex = i;
-                    },
-                    child: Column(
-                      children: <Widget>[
-                        Icon(
-                          icons[i],
-                          color: selectionProvider.currentIndex == i
-                              ? Theme.of(context).primaryColor
-                              : Theme.of(context).unselectedWidgetColor,
-                        ),
-                        Text(
-                          t,
-                          style: TextStyle(
-                              color: selectionProvider.currentIndex == i
-                                  ? Theme.of(context).primaryColor
-                                  : Theme.of(context).unselectedWidgetColor),
-                        )
-                      ],
-                    ),
+      child: ListView(
+        children: ["Home", "Transfer", "Settings", "Info"]
+            .asMap()
+            .map(
+              (i, t) => MapEntry(
+                i,
+                MaterialButton(
+                  height: 100,
+                  onPressed: () async {
+                    selectionProvider.currentIndex = i;
+                  },
+                  child: Column(
+                    children: <Widget>[
+                      Icon(
+                        icons[i],
+                        color: selectionProvider.currentIndex == i
+                            ? Theme.of(context).primaryColor
+                            : Theme.of(context).unselectedWidgetColor,
+                      ),
+                      Text(
+                        t,
+                        style: TextStyle(
+                            color: selectionProvider.currentIndex == i
+                                ? Theme.of(context).primaryColor
+                                : Theme.of(context).unselectedWidgetColor),
+                      )
+                    ],
                   ),
                 ),
-              )
-              .values
-              .toList(),
-        ),
+              ),
+            )
+            .values
+            .toList(),
       ),
     );
   }

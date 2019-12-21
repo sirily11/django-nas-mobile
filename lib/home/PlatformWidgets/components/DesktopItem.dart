@@ -64,7 +64,7 @@ class DesktopFolderItem extends StatelessWidget {
           controller.selectedElement = null;
           provider.isLoading = true;
           Navigator.of(context).push(
-            CupertinoPageRoute(builder: (ctx) {
+            MaterialPageRoute(builder: (ctx) {
               return HomePage(
                 folderID: folder.id,
                 name: folder.name,
@@ -194,6 +194,8 @@ class DesktopFileItem extends StatelessWidget {
                     _renderIcon(path: file.file),
                     Text(
                       "${p.basename(file.filename)}",
+                      softWrap: true,
+                      overflow: TextOverflow.clip,
                       textAlign: TextAlign.center,
                     ),
                     Text(
@@ -235,7 +237,7 @@ class DesktopDocumentItem extends StatelessWidget {
       child: GestureDetector(
         onDoubleTap: () {
           Navigator.of(context).push(
-            CupertinoPageRoute(builder: (ctx) {
+            MaterialPageRoute(builder: (ctx) {
               return EditorView(
                 id: document.id,
                 name: document.name,

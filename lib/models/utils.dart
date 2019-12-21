@@ -1,12 +1,16 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:django_nas_mobile/home/Row.dart';
+import 'package:django_nas_mobile/home/components/ErrorDialog.dart';
 import 'package:django_nas_mobile/home/components/UpdateDialog.dart';
 import 'package:django_nas_mobile/home/views/ImageView.dart';
 import 'package:django_nas_mobile/models/DesktopController.dart';
 import 'package:django_nas_mobile/models/Folder.dart';
 import 'package:django_nas_mobile/models/NasProvider.dart';
+import 'package:django_nas_mobile/models/UploadDownloadProvider.dart';
+import 'package:file_chooser/file_chooser.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:zefyr/zefyr.dart';
@@ -124,7 +128,7 @@ List<dynamic> convertToQuill(NotusDocument document) {
 Future onDragMoveTo(
     {@required BaseElement data,
     @required NasProvider nasProvider,
-    @required DesktopController desktopController,
+    DesktopController desktopController,
     @required BaseElement element}) async {
   if (data == element) {
     return;
@@ -155,14 +159,14 @@ Future onDragRemove(
   } else {
     print("File type is not supported");
   }
-  desktopController.selectedElement = null;
+  desktopController?.selectedElement = null;
 }
 
 /// Drag and move back the data
 Future onDragMoveBack(
     {@required BaseElement data,
     @required NasProvider nasProvider,
-    @required DesktopController desktopController,
+    DesktopController desktopController,
     @required BaseElement element}) async {
   if (data == element) {
     return;
@@ -176,7 +180,7 @@ Future onDragMoveBack(
   } else {
     print("File type is not supported");
   }
-  desktopController.selectedElement = null;
+  desktopController?.selectedElement = null;
 }
 
 Future onDragRename(
@@ -199,7 +203,7 @@ Future onDragRename(
         } else {
           throw ("File type is not supported");
         }
-        desktopController.selectedElement = null;
+        desktopController?.selectedElement = null;
       },
     ),
   );
@@ -212,6 +216,7 @@ Future<void> onFileTap({@required NasFile file, BuildContext context}) async {
         return ImageView(
           name: p.basename(file.filename),
           url: file.file,
+          nasFile: Platform.isMacOS ? file : null,
         );
       }),
     );
@@ -253,4 +258,39 @@ Widget renderMobileIcon(
     key: Key("file-$path"),
     width: size,
   );
+}
+
+Future downloadFile(BuildContext context,
+    {@required UploadDownloadProvider uploadDownloadProvider,
+    @required NasFile file}) async {
+  FileChooserResult chooserResult = await showSavePanel(
+    suggestedFileName: p.basename(file.file),
+  );
+  if (!chooserResult.canceled) {
+    try {
+      await uploadDownloadProvider.downloadItem(
+          file.file, chooserResult.paths[0]);
+    } catch (err) {
+      showDialog(
+        context: context,
+        builder: (ctx) => ErrorDialog(
+          title: "Download Error",
+          error: err.toString(),
+        ),
+      );
+    }
+  }
+}
+
+/// get part of long string if string is longer than required
+/// Will append ... at the end
+/// For example abcde will become abc... if [length] = 3
+String getLongString(String text, {int length = 3}) {
+  bool isLonger = true;
+  if (text.length < length) {
+    length = text.length;
+    isLonger = false;
+  }
+
+  return "${text.substring(0, length)}${isLonger ? "..." : ""}";
 }

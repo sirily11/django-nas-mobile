@@ -35,8 +35,6 @@ class NasProvider extends ChangeNotifier {
     }
   }
 
-  
-
   Future<void> initBox() async {
     if (Platform.isIOS || Platform.isAndroid) {
       var path = await getApplicationDocumentsDirectory();
@@ -257,8 +255,15 @@ class NasProvider extends ChangeNotifier {
   }
 
   Future<void> backToPrev() async {
-    parents.removeLast();
-    currentFolder = parents.last;
+    if (parents.length == 1) {
+      parents.clear();
+      this.fetchFolder(null);
+    } else if (parents.length > 0) {
+      parents.removeLast();
+      currentFolder = parents.last;
+    } else {
+      throw ("Parent is empty");
+    }
     notifyListeners();
   }
 

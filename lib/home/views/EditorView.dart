@@ -80,10 +80,37 @@ class EditorViewState extends State<EditorView> {
             }
 
             return ZefyrScaffold(
-              child: ZefyrEditor(
-                padding: EdgeInsets.all(16),
-                controller: _controller,
-                focusNode: _focusNode,
+              child: ZefyrTheme(
+                data: ZefyrThemeData.fallback(context).copyWith(
+                  cursorColor: Theme.of(context).cursorColor,
+                  paragraphTheme:
+                      StyleTheme(textStyle: Theme.of(context).textTheme.body1),
+                  headingTheme: HeadingTheme(
+                    level1: StyleTheme(
+                      textStyle: Theme.of(context)
+                          .textTheme
+                          .title
+                          .copyWith(fontSize: 30),
+                    ),
+                    level2: StyleTheme(
+                      textStyle: Theme.of(context)
+                          .textTheme
+                          .subtitle
+                          .copyWith(fontSize: 24),
+                    ),
+                    level3: StyleTheme(
+                      textStyle: Theme.of(context)
+                          .textTheme
+                          .subtitle
+                          .copyWith(fontSize: 20),
+                    ),
+                  ),
+                ),
+                child: ZefyrEditor(
+                  padding: EdgeInsets.all(16),
+                  controller: _controller,
+                  focusNode: _focusNode,
+                ),
               ),
             );
           }),
