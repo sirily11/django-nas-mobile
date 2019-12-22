@@ -84,16 +84,38 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: widget.folderID != null && selectionProvider.currentIndex == 0
-            ? IconButton(
-                color: Theme.of(context).textTheme.button.color,
-                onPressed: () async {
-                  DesktopController controller = Provider.of(context);
-                  controller.selectedElement = null;
-                  await provider.backToPrev();
-                  Navigator.pop(context);
-                },
-                icon: Icon(Icons.arrow_back_ios),
+        leading: provider.currentFolder != null &&
+                provider.parents.length > 1 &&
+                selectionProvider.currentIndex == 0
+            ? PlatformWidget(
+                desktop: IconButton(
+                  color: Theme.of(context).textTheme.button.color,
+                  onPressed: () async {
+                    DesktopController controller = Provider.of(context);
+                    controller.selectedElement = null;
+                    await provider.backToPrev();
+                  },
+                  icon: Icon(Icons.arrow_back_ios),
+                ),
+                mobile: IconButton(
+                  color: Theme.of(context).textTheme.button.color,
+                  onPressed: () async {
+                    DesktopController controller = Provider.of(context);
+                    controller.selectedElement = null;
+                    await provider.backToPrev();
+                    Navigator.pop(context);
+                  },
+                  icon: Icon(Icons.arrow_back_ios),
+                ),
+                largeScreen: IconButton(
+                  color: Theme.of(context).textTheme.button.color,
+                  onPressed: () async {
+                    DesktopController controller = Provider.of(context);
+                    controller.selectedElement = null;
+                    await provider.backToPrev();
+                  },
+                  icon: Icon(Icons.arrow_back_ios),
+                ),
               )
             : IconButton(
                 color: Theme.of(context).textTheme.button.color,
@@ -123,9 +145,15 @@ class _HomePageState extends State<HomePage> {
         ],
         elevation: 0,
         backgroundColor: Colors.transparent,
-        title: Text(
-          widget.name ?? "Django NAS",
-          style: Theme.of(context).textTheme.title,
+        title: PlatformWidget(
+          desktop: Text(
+            provider?.currentFolder?.name ?? "Django NAS",
+            style: Theme.of(context).textTheme.title,
+          ),
+          mobile: Text(
+            widget.name ?? "Django NAS",
+            style: Theme.of(context).textTheme.title,
+          ),
         ),
       ),
       body: body,

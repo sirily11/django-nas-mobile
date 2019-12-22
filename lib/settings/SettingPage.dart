@@ -33,7 +33,17 @@ class _SettingPageState extends State<SettingPage> {
       child: Container(
         child: Column(
           children: <Widget>[
-            TextField(
+            TextFormField(
+              autovalidate: true,
+              validator: (str) {
+                if (!(str.startsWith("http") | str.startsWith("https"))) {
+                  return "Invalid URL";
+                }
+                if (str.endsWith("/")) {
+                  return "Invalid URL";
+                }
+                return null;
+              },
               controller: controller,
               decoration: InputDecoration(labelText: "Base URL"),
             ),

@@ -20,7 +20,6 @@ class DesktopFileGrid extends StatelessWidget {
           currentFolder.folders.length +
           currentFolder.files.length;
     }
-    int numberPerRow = (MediaQuery.of(context).size.height / 400).round();
 
     return AnimatedSwitcher(
       duration: Duration(milliseconds: 100),
@@ -54,7 +53,6 @@ class DesktopFileGrid extends StatelessWidget {
                       file: currentFolder.files[index - prevIndex],
                     );
                   }
-
                   return Container();
                 },
               ),

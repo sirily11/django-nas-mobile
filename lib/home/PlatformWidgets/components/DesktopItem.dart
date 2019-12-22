@@ -60,17 +60,18 @@ class DesktopFolderItem extends StatelessWidget {
         controller.selectedElement = folder;
       },
       child: GestureDetector(
-        onDoubleTap: () {
+        onDoubleTap: () async {
           controller.selectedElement = null;
           provider.isLoading = true;
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (ctx) {
-              return HomePage(
-                folderID: folder.id,
-                name: folder.name,
-              );
-            }),
-          );
+          await provider.fetchFolder(folder.id);
+          // Navigator.of(context).push(
+          //   MaterialPageRoute(builder: (ctx) {
+          //     return HomePage(
+          //       folderID: folder.id,
+          //       name: folder.name,
+          //     );
+          //   }),
+          // );
         },
         child: Draggable<BaseElement>(
           data: folder,

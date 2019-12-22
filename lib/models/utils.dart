@@ -142,7 +142,7 @@ Future onDragMoveTo(
   } else {
     print("File type is not supported");
   }
-  desktopController.selectedElement = null;
+  desktopController?.selectedElement = null;
 }
 
 /// Drag and remove the data based on type of data
