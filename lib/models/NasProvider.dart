@@ -126,7 +126,9 @@ class NasProvider extends ChangeNotifier {
           .firstWhere((f) => f.id == currentFolder.id);
       parnentFolder.totalSize -= folder.totalSize;
       notifyListeners();
-    } catch (err) {}
+    } catch (err) {
+      print(err);
+    }
   }
 
   /// Move File to its parent
@@ -431,7 +433,8 @@ class DataFetcher {
       await _getURL();
       Response response =
           await this.networkProvider.patch("$url$id/", data: data);
-      return _getObject<T>(response.data);
+      var obj = _getObject<T>(response.data);
+      return obj;
     } catch (err) {
       print(err);
       rethrow;

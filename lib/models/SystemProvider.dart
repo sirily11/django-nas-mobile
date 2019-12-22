@@ -55,23 +55,24 @@ class SystemProvider with ChangeNotifier {
   final int length = 3;
   List<SystemInfo> systemInfoList = [];
   Dio networkProvider;
+  Box box;
   String error;
 
-  SystemProvider({Dio dio}) {
+  SystemProvider({Dio dio, Box box}) {
     this.networkProvider = dio ?? Dio();
-    this.getData();
-   
+    this.box = box;
+    if (box == null) {
+      initBox().then((_) async {
+        this.box = await Hive.openBox("settings");
+        await getData();
+      });
+    } else {
+      getData();
+    }
   }
 
   Future<void> getData() async {
     try {
-      if (Platform.isIOS || Platform.isAndroid) {
-        var dir = await getApplicationDocumentsDirectory();
-        Hive.init(dir.path);
-      } else if (Platform.isMacOS) {
-        Hive.init(Directory.current.path);
-      }
-      var box = await Hive.openBox("settings");
       var response =
           await this.networkProvider.get("${box.get("url")}$systemUrl");
       this.addData(SystemInfo.fromJson(response.data));
@@ -79,6 +80,15 @@ class SystemProvider with ChangeNotifier {
       this.error = err.toString();
     } finally {
       notifyListeners();
+    }
+  }
+
+  Future initBox() async {
+    if (Platform.isIOS || Platform.isAndroid) {
+      var dir = await getApplicationDocumentsDirectory();
+      Hive.init(dir.path);
+    } else if (Platform.isMacOS) {
+      Hive.init(Directory.current.path);
     }
   }
 

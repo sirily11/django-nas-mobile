@@ -281,16 +281,3 @@ Future downloadFile(BuildContext context,
     }
   }
 }
-
-/// get part of long string if string is longer than required
-/// Will append ... at the end
-/// For example abcde will become abc... if [length] = 3
-String getLongString(String text, {int length = 3}) {
-  bool isLonger = true;
-  if (text.length < length) {
-    length = text.length;
-    isLonger = false;
-  }
-
-  return "${text.substring(0, length)}${isLonger ? "..." : ""}";
-}
