@@ -69,6 +69,34 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Widget _renderReturnActionButton() {
+    NasProvider provider = Provider.of(context);
+    if (MediaQuery.of(context).size.width > 760 || Platform.isMacOS) {
+      return IconButton(
+        key: Key("back button"),
+        color: Theme.of(context).textTheme.button.color,
+        onPressed: () async {
+          DesktopController controller = Provider.of(context);
+          controller.selectedElement = null;
+          await provider.backToPrev();
+        },
+        icon: Icon(Icons.arrow_back_ios),
+      );
+    } else {
+      return IconButton(
+        key: Key("back button"),
+        color: Theme.of(context).textTheme.button.color,
+        onPressed: () async {
+          DesktopController controller = Provider.of(context);
+          controller.selectedElement = null;
+          await provider.backToPrev();
+          Navigator.pop(context);
+        },
+        icon: Icon(Icons.arrow_back_ios),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget body = PlatformWidget(
@@ -87,36 +115,7 @@ class _HomePageState extends State<HomePage> {
         leading: provider.currentFolder != null &&
                 provider.parents.length > 1 &&
                 selectionProvider.currentIndex == 0
-            ? PlatformWidget(
-                desktop: IconButton(
-                  color: Theme.of(context).textTheme.button.color,
-                  onPressed: () async {
-                    DesktopController controller = Provider.of(context);
-                    controller.selectedElement = null;
-                    await provider.backToPrev();
-                  },
-                  icon: Icon(Icons.arrow_back_ios),
-                ),
-                mobile: IconButton(
-                  color: Theme.of(context).textTheme.button.color,
-                  onPressed: () async {
-                    DesktopController controller = Provider.of(context);
-                    controller.selectedElement = null;
-                    await provider.backToPrev();
-                    Navigator.pop(context);
-                  },
-                  icon: Icon(Icons.arrow_back_ios),
-                ),
-                largeScreen: IconButton(
-                  color: Theme.of(context).textTheme.button.color,
-                  onPressed: () async {
-                    DesktopController controller = Provider.of(context);
-                    controller.selectedElement = null;
-                    await provider.backToPrev();
-                  },
-                  icon: Icon(Icons.arrow_back_ios),
-                ),
-              )
+            ? _renderReturnActionButton()
             : IconButton(
                 color: Theme.of(context).textTheme.button.color,
                 onPressed: null,
