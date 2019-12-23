@@ -464,8 +464,8 @@ void main() {
           parent: 5,
           createdAt: DateTime.now(),
           modifiedAt: DateTime.now());
-      NasFolder childFolder =
-          NasFolder(name: "cde", id: 5, totalSize: 40, documents: [nasDocument]);
+      NasFolder childFolder = NasFolder(
+          name: "cde", id: 5, totalSize: 40, documents: [nasDocument]);
       NasFolder rootFolder = NasFolder(folders: [childFolder], documents: []);
       when(client.patch(any, data: {"parent": null})).thenAnswer(
         (_) async => Response<Map<String, dynamic>>(
@@ -477,6 +477,114 @@ void main() {
       await provider.moveDocumentBack(nasDocument, null);
       expect(provider.currentFolder.documents.length, 0);
       expect(provider.parents[0].documents.length, 1);
+    });
+
+    test("move folder to", () async {
+      NasFolder folderTobeMoved =
+          NasFolder(name: "abc", id: 4, totalSize: 20, parent: 5);
+      NasFolder childFolder =
+          NasFolder(name: "cde", id: 5, totalSize: 40, folders: []);
+      NasFolder rootFolder = NasFolder(folders: [childFolder, folderTobeMoved]);
+      when(client.patch(any, data: {"parent": 5})).thenAnswer(
+        (_) async => Response<Map<String, dynamic>>(
+            data: {"id": 4, "name": "abc", "parent": null}, statusCode: 200),
+      );
+      NasProvider provider = NasProvider(box: box, networkProvider: client);
+      provider.currentFolder = rootFolder;
+      provider.parents = [rootFolder, childFolder];
+      await provider.moveFolderTo(folderTobeMoved, 5);
+      expect(provider.currentFolder.folders.length, 1);
+      verify(client.patch(any, data: {"parent": 5})).called(1);
+    });
+
+    test("move file to", () async {
+      NasFile fileTobeMoved = NasFile(
+          id: 4,
+          size: 20,
+          parent: 5,
+          createdAt: DateTime.now(),
+          modifiedAt: DateTime.now());
+      NasFolder childFolder = NasFolder(name: "cde", id: 5, totalSize: 40);
+      NasFolder rootFolder =
+          NasFolder(folders: [childFolder], files: [fileTobeMoved]);
+      when(client.patch(any, data: {"parent": 5})).thenAnswer(
+        (_) async => Response<Map<String, dynamic>>(
+            data: fileTobeMoved.toJson(), statusCode: 200),
+      );
+      NasProvider provider = NasProvider(box: box, networkProvider: client);
+      provider.currentFolder = rootFolder;
+      provider.parents = [rootFolder, childFolder];
+      await provider.moveFileTo(fileTobeMoved, 5);
+      expect(provider.currentFolder.folders.length, 1);
+      expect(provider.currentFolder.files.length, 0);
+      verify(client.patch(any, data: {"parent": 5})).called(1);
+    });
+
+    test("move document to", () async {
+      NasDocument nasDocument = NasDocument(
+          id: 4,
+          parent: 5,
+          createdAt: DateTime.now(),
+          modifiedAt: DateTime.now());
+      NasFolder childFolder =
+          NasFolder(name: "cde", id: 5, totalSize: 40, documents: []);
+      NasFolder rootFolder =
+          NasFolder(folders: [childFolder], documents: [nasDocument]);
+      when(client.patch(any, data: {"parent": 5})).thenAnswer(
+        (_) async => Response<Map<String, dynamic>>(
+            data: nasDocument.toJson(), statusCode: 200),
+      );
+      NasProvider provider = NasProvider(box: box, networkProvider: client);
+      provider.currentFolder = rootFolder;
+      provider.parents = [rootFolder, childFolder];
+      await provider.moveDocumentTo(nasDocument, 5);
+      expect(provider.currentFolder.folders.length, 1);
+      expect(provider.currentFolder.documents.length, 0);
+      verify(client.patch(any, data: {"parent": 5})).called(1);
+    });
+
+    test("Test back to prev when empty", () async {
+      NasFolder root = NasFolder(folders: [], name: "root");
+      NasProvider provider = NasProvider(box: box, networkProvider: client);
+      provider.currentFolder = root;
+
+      try {
+        await provider.backToPrev();
+      } catch (e) {
+        expect(e, isA<Exception>());
+      }
+    });
+
+    test("Test back to prev", () async {
+      NasFolder folder1_1_1 = NasFolder(id: 4, name: "a_a_a");
+      NasFolder folder1_1 =
+          NasFolder(id: 3, name: "a_a", folders: [folder1_1_1]);
+      NasFolder folder1 = NasFolder(id: 1, name: "a", folders: [folder1_1]);
+      NasFolder folder2 = NasFolder(id: 2, name: "b");
+      NasFolder root = NasFolder(folders: [folder1, folder2], name: "root");
+
+      when(client.get(any)).thenAnswer(
+        (_) async => Response<Map<String, dynamic>>(
+            data: root.toJson(), statusCode: 200),
+      );
+
+      NasProvider provider = NasProvider(box: box, networkProvider: client);
+      provider.currentFolder = folder1_1_1;
+      provider.parents = [root, folder1, folder1_1, folder1_1_1];
+      await provider.backToPrev();
+      expect(provider.currentFolder, folder1_1);
+      expect(provider.parents.length, 3);
+      await provider.backToPrev();
+      expect(provider.currentFolder, folder1);
+      expect(provider.parents.length, 2);
+      await provider.backToPrev();
+      expect(provider.currentFolder, root);
+      expect(provider.parents.length, 1);
+    });
+
+    test("init box", () async {
+      await provider.initBox();
+      expect(provider.box != null, true);
     });
   });
 }

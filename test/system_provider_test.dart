@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:django_nas_mobile/models/NasProvider.dart';
@@ -27,6 +28,7 @@ void main() {
     setUp(() {
       provider = SystemProvider(dio: dio, box: box);
     });
+
     test("Parse system info", () {
       var info = SystemInfo.fromJson(jsonData);
       expect(info.cpu, 30);
@@ -52,8 +54,6 @@ void main() {
 
     test("Init box", () async {
       await provider.initBox();
-      var box = Hive.openBox("test");
-      expect(box != null, true);
     });
 
     test("get Data", () async {

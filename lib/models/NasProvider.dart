@@ -181,6 +181,7 @@ class NasProvider extends ChangeNotifier {
   }
 
   /// Move file to current folder child
+  /// This won't add new folder to child folder's folder
   Future<void> moveFileTo(NasFile file, int target) async {
     try {
       var response = await DataFetcher(
@@ -197,6 +198,7 @@ class NasProvider extends ChangeNotifier {
   }
 
   /// Move document to current folder child
+  /// This won't add new file to child folder's file
   Future<void> moveDocumentTo(NasDocument document, int target) async {
     try {
       var response = await DataFetcher(
@@ -225,6 +227,7 @@ class NasProvider extends ChangeNotifier {
     }
   }
 
+  /// Search document based on the [keyword]
   Future<List<NasFile>> search(String keyword) async {
     try {
       List<NasFile> files = await DataFetcher(
@@ -256,6 +259,9 @@ class NasProvider extends ChangeNotifier {
     }
   }
 
+  /// go to previous page
+  /// pop the current page from provider's parents if provider's parents length > 0
+  /// else will throw error
   Future<void> backToPrev() async {
     if (parents.length == 1) {
       parents.clear();
@@ -264,7 +270,7 @@ class NasProvider extends ChangeNotifier {
       parents.removeLast();
       currentFolder = parents.last;
     } else {
-      throw ("Parent is empty");
+      throw Exception("Parent is empty");
     }
     notifyListeners();
   }
