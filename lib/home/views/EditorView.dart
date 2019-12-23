@@ -20,6 +20,7 @@ class EditorViewState extends State<EditorView> {
   /// Allows to control the editor and the document.
   ZefyrController _controller;
   GlobalKey<ScaffoldState> key = GlobalKey();
+  ZefyrMode mode = ZefyrMode.view;
 
   /// Zefyr editor like any other input field requires a focus node.
   FocusNode _focusNode = FocusNode();
@@ -32,12 +33,18 @@ class EditorViewState extends State<EditorView> {
     return Scaffold(
       key: key,
       appBar: AppBar(
-        title: Text(widget.name),
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        title: Text(
+          widget.name,
+        ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios),
           onPressed: () async {
             try {
-              this._saveDocument();
+              if (mode == ZefyrMode.edit) {
+                this._saveDocument();
+              }
             } catch (err) {} finally {
               Navigator.of(context).pop();
             }
@@ -46,9 +53,18 @@ class EditorViewState extends State<EditorView> {
         actions: <Widget>[
           IconButton(
             onPressed: () async {
-              await this._saveDocument();
+              if (mode == ZefyrMode.edit) {
+                setState(() {
+                  mode = ZefyrMode.view;
+                });
+                await this._saveDocument();
+              } else {
+                setState(() {
+                  mode = ZefyrMode.edit;
+                });
+              }
             },
-            icon: Icon(Icons.save),
+            icon: mode == ZefyrMode.edit ? Icon(Icons.save) : Icon(Icons.edit),
           )
         ],
       ),
@@ -107,6 +123,7 @@ class EditorViewState extends State<EditorView> {
                   ),
                 ),
                 child: ZefyrEditor(
+                  mode: mode,
                   padding: EdgeInsets.all(16),
                   controller: _controller,
                   focusNode: _focusNode,

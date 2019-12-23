@@ -28,6 +28,7 @@ class ParentFolderRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DragTarget<BaseElement>(
+      key: Key("parent-row"),
       onAccept: (data) async {
         NasProvider nasProvider = Provider.of(context);
         DesktopController desktopController = Provider.of(context);
@@ -68,6 +69,7 @@ class FileRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LongPressDraggable<BaseElement>(
+      key: Key("file-row"),
       data: file,
       feedback: OnDraggingWidget(
         title: p.basename(file.filename),
@@ -155,6 +157,7 @@ class FolderRow extends StatelessWidget {
 
   Widget buildFolder(BuildContext context, {bool isSelected = false}) {
     return LongPressDraggable<BaseElement>(
+      key: Key("folder-row"),
       data: folder,
       feedback: OnDraggingWidget(
         title: folder.name,
@@ -249,6 +252,7 @@ class DocumentRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LongPressDraggable<BaseElement>(
+      key: Key("document-row"),
       data: document,
       feedback: OnDraggingWidget(
         title: document.name,

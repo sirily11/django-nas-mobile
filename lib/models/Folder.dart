@@ -107,22 +107,26 @@ class NasDocument extends BaseElement {
 
   factory NasDocument.fromJson(Map<String, dynamic> json) => NasDocument(
         id: json["id"],
-        createdAt: DateTime.parse(json["created_at"]),
+        createdAt: json["created_at"] != null
+            ? DateTime.parse(json["created_at"])
+            : null,
         name: json["name"],
         description: json["description"],
         size: json["size"],
-        modifiedAt: DateTime.parse(json["modified_at"]),
+        modifiedAt: json["modified_at"] != null
+            ? DateTime.parse(json["modified_at"])
+            : null,
         parent: json["parent"],
         content: json["content"],
       );
 
   Map<String, dynamic> toJson() => {
         "id": id,
-        "created_at": createdAt.toIso8601String(),
+        "created_at": createdAt?.toIso8601String(),
         "name": name,
         "description": description,
         "size": size,
-        "modified_at": modifiedAt.toIso8601String(),
+        "modified_at": modifiedAt?.toIso8601String(),
         "parent": parent,
         "content": content,
       };

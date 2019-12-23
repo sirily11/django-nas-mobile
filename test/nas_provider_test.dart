@@ -586,5 +586,76 @@ void main() {
       await provider.initBox();
       expect(provider.box != null, true);
     });
+
+    test("Test create folder", () async {
+      NasFolder root = NasFolder(folders: [], name: "root");
+
+      when(client.post(any, data: {"name": "b", "parent": null})).thenAnswer(
+        (_) async => Response<Map<String, dynamic>>(
+            data: {"name": "b", "id": 1}, statusCode: 200),
+      );
+
+      NasProvider provider = NasProvider(box: box, networkProvider: client);
+      provider.currentFolder = root;
+      provider.parents = [root];
+
+      await provider.createNewFolder("b");
+      expect(provider.currentFolder.folders.length, 1);
+      expect(provider.currentFolder.folders.first.name, "b");
+    });
+
+    test("Test create document", () async {
+      NasFolder root = NasFolder(folders: [], name: "root", documents: []);
+      NasDocument document = NasDocument(name: "abc", id: 1);
+
+      when(client.post(any, data: {"name": "b", "parent": null})).thenAnswer(
+        (_) async => Response<Map<String, dynamic>>(
+            data: document.toJson(), statusCode: 200),
+      );
+
+      NasProvider provider = NasProvider(box: box, networkProvider: client);
+      provider.currentFolder = root;
+      provider.parents = [root];
+
+      await provider.createNewDocument("b");
+      expect(provider.currentFolder.documents.length, 1);
+      expect(provider.currentFolder.documents.first.name, "abc");
+    });
+
+    test("Test update folder", () async {
+      NasFolder folder = NasFolder(name: "b", id: 1);
+      NasFolder root = NasFolder(folders: [folder], name: "root");
+
+      when(client.patch(any, data: {"name": "c"})).thenAnswer(
+        (_) async => Response<Map<String, dynamic>>(
+            data: {"name": "c", "id": 1}, statusCode: 200),
+      );
+
+      NasProvider provider = NasProvider(box: box, networkProvider: client);
+      provider.currentFolder = root;
+      provider.parents = [root];
+
+      await provider.updateFolder("c", 1);
+      expect(provider.currentFolder.folders.length, 1);
+      expect(provider.currentFolder.folders.first.name, "c");
+    });
+
+    test("Test update document name", () async {
+      NasDocument document = NasDocument(name: "b", id: 1);
+      NasFolder root = NasFolder(documents: [document], name: "root");
+
+      when(client.patch(any, data: {"name": "c"})).thenAnswer(
+        (_) async => Response<Map<String, dynamic>>(
+            data: {"name": "c", "id": 1}, statusCode: 200),
+      );
+
+      NasProvider provider = NasProvider(box: box, networkProvider: client);
+      provider.currentFolder = root;
+      provider.parents = [root];
+
+      await provider.updateDocumentName("c", 1);
+      expect(provider.currentFolder.documents.length, 1);
+      expect(provider.currentFolder.documents.first.name, "c");
+    });
   });
 }
