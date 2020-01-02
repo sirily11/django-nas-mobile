@@ -264,7 +264,7 @@ Future downloadFile(BuildContext context,
     {@required UploadDownloadProvider uploadDownloadProvider,
     @required NasFile file}) async {
   FileChooserResult chooserResult = await showSavePanel(
-    suggestedFileName: p.basename(file.file),
+    suggestedFileName: p.basename(file.filename),
   );
   if (!chooserResult.canceled) {
     try {

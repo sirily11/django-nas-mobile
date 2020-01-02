@@ -150,7 +150,7 @@ void main() {
         MultiProvider(
           providers: [
             ChangeNotifierProvider(
-              builder: (_) => nasProvider,
+              create: (_) => nasProvider,
             ),
           ],
           child: MaterialApp(

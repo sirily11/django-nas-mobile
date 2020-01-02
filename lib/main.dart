@@ -18,19 +18,19 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          builder: (_) => NasProvider(),
+          create: (_) => NasProvider(),
         ),
         ChangeNotifierProvider(
-          builder: (_) => UploadDownloadProvider(),
+          create: (_) => UploadDownloadProvider(),
         ),
         ChangeNotifierProvider(
-          builder: (_) => SystemProvider(),
+          create: (_) => SystemProvider(),
         ),
         ChangeNotifierProvider(
-          builder: (_) => SelectionProvider(),
+          create: (_) => SelectionProvider(),
         ),
         ChangeNotifierProvider(
-          builder: (_) => DesktopController(),
+          create: (_) => DesktopController(),
         )
       ],
       child: MaterialApp(

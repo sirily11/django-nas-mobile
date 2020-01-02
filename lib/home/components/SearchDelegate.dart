@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:django_nas_mobile/home/HomePage.dart';
 import 'package:django_nas_mobile/home/components/LoadingShimmerList.dart';
 import 'package:django_nas_mobile/models/Folder.dart';
@@ -79,13 +81,14 @@ class FileSearch extends SearchDelegate {
   }
 
   Widget buildList(List<NasFile> files) {
+    Utf8Decoder decode = Utf8Decoder();
     return ListView.builder(
       itemCount: files.length,
       itemBuilder: (context, index) {
         NasFile file = files[index];
         return ListTile(
           leading: renderMobileIcon(path: file.file, file: file, size: 100),
-          title: Text("${p.basename(file.file)}"),
+          title: Text("${p.basename(file.filename)}"),
           subtitle: Text(getSize(file.size)),
           trailing: IconButton(
             tooltip: "Go to folder",
