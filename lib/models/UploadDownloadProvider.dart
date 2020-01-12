@@ -93,26 +93,23 @@ class UploadDownloadProvider extends ChangeNotifier {
           UploadDownloadItem(file: File(savePath), isUpload: false);
       items.add(item);
       notifyListeners();
-      await networkProvider.download(url, savePath,
-          onReceiveProgress: (received, total) {
-        item.total = total;
-        item.speed = (received - item.current).toDouble();
-        item.current = received;
-        double progress = (received / total);
-        item.progress = progress;
-        notifyListeners();
-      });
-      item.progress = 1;
-      item.isDone = true;
-      notifyListeners();
+      await _download(url, savePath, item);
     } catch (e) {
       print(e);
     }
   }
 
   /// only desktop can use
-  Future<void> downloadItems(List<String> urls, String savePath) async {
-    for (var u in urls) {
+  Future<void> downloadItems(List<String> urls, List<String> savePaths) async {
+    int i = 0;
+    List<UploadDownloadItem> items = savePaths
+        .map(
+          (p) => UploadDownloadItem(file: File(p), isUpload: false),
+        )
+        .toList();
+    this.items.addAll(items);
+    notifyListeners();
+    for (var item in items) {
       if (pause) {
         await Future.doWhile(() async {
           await Future.delayed(Duration(milliseconds: 100));
@@ -120,9 +117,26 @@ class UploadDownloadProvider extends ChangeNotifier {
         });
       }
       if (!_pause) {
-        await downloadItem(u, savePath);
+        await _download(urls[i], savePaths[i], item);
       }
+      i++;
     }
+  }
+
+  Future<void> _download(
+      String url, String savePath, UploadDownloadItem item) async {
+    await networkProvider.download(url, savePath,
+        onReceiveProgress: (received, total) {
+      item.total = total;
+      item.speed = (received - item.current).toDouble();
+      item.current = received;
+      double progress = (received / total);
+      item.progress = progress;
+      notifyListeners();
+    });
+    item.progress = 1;
+    item.isDone = true;
+    notifyListeners();
   }
 
   Future<NasFile> uploadItem(UploadDownloadItem item,

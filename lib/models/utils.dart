@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-
+import 'package:path/path.dart' as p;
 import 'package:django_nas_mobile/home/Row.dart';
 import 'package:django_nas_mobile/home/components/ErrorDialog.dart';
 import 'package:django_nas_mobile/home/components/UpdateDialog.dart';
@@ -270,6 +270,32 @@ Future downloadFile(BuildContext context,
     try {
       await uploadDownloadProvider.downloadItem(
           file.file, chooserResult.paths[0]);
+    } catch (err) {
+      showDialog(
+        context: context,
+        builder: (ctx) => ErrorDialog(
+          title: "Download Error",
+          error: err.toString(),
+        ),
+      );
+    }
+  }
+}
+
+/// Download multiple files
+Future downloadFiles(BuildContext context,
+    {@required UploadDownloadProvider uploadDownloadProvider,
+    @required List<NasFile> files}) async {
+  FileChooserResult chooserResult =
+      await showOpenPanel(canSelectDirectories: true);
+  if (!chooserResult.canceled) {
+    try {
+      await uploadDownloadProvider.downloadItems(
+          files.map((f) => f.file).toList(),
+          files
+              .map((f) =>
+                  p.join(chooserResult.paths.first, p.basename(f.filename)))
+              .toList());
     } catch (err) {
       showDialog(
         context: context,

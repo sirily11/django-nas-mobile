@@ -11,6 +11,8 @@ import 'package:django_nas_mobile/info/InfoPage.dart';
 import 'package:django_nas_mobile/models/DesktopController.dart';
 import 'package:django_nas_mobile/models/NasProvider.dart';
 import 'package:django_nas_mobile/models/SelectionProvider.dart';
+import 'package:django_nas_mobile/models/UploadDownloadProvider.dart';
+import 'package:django_nas_mobile/models/utils.dart';
 import 'package:django_nas_mobile/settings/SettingPage.dart';
 import 'package:django_nas_mobile/upload/UploadPage.dart';
 import 'package:flutter/material.dart';
@@ -69,6 +71,26 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Widget buildDownloadAll(BuildContext context) {
+    // DesktopController desktopController = Provider.of(context);
+    NasProvider nasProvider = Provider.of(context);
+    UploadDownloadProvider uploadDownloadProvider = Provider.of(context);
+
+    return IconButton(
+      tooltip: "Download All",
+      onPressed: () async {
+        await downloadFiles(context,
+            files: nasProvider.currentFolder.files,
+            uploadDownloadProvider: uploadDownloadProvider);
+      },
+      iconSize: 30,
+      icon: Icon(
+        Icons.cloud_download,
+        color: Theme.of(context).unselectedWidgetColor,
+      ),
+    );
+  }
+
   Widget _renderReturnActionButton() {
     NasProvider provider = Provider.of(context);
     if (MediaQuery.of(context).size.width > 760 || Platform.isMacOS) {
@@ -122,6 +144,7 @@ class _HomePageState extends State<HomePage> {
                 icon: Icon(Icons.arrow_back_ios),
               ),
         actions: <Widget>[
+          buildDownloadAll(context),
           IconButton(
             color: Theme.of(context).textTheme.button.color,
             icon: Icon(Icons.refresh),
