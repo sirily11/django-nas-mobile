@@ -5,9 +5,11 @@ import 'package:django_nas_mobile/models/NasProvider.dart';
 import 'package:django_nas_mobile/models/UploadDownloadProvider.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:file_chooser/file_chooser.dart';
+import 'package:multi_image_picker/multi_image_picker.dart';
 
 class CreateNewButton extends StatelessWidget {
   final Color color;
@@ -59,15 +61,21 @@ class CreateNewButton extends StatelessWidget {
           baseURL: nasProvider.baseURL);
       nasProvider.addFiles(data, data[0].parent);
     } else if (selection == 3) {
-      var image = await ImagePicker.pickImage(source: ImageSource.gallery);
-      if (image == null) {
+      var images = await MultiImagePicker.pickImages(maxImages: 300);
+      if (images == null) {
         return;
       }
       int parent = nasProvider.currentFolder.id;
-      var data = await uploadProvider.addItem(
-          UploadDownloadItem(file: image, parent: parent),
-          baseURL: nasProvider.baseURL);
-      nasProvider.addFile(data, data.parent);
+      List<UploadDownloadItem> items = [];
+      for (var image in images) {
+        var u = UploadDownloadItem(
+            data: await image.getByteData(), parent: parent, name: image.name);
+        items.add(u);
+      }
+      var data =
+          await uploadProvider.addItems(items, baseURL: nasProvider.baseURL);
+      nasProvider.addFiles(data, parent);
+    
     } else {
       var video = await ImagePicker.pickVideo(
         source: ImageSource.gallery,

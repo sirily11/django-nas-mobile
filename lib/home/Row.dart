@@ -19,7 +19,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'components/ErrorDialog.dart';
 
 enum IconType { folder, file, document, image, video }
-const IMAGES = ['.jpg', '.png', 'bpm', '.gif'];
+const IMAGES = ['.jpg', '.png', 'bpm', '.gif', 'jpeg', 'HEIC'];
 const VIDEOS = ['.mov', '.mp4', '.m4v'];
 
 class ParentFolderRow extends StatelessWidget {

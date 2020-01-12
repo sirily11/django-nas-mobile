@@ -4,10 +4,12 @@ import 'package:dio/dio.dart';
 import 'package:django_nas_mobile/models/Folder.dart';
 import 'package:django_nas_mobile/models/NasProvider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:path/path.dart' as p;
 
 class UploadDownloadItem {
   File file;
+  ByteData data;
   String name;
   double progress;
   int parent;
@@ -34,7 +36,8 @@ class UploadDownloadItem {
       this.parent,
       this.isDone = false,
       this.name,
-      this.isUpload = true});
+      this.isUpload = true,
+      this.data});
 }
 
 class UploadDownloadProvider extends ChangeNotifier {
@@ -124,10 +127,20 @@ class UploadDownloadProvider extends ChangeNotifier {
 
   Future<NasFile> uploadItem(UploadDownloadItem item,
       {@required String baseURL}) async {
-    FormData data = FormData.fromMap({
-      "parent": item.parent,
-      "file": await MultipartFile.fromFile(item.file.path)
-    });
+    FormData data;
+    if (item.data != null) {
+      data = FormData.fromMap({
+        "parent": item.parent,
+        "file": MultipartFile.fromBytes(item.data.buffer.asUint8List(),
+            filename: item.name)
+      });
+    } else {
+      data = FormData.fromMap({
+        "parent": item.parent,
+        "file": await MultipartFile.fromFile(item.file.path)
+      });
+    }
+
     var res = await DataFetcher(
             url: fileUrl, baseURL: baseURL, networkProvider: networkProvider)
         .create<NasFile>(data, callback: (count, total) {
