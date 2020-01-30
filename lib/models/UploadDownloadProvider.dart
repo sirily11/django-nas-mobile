@@ -171,6 +171,19 @@ class UploadDownloadProvider extends ChangeNotifier {
     return res;
   }
 
+  /// Upload File to s3
+  Future<void> uploadToCloud(NasFile file, {@required String baseURL}) async {
+    var item = UploadDownloadItem(file: File(file.file), isUpload: true);
+    this.items.add(item);
+    notifyListeners();
+    var url = "$baseURL$s3Upload${file.id}";
+    // await Future.delayed(Duration(milliseconds: 800));
+    await this.networkProvider.post(url);
+    item.isDone = true;
+    item.progress = 1;
+    notifyListeners();
+  }
+
   /// Only remove the file which has been uploaded
   removeItem(UploadDownloadItem item) {
     if (item.progress == null || item.isDone) {

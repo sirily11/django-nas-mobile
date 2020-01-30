@@ -22,7 +22,7 @@ class DesktopToolbar extends StatelessWidget {
 
     return AnimatedPositioned(
       key: Key("a"),
-      bottom: MediaQuery.of(context).size.height / 2,
+      bottom: MediaQuery.of(context).size.height / 3,
       right: show ? 0 : -100,
       duration: Duration(milliseconds: 100),
       child: Hero(
@@ -32,6 +32,21 @@ class DesktopToolbar extends StatelessWidget {
           child: Card(
             child: Column(
               children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: IconButton(
+                    icon: Icon(Icons.cloud_upload),
+                    tooltip: "Upload To S3",
+                    onPressed: () async {
+                      if (desktopController.selectedElement is NasFile) {
+                        UploadDownloadProvider provider = Provider.of(context);
+                        await provider.uploadToCloud(
+                            desktopController.selectedElement,
+                            baseURL: nasProvider.baseURL);
+                      }
+                    },
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: DragTarget<BaseElement>(

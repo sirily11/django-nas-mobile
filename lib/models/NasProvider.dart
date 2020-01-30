@@ -11,6 +11,7 @@ String fileUrl = "/api/file/";
 String documentUrl = "/api/document/";
 String editorUrl = "/#/edit/";
 String systemUrl = "/system/";
+String s3Upload = "/s3/";
 
 class NasProvider extends ChangeNotifier {
   /// List of parents of current folder
