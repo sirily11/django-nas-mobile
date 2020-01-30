@@ -172,16 +172,40 @@ class UploadDownloadProvider extends ChangeNotifier {
   }
 
   /// Upload File to s3
-  Future<void> uploadToCloud(NasFile file, {@required String baseURL}) async {
-    var item = UploadDownloadItem(file: File(file.file), isUpload: true);
-    this.items.add(item);
+  Future<void> uploadItemToCloud(UploadDownloadItem item,
+      {@required String url}) async {
     notifyListeners();
-    var url = "$baseURL$s3Upload${file.id}";
     // await Future.delayed(Duration(milliseconds: 800));
     await this.networkProvider.post(url);
     item.isDone = true;
     item.progress = 1;
     notifyListeners();
+  }
+
+  /// only desktop can use
+  Future<void> uploadItemsToCloud(List<NasFile> files,
+      {@required basePath}) async {
+    int i = 0;
+    List<UploadDownloadItem> items = files
+        .map(
+          (f) => UploadDownloadItem(file: File(f.file), isUpload: true),
+        )
+        .toList();
+    this.items.addAll(items);
+    notifyListeners();
+    for (var item in items) {
+      if (pause) {
+        await Future.doWhile(() async {
+          await Future.delayed(Duration(milliseconds: 100));
+          return this._pause;
+        });
+      }
+      if (!_pause) {
+        var path = '$basePath$s3Upload${files[i].id}';
+        await uploadItemToCloud(item, url: path);
+      }
+      i++;
+    }
   }
 
   /// Only remove the file which has been uploaded

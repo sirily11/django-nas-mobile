@@ -38,11 +38,22 @@ class DesktopToolbar extends StatelessWidget {
                     icon: Icon(Icons.cloud_upload),
                     tooltip: "Upload To S3",
                     onPressed: () async {
-                      if (desktopController.selectedElement is NasFile) {
-                        UploadDownloadProvider provider = Provider.of(context);
-                        await provider.uploadToCloud(
-                            desktopController.selectedElement,
-                            baseURL: nasProvider.baseURL);
+                      var selectedItem = desktopController.selectedElement;
+                      UploadDownloadProvider provider = Provider.of(context);
+                      if (selectedItem is NasFile) {
+                        await provider.uploadItemToCloud(
+                            UploadDownloadItem(file: File(selectedItem.file)),
+                            url:
+                                "${nasProvider.baseURL}$s3Upload${selectedItem.id}");
+                      }
+                      if (selectedItem is NasFolder) {
+                        var folder = await DataFetcher(
+                                baseURL: nasProvider.baseURL,
+                                url: folderUrl,
+                                networkProvider: nasProvider.networkProvider)
+                            .fetchOne<NasFolder>(id: selectedItem.id);
+                        await provider.uploadItemsToCloud(folder.files,
+                            basePath: nasProvider.baseURL);
                       }
                     },
                   ),
