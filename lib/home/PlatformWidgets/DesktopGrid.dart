@@ -25,7 +25,7 @@ class DesktopFileGrid extends StatelessWidget {
       duration: Duration(milliseconds: 100),
       child: nasProvider.isLoading
           ? Center(child: Image.asset("assets/icons/animat-code-color.gif"))
-          : GestureDetector(
+          : Scrollbar(
               child: StaggeredGridView.countBuilder(
                 itemCount: length,
                 crossAxisCount: 10,

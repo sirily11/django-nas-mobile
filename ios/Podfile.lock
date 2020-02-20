@@ -12,6 +12,10 @@ PODS:
   - file_picker (0.0.1):
     - Flutter
   - Flutter (1.0.0)
+  - flutter_ijkplayer (0.0.1):
+    - Flutter
+    - FlutterIJK (~> 0.1.0)
+  - FlutterIJK (0.1.0)
   - image_picker (0.0.1):
     - Flutter
   - MTBBarcodeScanner (5.0.11)
@@ -47,7 +51,8 @@ DEPENDENCIES:
   - barcode_scan (from `.symlinks/plugins/barcode_scan/ios`)
   - file_chooser (from `.symlinks/plugins/file_chooser/ios`)
   - file_picker (from `.symlinks/plugins/file_picker/ios`)
-  - Flutter (from `.symlinks/flutter/ios-profile`)
+  - Flutter (from `Flutter`)
+  - flutter_ijkplayer (from `.symlinks/plugins/flutter_ijkplayer/ios`)
   - image_picker (from `.symlinks/plugins/image_picker/ios`)
   - multi_image_picker (from `.symlinks/plugins/multi_image_picker/ios`)
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
@@ -68,6 +73,7 @@ SPEC REPOS:
     - BSGridCollectionViewLayout
     - BSImagePicker
     - BSImageView
+    - FlutterIJK
     - MTBBarcodeScanner
 
 EXTERNAL SOURCES:
@@ -78,7 +84,9 @@ EXTERNAL SOURCES:
   file_picker:
     :path: ".symlinks/plugins/file_picker/ios"
   Flutter:
-    :path: ".symlinks/flutter/ios-profile"
+    :path: Flutter
+  flutter_ijkplayer:
+    :path: ".symlinks/plugins/flutter_ijkplayer/ios"
   image_picker:
     :path: ".symlinks/plugins/image_picker/ios"
   multi_image_picker:
@@ -116,6 +124,8 @@ SPEC CHECKSUMS:
   file_chooser: 98943893422baaed80ca2415390aec58f01ea192
   file_picker: 408623be2125b79a4539cf703be3d4b3abe5e245
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  flutter_ijkplayer: ef9006131553deb6d8ae6d7fbd3bcbf93b135930
+  FlutterIJK: 68b00c1d11162b5016f3611853aa699e198bd1d2
   image_picker: e3eacd46b94694dde7cf2705955cece853aa1a8f
   MTBBarcodeScanner: f453b33c4b7dfe545d8c6484ed744d55671788cb
   multi_image_picker: 9fe118993be074708a1a2d3152ea48259d422988
@@ -132,6 +142,6 @@ SPEC CHECKSUMS:
   video_player_web: da8cadb8274ed4f8dbee8d7171b420dedd437ce7
   webview_flutter: db3aba222b23e4dc432e0c5882834123dc50ff9f
 
-PODFILE CHECKSUM: 2c26e2bafa90f053205a9e99ab1fdce88251e293
+PODFILE CHECKSUM: 083258d7f5e80b42ea9bfee905fe93049bc04c64
 
 COCOAPODS: 1.8.3

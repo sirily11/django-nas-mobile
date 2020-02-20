@@ -181,31 +181,44 @@ class DesktopFileItem extends StatelessWidget {
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
-            child: ClipRRect(
-              borderRadius: new BorderRadius.circular(8.0),
-              child: Container(
-                height: 200,
-                color: isSelected
-                    ? Theme.of(context).textSelectionColor.withOpacity(0.7)
-                    : null,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    _renderIcon(path: file.file),
-                    Text(
-                      "${p.basename(file.filename)}",
-                      softWrap: true,
-                      overflow: TextOverflow.clip,
-                      textAlign: TextAlign.center,
+            child: Stack(
+              children: <Widget>[
+                ClipRRect(
+                  borderRadius: new BorderRadius.circular(8.0),
+                  child: Container(
+                    height: 200,
+                    color: isSelected
+                        ? Theme.of(context).textSelectionColor.withOpacity(0.7)
+                        : null,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        _renderIcon(path: file.file),
+                        Text(
+                          "${p.basename(file.filename)}",
+                          softWrap: true,
+                          overflow: TextOverflow.clip,
+                          textAlign: TextAlign.center,
+                        ),
+                        Text(
+                          "${getSize(file.size)}",
+                          style: Theme.of(context).textTheme.caption,
+                        )
+                      ],
                     ),
-                    Text(
-                      "${getSize(file.size)}",
-                      style: Theme.of(context).textTheme.caption,
-                    )
-                  ],
+                  ),
                 ),
-              ),
+                if (file.hasUploadedToCloud)
+                  Positioned(
+                    child: Icon(
+                      Icons.cloud_upload,
+                      color: Colors.green,
+                    ),
+                    top: 10,
+                    right: 0,
+                  )
+              ],
             ),
           ),
         ),

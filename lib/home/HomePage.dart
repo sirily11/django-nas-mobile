@@ -6,9 +6,11 @@ import 'package:django_nas_mobile/home/PlatformWidgets/DesktopGrid.dart';
 import 'package:django_nas_mobile/home/PlatformWidgets/DesktopView.dart';
 import 'package:django_nas_mobile/home/PlatformWidgets/MobileView.dart';
 import 'package:django_nas_mobile/home/components/CreateNewButton.dart';
+import 'package:django_nas_mobile/home/components/LoadingShimmerList.dart';
 import 'package:django_nas_mobile/home/components/SearchDelegate.dart';
 import 'package:django_nas_mobile/info/InfoPage.dart';
 import 'package:django_nas_mobile/models/DesktopController.dart';
+import 'package:django_nas_mobile/models/Folder.dart';
 import 'package:django_nas_mobile/models/NasProvider.dart';
 import 'package:django_nas_mobile/models/SelectionProvider.dart';
 import 'package:django_nas_mobile/models/UploadDownloadProvider.dart';
@@ -29,6 +31,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  NasFolder currentFolder;
+
   @override
   void initState() {
     super.initState();
@@ -37,8 +41,10 @@ class _HomePageState extends State<HomePage> {
       if (provider.box == null) {
         await provider.initBox();
       }
-
-      await provider.fetchFolder(widget.folderID);
+      var folder = await provider.fetchFolder(widget.folderID);
+      setState(() {
+        currentFolder = folder;
+      });
     });
   }
 
@@ -62,10 +68,18 @@ class _HomePageState extends State<HomePage> {
               if (!snapshot.hasData) {
                 return Container();
               }
-              return PlatformWidget(
-                desktop: DesktopFileGrid(),
-                largeScreen: DesktopFileGrid(),
-                mobile: FileListWidget(),
+
+              return AnimatedSwitcher(
+                duration: Duration(milliseconds: 200),
+                child: currentFolder == null
+                    ? LoadingShimmerList()
+                    : PlatformWidget(
+                        desktop: DesktopFileGrid(),
+                        largeScreen: DesktopFileGrid(),
+                        mobile: FileListWidget(
+                          currentFolder: currentFolder,
+                        ),
+                      ),
               );
             });
     }
@@ -93,8 +107,12 @@ class _HomePageState extends State<HomePage> {
 
   Widget _renderReturnActionButton() {
     NasProvider provider = Provider.of(context);
+
     if (MediaQuery.of(context).size.width > 760 || Platform.isMacOS) {
-      return IconButton(
+      if (provider.parents.length == 1) {
+        return null;
+      }
+      return BackButton(
         key: Key("back button"),
         color: Theme.of(context).textTheme.button.color,
         onPressed: () async {
@@ -102,10 +120,12 @@ class _HomePageState extends State<HomePage> {
           controller.selectedElement = null;
           await provider.backToPrev();
         },
-        icon: Icon(Icons.arrow_back_ios),
       );
     } else {
-      return IconButton(
+      if (!Navigator.canPop(context)) {
+        return null;
+      }
+      return BackButton(
         key: Key("back button"),
         color: Theme.of(context).textTheme.button.color,
         onPressed: () async {
@@ -114,7 +134,6 @@ class _HomePageState extends State<HomePage> {
           await provider.backToPrev();
           Navigator.pop(context);
         },
-        icon: Icon(Icons.arrow_back_ios),
       );
     }
   }
@@ -134,9 +153,7 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        leading: provider.currentFolder != null &&
-                provider.parents.length > 1 &&
-                selectionProvider.currentIndex == 0
+        leading: selectionProvider.currentIndex == 0
             ? _renderReturnActionButton()
             : IconButton(
                 color: Theme.of(context).textTheme.button.color,

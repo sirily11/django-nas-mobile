@@ -5,6 +5,7 @@ import 'package:django_nas_mobile/models/Folder.dart';
 import 'package:django_nas_mobile/models/NasProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_widgets/flutter_widgets.dart';
 import 'package:path/path.dart' as p;
 
 class UploadDownloadItem {
@@ -45,6 +46,7 @@ class UploadDownloadProvider extends ChangeNotifier {
   bool onlyNotUploadItem = false;
   bool _pause = false;
   Dio networkProvider;
+  ItemScrollController scrollController = ItemScrollController();
 
   UploadDownloadProvider({Dio networkProvider}) {
     this.networkProvider = networkProvider ?? Dio();
@@ -71,6 +73,7 @@ class UploadDownloadProvider extends ChangeNotifier {
     this.items.addAll(items);
     notifyListeners();
     List<NasFile> l = [];
+    int index = 0;
     for (var i in items) {
       if (pause) {
         await Future.doWhile(() async {
@@ -81,7 +84,14 @@ class UploadDownloadProvider extends ChangeNotifier {
       if (!_pause) {
         var data = await this.uploadItem(i, baseURL: baseURL);
         l.add(data);
+        if (index < items.length - 3) {
+          await scrollController.scrollTo(
+            index: index,
+            duration: Duration(milliseconds: 300),
+          );
+        }
       }
+      index += 1;
     }
     return l;
   }
@@ -118,6 +128,10 @@ class UploadDownloadProvider extends ChangeNotifier {
       }
       if (!_pause) {
         await _download(urls[i], savePaths[i], item);
+        if (i < urls.length - 3) {
+          await scrollController.scrollTo(
+              index: i, duration: Duration(milliseconds: 300));
+        }
       }
       i++;
     }
@@ -187,6 +201,7 @@ class UploadDownloadProvider extends ChangeNotifier {
       {@required basePath}) async {
     int i = 0;
     List<UploadDownloadItem> items = files
+        .where((element) => element.hasUploadedToCloud == false)
         .map(
           (f) => UploadDownloadItem(file: File(f.file), isUpload: true),
         )
@@ -203,6 +218,10 @@ class UploadDownloadProvider extends ChangeNotifier {
       if (!_pause) {
         var path = '$basePath$s3Upload${files[i].id}';
         await uploadItemToCloud(item, url: path);
+        if (i < items.length - 3) {
+          await scrollController.scrollTo(
+              index: i, duration: Duration(milliseconds: 300));
+        }
       }
       i++;
     }

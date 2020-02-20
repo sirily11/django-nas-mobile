@@ -2,6 +2,7 @@ import 'package:django_nas_mobile/models/UploadDownloadProvider.dart';
 import 'package:django_nas_mobile/models/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:flutter_widgets/flutter_widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:path/path.dart' as p;
 
@@ -12,60 +13,70 @@ class UploadPage extends StatelessWidget {
 
     return Stack(
       children: <Widget>[
-        ListView.separated(
-          separatorBuilder: (ctx, index) {
-            return Divider();
-          },
-          itemCount: uploadProvider.onlyNotUploadItem
-              ? uploadProvider.items.where((i) => !i.isDone).toList().length
-              : uploadProvider.items.length,
-          itemBuilder: (context, index) {
-            UploadDownloadItem item = uploadProvider.onlyNotUploadItem
-                ? uploadProvider.items.where((i) => !i.isDone).toList()[index]
-                : uploadProvider.items[index];
-            return Slidable(
-              actionPane: SlidableDrawerActionPane(),
-              secondaryActions: <Widget>[
-                IconSlideAction(
-                  onTap: () async {
-                    uploadProvider.removeItem(item);
+        Scrollbar(
+          child: uploadProvider.items.length == 0
+              ? Container()
+              : ScrollablePositionedList.separated(
+                  itemScrollController: uploadProvider.scrollController,
+                  separatorBuilder: (ctx, index) {
+                    return Divider();
                   },
-                  icon: Icons.delete,
-                  caption: "Delete",
-                  color: Colors.red,
-                ),
-              ],
-              child: ListTile(
-                trailing: item.isDone
-                    ? Icon(
-                        Icons.done,
-                        color: Colors.green,
-                      )
-                    : Icon(
-                        Icons.clear,
-                        color: Theme.of(context).disabledColor,
-                      ),
-                leading: Stack(
-                  children: <Widget>[
-                    CircularProgressIndicator(
-                      value: item.progress ?? 0,
-                    ),
-                    Positioned.fill(
-                      child: Align(
-                        child: Text(
-                          "${((item.progress ?? 0) * 100).toStringAsFixed(0)}%",
-                          style: TextStyle(fontSize: 10),
+                  itemCount: uploadProvider.onlyNotUploadItem
+                      ? uploadProvider.items
+                          .where((i) => !i.isDone)
+                          .toList()
+                          .length
+                      : uploadProvider.items.length,
+                  itemBuilder: (context, index) {
+                    UploadDownloadItem item = uploadProvider.onlyNotUploadItem
+                        ? uploadProvider.items
+                            .where((i) => !i.isDone)
+                            .toList()[index]
+                        : uploadProvider.items[index];
+                    return Slidable(
+                      actionPane: SlidableDrawerActionPane(),
+                      secondaryActions: <Widget>[
+                        IconSlideAction(
+                          onTap: () async {
+                            uploadProvider.removeItem(item);
+                          },
+                          icon: Icons.delete,
+                          caption: "Delete",
+                          color: Colors.red,
                         ),
+                      ],
+                      child: ListTile(
+                        trailing: item.isDone
+                            ? Icon(
+                                Icons.done,
+                                color: Colors.green,
+                              )
+                            : Icon(
+                                Icons.clear,
+                                color: Theme.of(context).disabledColor,
+                              ),
+                        leading: Stack(
+                          children: <Widget>[
+                            CircularProgressIndicator(
+                              value: item.progress ?? 0,
+                            ),
+                            Positioned.fill(
+                              child: Align(
+                                child: Text(
+                                  "${((item.progress ?? 0) * 100).toStringAsFixed(0)}%",
+                                  style: TextStyle(fontSize: 10),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                        title: Text(p.basename(item.file.path)),
+                        subtitle: Text(
+                            "${getSize(item.current.toDouble())}/${getSize(item?.total?.toDouble())}"),
                       ),
-                    )
-                  ],
+                    );
+                  },
                 ),
-                title: Text(p.basename(item.file.path)),
-                subtitle: Text(
-                    "${getSize(item.current.toDouble())}/${getSize(item?.total?.toDouble())}"),
-              ),
-            );
-          },
         ),
         TotalUploadProgress(
           key: Key("uploadpage-progess"),

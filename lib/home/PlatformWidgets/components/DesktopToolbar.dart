@@ -41,10 +41,8 @@ class DesktopToolbar extends StatelessWidget {
                       var selectedItem = desktopController.selectedElement;
                       UploadDownloadProvider provider = Provider.of(context);
                       if (selectedItem is NasFile) {
-                        await provider.uploadItemToCloud(
-                            UploadDownloadItem(file: File(selectedItem.file)),
-                            url:
-                                "${nasProvider.baseURL}$s3Upload${selectedItem.id}");
+                        await provider.uploadItemsToCloud([selectedItem],
+                            basePath: nasProvider.baseURL);
                       }
                       if (selectedItem is NasFolder) {
                         var folder = await DataFetcher(

@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+
+import 'package:django_nas_mobile/home/views/VideoView.dart';
 import 'package:path/path.dart' as p;
 import 'package:django_nas_mobile/home/Row.dart';
 import 'package:django_nas_mobile/home/components/ErrorDialog.dart';
@@ -222,7 +224,15 @@ Future<void> onFileTap({@required NasFile file, BuildContext context}) async {
     );
   } else if (VIDEOS.contains(p.extension(file.filename).toLowerCase())) {
     if (await canLaunch(file.file)) {
-      await launch(file.file);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (c) => VideoView(
+            name: p.basename(file.filename),
+            url: file.file,
+          ),
+        ),
+      );
     }
   } else {
     if (await canLaunch(file.file)) {

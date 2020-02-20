@@ -33,10 +33,13 @@ dependencies:
   image_picker: ^0.6.2+1
   url_launcher: ^5.4.1
   charts_flutter: ^0.8.1
+  flutter_ijkplayer: ^0.3.5+1
   liquid_pull_to_refresh: ^1.1.1
   flutter_staggered_grid_view: ^0.3.0
   multi_image_picker: ^4.6.1
   community_material_icon: 3.5.95
+  flutter_easyrefresh: ^2.0.9
+  flutter_widgets: ^0.1.11
   chewie:
   hive:
   hive_flutter:

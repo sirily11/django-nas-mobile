@@ -242,7 +242,7 @@ class NasProvider extends ChangeNotifier {
 
   /// fetch folder
   /// if [id] is null, then fetch root folder
-  Future<void> fetchFolder(int id) async {
+  Future<NasFolder> fetchFolder(int id) async {
     try {
       isLoading = true;
       notifyListeners();
@@ -253,11 +253,13 @@ class NasProvider extends ChangeNotifier {
           .fetchOne<NasFolder>(id: id);
       currentFolder = folder;
       parents.add(folder);
+      return folder;
     } catch (err) {} finally {
       await Future.delayed(Duration(milliseconds: 200));
       isLoading = false;
       notifyListeners();
     }
+    return null;
   }
 
   /// go to previous page
