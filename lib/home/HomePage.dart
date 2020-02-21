@@ -218,6 +218,7 @@ class MobileButtonNavigationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     SelectionProvider selectionProvider = Provider.of(context);
+
     return BottomNavigationBar(
       unselectedItemColor: Theme.of(context).unselectedWidgetColor,
       selectedItemColor: Theme.of(context).primaryColor,

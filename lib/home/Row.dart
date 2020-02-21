@@ -23,7 +23,8 @@ const IMAGES = ['.jpg', '.png', 'bpm', '.gif', 'jpeg', 'HEIC'];
 const VIDEOS = ['.mov', '.mp4', '.m4v'];
 
 class ParentFolderRow extends StatelessWidget {
-  ParentFolderRow();
+  final Function onDrag;
+  ParentFolderRow({@required this.onDrag});
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +39,7 @@ class ParentFolderRow extends StatelessWidget {
               desktopController: desktopController,
               nasProvider: nasProvider,
               element: BaseElement(id: nasProvider.currentFolder.parent));
+          await this.onDrag();
         } catch (err) {
           showDialog(
             context: context,
@@ -125,8 +127,9 @@ class FileRow extends StatelessWidget {
 
 class FolderRow extends StatelessWidget {
   final NasFolder folder;
+  final Function onDrag;
 
-  FolderRow({@required this.folder});
+  FolderRow({@required this.folder, @required this.onDrag});
 
   @override
   Widget build(BuildContext context) {
@@ -136,6 +139,7 @@ class FolderRow extends StatelessWidget {
         try {
           await onDragMoveTo(
               data: data, nasProvider: nasProvider, element: folder);
+          await this.onDrag();
         } catch (err) {
           showDialog(
             context: context,
@@ -219,8 +223,8 @@ class FolderRow extends StatelessWidget {
         ],
         child: ListTile(
           selected: isSelected,
-          onTap: () {
-            Navigator.of(context).push(
+          onTap: () async {
+            await Navigator.of(context).push(
               MaterialPageRoute(builder: (ctx) {
                 return HomePage(
                   folderID: folder.id,
@@ -228,6 +232,7 @@ class FolderRow extends StatelessWidget {
                 );
               }),
             );
+            await this.onDrag();
           },
           leading: Image.asset(
             "assets/icons/folder.png",

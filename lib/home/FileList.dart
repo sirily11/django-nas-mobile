@@ -46,7 +46,9 @@ class FileListWidget extends StatelessWidget {
           // Render previous folder
           if (index == 0) {
             return provider.currentFolder.parents.length > 0
-                ? ParentFolderRow()
+                ? ParentFolderRow(
+                    onDrag: this.refresh,
+                  )
                 : Container();
           }
           // put index back (-1)
@@ -54,6 +56,7 @@ class FileListWidget extends StatelessWidget {
 
           if (index >= 0 && index < currentFolder.folders.length) {
             return FolderRow(
+              onDrag: this.refresh,
               folder: currentFolder.folders[index],
             );
           } else if (index >= currentFolder.folders.length &&
