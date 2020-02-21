@@ -8,15 +8,15 @@ import 'package:flutter_easyrefresh/taurus_header.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:provider/provider.dart';
 
-import 'components/LoadingShimmerList.dart';
-
 /// Create File List Widget
 /// This will render main file list
 class FileListWidget extends StatelessWidget {
   final NasFolder currentFolder;
+  final Function refresh;
 
   FileListWidget({
     @required this.currentFolder,
+    @required this.refresh,
     Key key,
   }) : super(key: key);
 
@@ -37,8 +37,7 @@ class FileListWidget extends StatelessWidget {
       key: Key("refresh-widget"),
       header: TaurusHeader(),
       onRefresh: () async {
-        NasProvider provider = Provider.of(context);
-        await provider.refresh(provider.currentFolder.id);
+        await this.refresh();
       },
       child: ListView.builder(
         key: Key("Mobile Filelist"),

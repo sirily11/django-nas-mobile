@@ -75,7 +75,6 @@ class CreateNewButton extends StatelessWidget {
       var data =
           await uploadProvider.addItems(items, baseURL: nasProvider.baseURL);
       nasProvider.addFiles(data, parent);
-    
     } else {
       var video = await ImagePicker.pickVideo(
         source: ImageSource.gallery,

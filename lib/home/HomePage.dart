@@ -37,14 +37,18 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     Future.delayed(Duration(milliseconds: 20)).then((_) async {
-      NasProvider provider = Provider.of(context);
-      if (provider.box == null) {
-        await provider.initBox();
-      }
-      var folder = await provider.fetchFolder(widget.folderID);
-      setState(() {
-        currentFolder = folder;
-      });
+      await fetch();
+    });
+  }
+
+  Future fetch() async {
+    NasProvider provider = Provider.of(context);
+    if (provider.box == null) {
+      await provider.initBox();
+    }
+    var folder = await provider.fetchFolder(widget.folderID);
+    setState(() {
+      currentFolder = folder;
     });
   }
 
@@ -77,6 +81,7 @@ class _HomePageState extends State<HomePage> {
                         desktop: DesktopFileGrid(),
                         largeScreen: DesktopFileGrid(),
                         mobile: FileListWidget(
+                          refresh: this.fetch,
                           currentFolder: currentFolder,
                         ),
                       ),
@@ -166,9 +171,7 @@ class _HomePageState extends State<HomePage> {
             color: Theme.of(context).textTheme.button.color,
             icon: Icon(Icons.refresh),
             onPressed: () async {
-              NasProvider nasProvider = Provider.of(context);
-              nasProvider.isLoading = true;
-              nasProvider.refresh(nasProvider.currentFolder.id);
+              await this.fetch();
             },
           ),
           IconButton(
