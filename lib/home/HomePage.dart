@@ -172,7 +172,11 @@ class _HomePageState extends State<HomePage> {
             color: Theme.of(context).textTheme.button.color,
             icon: Icon(Icons.refresh),
             onPressed: () async {
-              await this.fetch();
+              if (Platform.isMacOS) {
+                await provider.refresh(provider.currentFolder.id);
+              } else {
+                await this.fetch();
+              }
             },
           ),
           IconButton(

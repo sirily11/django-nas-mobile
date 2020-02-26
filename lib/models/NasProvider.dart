@@ -189,7 +189,9 @@ class NasProvider extends ChangeNotifier {
 
   Future<void> refresh(int id) async {
     try {
+      isLoading = true;
       notifyListeners();
+
       var folder = await DataFetcher(
               url: folderUrl,
               networkProvider: this.networkProvider,

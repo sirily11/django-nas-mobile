@@ -239,12 +239,11 @@ void main() {
     test("Go to child", () async {
       await provider.fetchFolder(null);
       var root = provider.currentFolder;
-      expect(provider.parents.length, 1);
+
       provider.isLoading = true;
       await provider.fetchFolder(root.folders[0].id);
       expect(provider.currentFolder.name, folders[0]['name']);
       expect(provider.isLoading, false);
-      expect(provider.parents.length, 2);
     });
 
     test("Get URL", () async {
@@ -265,10 +264,9 @@ void main() {
 
     test("Set URL", () async {
       provider.currentFolder = NasFolder.fromJson(folders[1]);
-      provider.parents.add(NasFolder.fromJson(folders[0]));
+
       await provider.setURL("abc");
       // clear parents
-      expect(provider.parents.length, 0);
       expect(provider.baseURL, "abc");
       verify(box.put(any, any)).called(1);
     });
@@ -295,13 +293,9 @@ void main() {
         ),
       );
 
-      provider.parents = [folder1, folder2];
       provider.currentFolder = folder2;
       await provider.refresh(2);
-      expect(provider.parents.length, 2);
-      expect(provider.parents[1].id, 2);
       expect(provider.currentFolder.id, 2);
-      expect(provider.parents[0].id, 1);
     });
 
     test("Delete file in root", () async {
@@ -321,7 +315,6 @@ void main() {
       provider.currentFolder = currentFolder;
       await provider.deleteFile(fileToBeDeleted);
       expect(provider.currentFolder.files.length, 0);
-      expect(provider.parents.length, 0);
     });
 
     test("Delete file not in root", () async {
@@ -343,11 +336,9 @@ void main() {
 
       NasProvider provider = NasProvider(box: box, networkProvider: client);
       provider.currentFolder = childFolder;
-      provider.parents = [rootFolder];
+
       await provider.deleteFile(fileToBeDeleted);
       expect(provider.currentFolder.files.length, 0);
-      expect(provider.parents[0].folders.first.totalSize, 20.0);
-      expect(provider.parents[0].files.length, 1);
     });
 
     test("Delete document", () async {
@@ -406,14 +397,11 @@ void main() {
 
       NasProvider provider = NasProvider(box: box, networkProvider: client);
       provider.currentFolder = childFolder;
-      provider.parents = [rootFolder];
+
       expect(provider.currentFolder.folders.length, 1);
-      expect(provider.parents.length, 1);
-      expect(provider.parents[0].folders.length, 1);
+
       await provider.deleteFolder(folderTobeDeleted);
       expect(provider.currentFolder.folders.length, 0);
-      expect(provider.parents[0].folders.length, 1);
-      expect(provider.parents[0].folders[0].totalSize, 20);
     });
 
     test("move folder back", () async {
@@ -428,11 +416,10 @@ void main() {
       );
       NasProvider provider = NasProvider(box: box, networkProvider: client);
       provider.currentFolder = childFolder;
-      provider.parents = [rootFolder, childFolder];
+
       await provider.moveFolderBack(folderTobeMoved, null);
       expect(provider.currentFolder.folders.length, 0);
       expect(provider.currentFolder.totalSize, 20);
-      expect(provider.parents[0].folders.length, 2);
     });
 
     test("move file back", () async {
@@ -451,11 +438,10 @@ void main() {
       );
       NasProvider provider = NasProvider(box: box, networkProvider: client);
       provider.currentFolder = childFolder;
-      provider.parents = [rootFolder, childFolder];
+
       await provider.moveFileBack(fileTobeMoved, null);
       expect(provider.currentFolder.files.length, 0);
       expect(provider.currentFolder.totalSize, 20);
-      expect(provider.parents[0].files.length, 1);
     });
 
     test("move document back", () async {
@@ -473,10 +459,9 @@ void main() {
       );
       NasProvider provider = NasProvider(box: box, networkProvider: client);
       provider.currentFolder = childFolder;
-      provider.parents = [rootFolder, childFolder];
+
       await provider.moveDocumentBack(nasDocument, null);
       expect(provider.currentFolder.documents.length, 0);
-      expect(provider.parents[0].documents.length, 1);
     });
 
     test("move folder to", () async {
@@ -491,7 +476,7 @@ void main() {
       );
       NasProvider provider = NasProvider(box: box, networkProvider: client);
       provider.currentFolder = rootFolder;
-      provider.parents = [rootFolder, childFolder];
+
       await provider.moveFolderTo(folderTobeMoved, 5);
       expect(provider.currentFolder.folders.length, 1);
       verify(client.patch(any, data: {"parent": 5})).called(1);
@@ -513,7 +498,7 @@ void main() {
       );
       NasProvider provider = NasProvider(box: box, networkProvider: client);
       provider.currentFolder = rootFolder;
-      provider.parents = [rootFolder, childFolder];
+
       await provider.moveFileTo(fileTobeMoved, 5);
       expect(provider.currentFolder.folders.length, 1);
       expect(provider.currentFolder.files.length, 0);
@@ -536,7 +521,7 @@ void main() {
       );
       NasProvider provider = NasProvider(box: box, networkProvider: client);
       provider.currentFolder = rootFolder;
-      provider.parents = [rootFolder, childFolder];
+
       await provider.moveDocumentTo(nasDocument, 5);
       expect(provider.currentFolder.folders.length, 1);
       expect(provider.currentFolder.documents.length, 0);
@@ -570,16 +555,15 @@ void main() {
 
       NasProvider provider = NasProvider(box: box, networkProvider: client);
       provider.currentFolder = folder1_1_1;
-      provider.parents = [root, folder1, folder1_1, folder1_1_1];
+
       await provider.backToPrev();
       expect(provider.currentFolder, folder1_1);
-      expect(provider.parents.length, 3);
+
       await provider.backToPrev();
       expect(provider.currentFolder, folder1);
-      expect(provider.parents.length, 2);
+
       await provider.backToPrev();
       expect(provider.currentFolder, root);
-      expect(provider.parents.length, 1);
     });
 
     test("init box", () async {
@@ -597,7 +581,6 @@ void main() {
 
       NasProvider provider = NasProvider(box: box, networkProvider: client);
       provider.currentFolder = root;
-      provider.parents = [root];
 
       await provider.createNewFolder("b");
       expect(provider.currentFolder.folders.length, 1);
@@ -615,7 +598,6 @@ void main() {
 
       NasProvider provider = NasProvider(box: box, networkProvider: client);
       provider.currentFolder = root;
-      provider.parents = [root];
 
       await provider.createNewDocument("b");
       expect(provider.currentFolder.documents.length, 1);
@@ -633,7 +615,6 @@ void main() {
 
       NasProvider provider = NasProvider(box: box, networkProvider: client);
       provider.currentFolder = root;
-      provider.parents = [root];
 
       await provider.updateFolder("c", 1);
       expect(provider.currentFolder.folders.length, 1);
@@ -651,7 +632,6 @@ void main() {
 
       NasProvider provider = NasProvider(box: box, networkProvider: client);
       provider.currentFolder = root;
-      provider.parents = [root];
 
       await provider.updateDocumentName("c", 1);
       expect(provider.currentFolder.documents.length, 1);
