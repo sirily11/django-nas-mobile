@@ -114,7 +114,8 @@ class _HomePageState extends State<HomePage> {
     NasProvider provider = Provider.of(context);
 
     if (MediaQuery.of(context).size.width > 760 || Platform.isMacOS) {
-      if (provider.parents.length == 1) {
+      if (provider?.currentFolder == null ||
+          provider.currentFolder.parents.length == 0) {
         return null;
       }
       return BackButton(

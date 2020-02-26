@@ -14,10 +14,6 @@ String systemUrl = "/system/";
 String s3Upload = "/s3/";
 
 class NasProvider extends ChangeNotifier {
-  /// List of parents of current folder
-  /// If current folder's path is [a > b > c],
-  /// then content of parents is [a, b]
-  List<NasFolder> parents = [];
   NasFolder currentFolder;
   bool isLoading = false;
   Dio networkProvider;
@@ -57,7 +53,6 @@ class NasProvider extends ChangeNotifier {
     currentFolder = null;
     this.baseURL = url;
     await this.fetchFolder(null);
-    parents = [];
   }
 
   /// Delete file.
@@ -70,11 +65,6 @@ class NasProvider extends ChangeNotifier {
               baseURL: baseURL)
           .delete<NasFile>(file.id);
       currentFolder.files.removeWhere((f) => f.id == file.id);
-      var parnentFolder = parents.last.folders
-          .firstWhere((f) => f.id == currentFolder.id, orElse: () => null);
-      if (parnentFolder != null) {
-        parnentFolder.totalSize -= file.size;
-      }
     } catch (err) {} finally {
       notifyListeners();
     }
@@ -101,11 +91,6 @@ class NasProvider extends ChangeNotifier {
               baseURL: baseURL)
           .delete<NasFolder>(folder.id);
       currentFolder.folders.removeWhere((d) => d.id == folder.id);
-      var parnentFolder = parents.last.folders
-          .firstWhere((f) => f.id == currentFolder.id, orElse: () => null);
-      if (parnentFolder != null) {
-        parnentFolder.totalSize -= folder.totalSize;
-      }
     } catch (err) {} finally {
       notifyListeners();
     }
@@ -116,16 +101,11 @@ class NasProvider extends ChangeNotifier {
   Future<void> moveFolderBack(NasFolder folder, int parent) async {
     try {
       var response = await DataFetcher(
-              url: folderUrl,
-              networkProvider: this.networkProvider,
-              baseURL: baseURL)
-          .update<NasFolder>(folder.id, {"parent": parent});
-      parents[parents.length - 2]?.folders?.add(response);
+        url: folderUrl,
+        networkProvider: this.networkProvider,
+        baseURL: baseURL,
+      ).update<NasFolder>(folder.id, {"parent": parent});
       currentFolder.folders.removeWhere((f) => f.id == folder.id);
-      var parnentFolder = parents[parents.length - 2]
-          .folders
-          .firstWhere((f) => f.id == currentFolder.id);
-      parnentFolder.totalSize -= folder.totalSize;
       notifyListeners();
     } catch (err) {
       print(err);
@@ -141,12 +121,7 @@ class NasProvider extends ChangeNotifier {
               networkProvider: this.networkProvider,
               baseURL: baseURL)
           .update<NasFile>(file.id, {"parent": parent});
-      parents[parents.length - 2]?.files?.add(response);
       currentFolder.files.removeWhere((f) => f.id == file.id);
-      var parnentFolder = parents[parents.length - 2]
-          .folders
-          .firstWhere((f) => f.id == currentFolder.id);
-      parnentFolder.totalSize -= file.size;
       notifyListeners();
     } catch (err) {}
   }
@@ -160,7 +135,7 @@ class NasProvider extends ChangeNotifier {
               networkProvider: this.networkProvider,
               baseURL: baseURL)
           .update<NasDocument>(document.id, {"parent": parent});
-      parents[parents.length - 2]?.documents?.add(response);
+      // parents[parents.length - 2]?.documents?.add(response);
       currentFolder.documents.removeWhere((d) => d.id == document.id);
       notifyListeners();
     } catch (err) {}
@@ -221,7 +196,6 @@ class NasProvider extends ChangeNotifier {
               baseURL: baseURL)
           .fetchOne<NasFolder>(id: id);
       currentFolder = folder;
-      parents.last = folder;
     } catch (err) {} finally {
       isLoading = false;
       notifyListeners();
@@ -252,7 +226,7 @@ class NasProvider extends ChangeNotifier {
               baseURL: baseURL)
           .fetchOne<NasFolder>(id: id);
       currentFolder = folder;
-      parents.add(folder);
+      // parents.add(folder);
       return folder;
     } catch (err) {} finally {
       await Future.delayed(Duration(milliseconds: 200));
@@ -266,15 +240,16 @@ class NasProvider extends ChangeNotifier {
   /// pop the current page from provider's parents if provider's parents length > 0
   /// else will throw error
   Future<void> backToPrev() async {
-    if (parents.length == 1) {
-      parents.clear();
-      this.fetchFolder(null);
-    } else if (parents.length > 0) {
-      parents.removeLast();
-      currentFolder = parents.last;
-    } else {
-      throw Exception("Parent is empty");
-    }
+    // if (parents.length == 1) {
+    //   parents.clear();
+    //   this.fetchFolder(null);
+    // } else if (parents.length > 0) {
+    //   parents.removeLast();
+    //   currentFolder = parents.last;
+    // } else {
+    //   throw Exception("Parent is empty");
+    // }
+    await this.fetchFolder(this.currentFolder.parent);
     notifyListeners();
   }
 
@@ -330,19 +305,15 @@ class NasProvider extends ChangeNotifier {
   }
 
   void addFile(NasFile file, int parent) async {
-    var folder =
-        this.parents.firstWhere((p) => p.id == parent, orElse: () => null);
-    if (folder != null) {
-      folder.files.add(file);
+    if (currentFolder != null) {
+      currentFolder.files.add(file);
     }
     notifyListeners();
   }
 
   void addFiles(List<NasFile> files, int parent) {
-    var folder =
-        this.parents.firstWhere((p) => p.id == parent, orElse: () => null);
-    if (folder != null) {
-      folder.files.addAll(files);
+    if (currentFolder != null) {
+      currentFolder.files.addAll(files);
     }
     notifyListeners();
   }
