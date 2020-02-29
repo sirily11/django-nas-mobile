@@ -98,6 +98,35 @@ class FileRow extends StatelessWidget {
             caption: "Delete",
             color: Colors.red,
           ),
+          IconSlideAction(
+              color: Colors.blue,
+              icon: Icons.edit,
+              caption: "Rename",
+              onTap: () {
+                TextEditingController controller = TextEditingController(
+                    text: p.basenameWithoutExtension(file.filename));
+                showDialog(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: Text("Rename Folder"),
+                    content: TextField(
+                      controller: controller,
+                      decoration: InputDecoration(labelText: "Folder Name"),
+                    ),
+                    actions: <Widget>[
+                      FlatButton(
+                        onPressed: () async {
+                          NasProvider provider = Provider.of(context);
+                          await provider.updateFileName(file,
+                              controller.text + p.extension(file.filename));
+                          Navigator.pop(context);
+                        },
+                        child: Text("OK"),
+                      )
+                    ],
+                  ),
+                );
+              }),
           if (Platform.isMacOS)
             IconSlideAction(
               onTap: () async {

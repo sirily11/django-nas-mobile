@@ -11,6 +11,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class DesktopToolbar extends StatelessWidget {
+  final Function refresh;
+
+  DesktopToolbar({@required this.refresh});
+
   @override
   Widget build(BuildContext context) {
     DesktopController desktopController = Provider.of(context);

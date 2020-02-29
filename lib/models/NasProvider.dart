@@ -216,6 +216,31 @@ class NasProvider extends ChangeNotifier {
     } catch (err) {}
   }
 
+  /// Update file name
+  Future updateFileName(NasFile nasFile, String newName) async {
+    try {
+      isLoading = true;
+      notifyListeners();
+      var file = await DataFetcher(
+              url: fileUrl,
+              networkProvider: this.networkProvider,
+              baseURL: baseURL)
+          .update<NasFile>(nasFile.id, {"filename": newName});
+      var updatedFile = currentFolder.files
+          .firstWhere((f) => f.id == file.id, orElse: () => null);
+      if (updatedFile != null) {
+        updatedFile.file = file.file;
+        updatedFile.filename = file.filename;
+      }
+      notifyListeners();
+      return file;
+    } catch (err) {} finally {
+      isLoading = false;
+      notifyListeners();
+    }
+    return null;
+  }
+
   /// fetch folder
   /// if [id] is null, then fetch root folder
   Future<NasFolder> fetchFolder(int id) async {

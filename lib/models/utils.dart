@@ -190,7 +190,8 @@ Future onDragRename(
     NasProvider nasProvider,
     BuildContext context,
     @required DesktopController desktopController}) async {
-  TextEditingController controller = TextEditingController(text: data.name);
+  TextEditingController controller = TextEditingController(
+      text: data.name ?? p.basenameWithoutExtension(data.filename));
   showDialog(
     context: context,
     builder: (c) => UpdateDialog(
@@ -202,6 +203,9 @@ Future onDragRename(
           await nasProvider.updateFolder(controller.text, data.id);
         } else if (data is NasDocument) {
           await nasProvider.updateDocumentName(controller.text, data.id);
+        } else if (data is NasFile) {
+          await nasProvider.updateFileName(
+              data, controller.text + p.extension(data.filename));
         } else {
           throw ("File type is not supported");
         }

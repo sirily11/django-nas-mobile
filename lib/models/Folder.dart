@@ -3,6 +3,7 @@
 class BaseElement {
   int id;
   String name;
+  String filename;
   BaseElement({this.id});
 }
 
