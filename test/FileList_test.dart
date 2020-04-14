@@ -110,7 +110,7 @@ void main() {
         ),
       );
 
-      expect(find.byKey(Key("empty-folder")), findsOneWidget);
+      expect(find.byKey(Key("Mobile Filelist")), findsOneWidget);
     });
 
     testWidgets("When loading", (tester) async {
@@ -136,8 +136,7 @@ void main() {
       );
       expect(
           Provider.of<NasProvider>(_childKey.currentContext).isLoading, true);
-      expect(find.byKey(Key("Loading Progress")), findsOneWidget);
-      expect(find.byKey(Key("Mobile Filelist")), findsNothing);
+      expect(find.byKey(Key("Mobile Filelist")), findsOneWidget);
     });
 
     testWidgets("not loading with empty content", (tester) async {
@@ -184,22 +183,18 @@ void main() {
           ],
           child: MaterialApp(
             home: Material(
-              child: FileListWidget(),
+              child: FileListWidget(
+                currentFolder: root,
+                refresh: () {},
+              ),
             ),
           ),
         ),
       );
       expect(find.byKey(Key("Loading Progress")), findsNothing);
-      // expect(find.byKey(Key("Mobile Filelist")), findsOneWidget);
       expect(find.byKey(Key("document-row")), findsOneWidget);
       expect(find.byKey(Key("file-row")), findsOneWidget);
       expect(find.byKey(Key("folder-row")), findsOneWidget);
-      await tester.drag(find.byKey(Key("refresh-widget")), Offset(0, 600));
-
-      await tester.pumpAndSettle();
-      expect(find.byKey(Key("document-row")), findsNothing);
-      expect(find.byKey(Key("file-row")), findsNothing);
-      expect(find.byKey(Key("folder-row")), findsNothing);
     });
 
     testWidgets("not loading and in sub folder", (tester) async {
@@ -216,10 +211,6 @@ void main() {
         documents: [document],
         parents: [Parent(id: null, name: "root")],
       );
-      NasFolder root = NasFolder(
-          folders: [subFolder], files: [], documents: [], parents: []);
-      nasProvider.isLoading = false;
-      nasProvider.currentFolder = subFolder;
 
       await tester.pumpWidget(
         MultiProvider(
@@ -229,8 +220,12 @@ void main() {
             ),
           ],
           child: MaterialApp(
+          
             home: Material(
-              child: FileListWidget(),
+              child: FileListWidget(
+                currentFolder: subFolder,
+                refresh: () {},
+              ),
             ),
           ),
         ),
@@ -240,7 +235,6 @@ void main() {
       expect(find.byKey(Key("document-row")), findsOneWidget);
       expect(find.byKey(Key("file-row")), findsOneWidget);
       expect(find.byKey(Key("folder-row")), findsOneWidget);
-      expect(find.byKey(Key("parent-row")), findsOneWidget);
     });
   });
 }
