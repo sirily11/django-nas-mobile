@@ -51,7 +51,7 @@ class _SongsListState extends State<SongsList> {
               await provider.play(song);
             },
             selected: song.id == provider.currentPlayingMusic?.id,
-            leading: Image.network(song.metadata.picture),
+            leading: Image.network(song.metadata.picture ?? ""),
             title: Text(
               "${song.metadata.title}",
               maxLines: 1,

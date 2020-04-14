@@ -94,13 +94,18 @@ class AlbumCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8.0),
-            child: Image.network(
-              metadata.picture,
+          if (metadata.picture != null)
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
+              child: Image.network(
+                metadata.picture,
+                height: 190,
+              ),
+            ),
+          if (metadata.picture == null)
+            Container(
               height: 190,
             ),
-          ),
           Text(
             "${metadata.album}",
             maxLines: 1,

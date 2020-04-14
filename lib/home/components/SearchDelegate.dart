@@ -186,7 +186,7 @@ class MusicSearch extends SearchDelegate {
         NasFile file = files[index];
         return ListTile(
           selected: musicProvider.currentPlayingMusic?.id == file.id,
-          leading: Image.network(file.metadata.picture, height: 40),
+          leading: Image.network(file.metadata.picture ?? "", height: 40),
           title: Text("${file.metadata.title}"),
           subtitle: Text("${file.metadata.artist}"),
           onTap: () async {
