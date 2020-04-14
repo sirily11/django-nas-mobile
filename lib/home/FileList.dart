@@ -46,7 +46,7 @@ class FileListWidget extends StatelessWidget {
         itemBuilder: (ctx, index) {
           // Render previous folder
           if (index == 0) {
-            return provider.currentFolder.parents.length > 0
+            return Navigator.canPop(context)
                 ? ParentFolderRow(
                     onDrag: this.refresh,
                   )

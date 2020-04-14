@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 
-class MusicProvider with ChangeNotifier {
+class MusicProvider extends ChangeNotifier {
   NasFile currentPlayingMusic;
   Duration totalDuration;
   Duration currentPosition;
@@ -30,6 +30,13 @@ class MusicProvider with ChangeNotifier {
     }
   }
 
+  @override
+  void dispose() {
+    print("Music player closed");
+    audioPlayer.dispose();
+    super.dispose();
+  }
+
   static void x(AudioPlayerState value) {
     print("state => $value");
   }
@@ -46,6 +53,12 @@ class MusicProvider with ChangeNotifier {
     });
 
     audioPlayer.monitorNotificationStateChanges(x);
+
+    audioPlayer.onPlayerError.listen((msg) {
+      currentState = AudioPlayerState.STOPPED;
+      totalDuration = Duration(seconds: 0);
+      currentPosition = Duration(seconds: 0);
+    });
 
     audioPlayer.onAudioPositionChanged.listen((event) {
       currentPosition = event;

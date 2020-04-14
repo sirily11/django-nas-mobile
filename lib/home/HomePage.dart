@@ -122,8 +122,8 @@ class _HomePageState extends State<HomePage> {
         onPressed: () async {
           DesktopController controller = Provider.of(context);
           controller.selectedElement = null;
-          await provider.backToPrev();
           Navigator.pop(context);
+          await provider.backToPrev();
         },
       );
     }
@@ -180,11 +180,9 @@ class _HomePageState extends State<HomePage> {
         title: PlatformWidget(
           desktop: Text(
             provider?.currentFolder?.name ?? "Django NAS",
-            style: Theme.of(context).textTheme.title,
           ),
           mobile: Text(
             widget.name ?? "Django NAS",
-            style: Theme.of(context).textTheme.title,
           ),
         ),
       ),

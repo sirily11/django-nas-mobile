@@ -29,7 +29,7 @@ class FullScreenPlayer extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
                 child: provider.currentPlayingMusic != null
                     ? Image.network(
-                        provider.currentPlayingMusic.metadata.picture,
+                        provider.currentPlayingMusic.metadata.picture ?? "",
                         height: 250,
                         width: 300,
                       )
@@ -99,9 +99,9 @@ class FullScreenPlayer extends StatelessWidget {
               ],
             ),
             if (provider.currentPlayingMusic != null)
-              Slider(
+              Slider.adaptive(
                 min: 0,
-                max: provider.totalDuration?.inSeconds?.toDouble() ?? 1000,
+                max: provider.totalDuration?.inSeconds?.toDouble() ?? 10000,
                 value: provider.currentPosition?.inSeconds?.toDouble() ?? 0,
                 onChangeStart: (e) async {
                   await provider.pause();

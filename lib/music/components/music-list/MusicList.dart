@@ -99,12 +99,12 @@ class AlbumCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(8.0),
               child: Image.network(
                 metadata.picture,
-                height: 190,
+                height: 185,
               ),
             ),
           if (metadata.picture == null)
             Container(
-              height: 190,
+              height: 185,
             ),
           Text(
             "${metadata.album}",

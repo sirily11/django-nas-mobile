@@ -34,14 +34,14 @@ class BottomMusicPlayer extends StatelessWidget {
         child: Container(
           color: Theme.of(context).cardColor,
           width: MediaQuery.of(context).size.width,
-          height: 70,
+          height: 90,
           child: Padding(
             padding: EdgeInsets.only(left: 10, bottom: 10, right: 10),
             child: Row(
               children: <Widget>[
                 provider.currentPlayingMusic != null
                     ? Image.network(
-                        provider.currentPlayingMusic?.metadata?.picture,
+                        provider.currentPlayingMusic?.metadata?.picture ?? "",
                         width: 50,
                       )
                     : Container(
