@@ -20,7 +20,6 @@ class PaginationResult<T extends BaseElement> {
   PaginationResult({
     this.count,
     this.next,
-    this.count,
     this.currentPage,
     this.totalPages,
     this.results,
@@ -44,7 +43,7 @@ class MusicMetadata extends BaseElement {
   String title;
   String album;
   String artist;
-  DateTime year;
+  String year;
   String genre;
   int track;
   String picture;
@@ -71,7 +70,7 @@ class MusicMetadata extends BaseElement {
         title: json["title"],
         album: json["album"],
         artist: json["artist"],
-        year: DateTime.parse(json["year"]),
+        year: json["year"],
         genre: json["genre"],
         track: json["track"],
         picture: json["picture"],
@@ -85,7 +84,7 @@ class MusicMetadata extends BaseElement {
         "title": title,
         "album": album,
         "artist": artist,
-        "year": year.toIso8601String(),
+        "year": year,
         "genre": genre,
         "track": track,
         "picture": picture,

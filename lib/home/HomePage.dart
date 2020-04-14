@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:django_nas_mobile/PlatformWidget.dart';
+import 'package:django_nas_mobile/drawer/DrawerPanel.dart';
 import 'package:django_nas_mobile/home/FileList.dart';
 import 'package:django_nas_mobile/home/PlatformWidgets/DesktopGrid.dart';
 import 'package:django_nas_mobile/home/PlatformWidgets/DesktopView.dart';
@@ -36,9 +37,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration(milliseconds: 20)).then((_) async {
-      await fetch();
-    });
   }
 
   Future fetch() async {
@@ -66,27 +64,14 @@ class _HomePageState extends State<HomePage> {
       case 3:
         return InfoPage();
       default:
-        return FutureBuilder<bool>(
-            future: Future.delayed(Duration(milliseconds: 50), () => true),
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                return Container();
-              }
-
-              return AnimatedSwitcher(
-                duration: Duration(milliseconds: 200),
-                child: currentFolder == null
-                    ? LoadingShimmerList()
-                    : PlatformWidget(
-                        desktop: DesktopFileGrid(),
-                        largeScreen: DesktopFileGrid(),
-                        mobile: FileListWidget(
-                          refresh: this.fetch,
-                          currentFolder: currentFolder,
-                        ),
-                      ),
-              );
-            });
+        return PlatformWidget(
+          desktop: DesktopFileGrid(),
+          largeScreen: DesktopFileGrid(),
+          mobile: FileListWidget(
+            refresh: this.fetch,
+            currentFolder: currentFolder,
+          ),
+        );
     }
   }
 
@@ -204,6 +189,7 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       body: body,
+      drawer: DrawerPanel(),
       bottomNavigationBar: PlatformWidget(
         desktop: Container(
           height: 0,

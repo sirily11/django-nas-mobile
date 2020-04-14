@@ -1,4 +1,6 @@
 PODS:
+  - audioplayers (0.0.1):
+    - Flutter
   - barcode_scan (0.0.1):
     - Flutter
     - MTBBarcodeScanner
@@ -48,6 +50,7 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
+  - audioplayers (from `.symlinks/plugins/audioplayers/ios`)
   - barcode_scan (from `.symlinks/plugins/barcode_scan/ios`)
   - file_chooser (from `.symlinks/plugins/file_chooser/ios`)
   - file_picker (from `.symlinks/plugins/file_picker/ios`)
@@ -77,6 +80,8 @@ SPEC REPOS:
     - Regift
 
 EXTERNAL SOURCES:
+  audioplayers:
+    :path: ".symlinks/plugins/audioplayers/ios"
   barcode_scan:
     :path: ".symlinks/plugins/barcode_scan/ios"
   file_chooser:
@@ -115,6 +120,7 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/webview_flutter/ios"
 
 SPEC CHECKSUMS:
+  audioplayers: 84f968cea3f2deab00ec4f8ff53358b3c0b3992c
   barcode_scan: 33f586d02270046fc6559135038b34b5754eaa4f
   BSGridCollectionViewLayout: 333dcb457a5a3bdd9212607ab5756553dcfe06cb
   BSImagePicker: 07404254f2fcdaf5a2eb403c0f8c337267ce8738

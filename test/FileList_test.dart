@@ -220,7 +220,6 @@ void main() {
           folders: [subFolder], files: [], documents: [], parents: []);
       nasProvider.isLoading = false;
       nasProvider.currentFolder = subFolder;
-      nasProvider.parents = [root, subFolder];
 
       await tester.pumpWidget(
         MultiProvider(

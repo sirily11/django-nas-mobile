@@ -1,7 +1,11 @@
 import 'package:django_nas_mobile/models/DesktopController.dart';
+import 'package:django_nas_mobile/models/MusicProvider.dart';
 import 'package:django_nas_mobile/models/NasProvider.dart';
 import 'package:django_nas_mobile/models/SelectionProvider.dart';
 import 'package:django_nas_mobile/models/SystemProvider.dart';
+import 'package:django_nas_mobile/music/MusicPage.dart';
+import 'package:django_nas_mobile/music/components/artist/ArtistPage.dart';
+import 'package:django_nas_mobile/music/components/songs/SongsPage.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -31,18 +35,28 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (_) => DesktopController(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => MusicProvider(),
         )
       ],
       child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'Flutter Demo',
-          themeMode: ThemeMode.system,
-          darkTheme: ThemeData.dark().copyWith(
-              primaryColor: Colors.orange,
-              appBarTheme: AppBarTheme().copyWith(color: Colors.grey[900])),
-          theme: ThemeData(
-              primarySwatch: Colors.blue, primaryColor: Colors.orange),
-          home: HomePage()),
+        debugShowCheckedModeBanner: false,
+        title: 'Flutter Demo',
+        themeMode: ThemeMode.system,
+        darkTheme: ThemeData.dark().copyWith(
+            primaryColor: Colors.orange,
+            appBarTheme: AppBarTheme().copyWith(color: Colors.grey[900])),
+        theme:
+            ThemeData(primarySwatch: Colors.blue, primaryColor: Colors.orange),
+        routes: {
+          '/': (c) => HomePage(),
+          '/music': (c) => MusicPage(),
+          '/music-artist': (c) => ArtistPage(),
+          '/music-song': (c) => SongsPage()
+        },
+        initialRoute: '/music',
+      ),
     );
   }
 }

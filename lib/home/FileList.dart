@@ -23,25 +23,24 @@ class FileListWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     NasProvider provider = Provider.of(context);
+    int length = 0;
 
-    if (currentFolder == null) {
-      return Container(
-        key: Key("empty-folder"),
-      );
+    if (currentFolder != null) {
+      length = currentFolder.documents.length +
+          currentFolder.folders.length +
+          currentFolder.files.length;
     }
-    int length = currentFolder.documents.length +
-        currentFolder.folders.length +
-        currentFolder.files.length;
 
     return EasyRefresh(
       key: Key("refresh-widget"),
       header: TaurusHeader(),
+      firstRefresh: true,
       onRefresh: () async {
         await this.refresh();
       },
       child: ListView.builder(
         key: Key("Mobile Filelist"),
-        itemCount: length + 1,
+        itemCount: length == 0 ? 0 : length + 1,
         itemBuilder: (ctx, index) {
           // Render previous folder
           if (index == 0) {
