@@ -1,6 +1,7 @@
 import 'package:django_nas_mobile/home/Row.dart';
 import 'package:django_nas_mobile/models/Folder.dart';
 import 'package:django_nas_mobile/models/NasProvider.dart';
+import 'package:django_nas_mobile/music/components/InitProgressDialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyrefresh/bezier_hour_glass_header.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
@@ -33,6 +34,7 @@ class FileListWidget extends StatelessWidget {
 
     return EasyRefresh(
       key: Key("refresh-widget"),
+      firstRefreshWidget: InitLoadingProgressDialog(),
       header: TaurusHeader(),
       firstRefresh: true,
       onRefresh: () async {

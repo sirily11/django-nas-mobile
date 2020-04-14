@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:django_nas_mobile/models/Folder.dart';
 import 'package:django_nas_mobile/models/MusicProvider.dart';
 import 'package:django_nas_mobile/music/components/InitProgressDialog.dart';
+import 'package:django_nas_mobile/music/components/artist/ArtistDetail.dart';
 import 'package:django_nas_mobile/music/components/music-player/BottomMusicPlayer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyrefresh/ball_pulse_header.dart';
@@ -124,12 +125,22 @@ class _MusicDetailState extends State<MusicDetail> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                Text(
-                  widget.album.artist,
-                  maxLines: 1,
-                  overflow: TextOverflow.clip,
-                  style: TextStyle(
-                    color: Colors.red,
+                InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (c) => ArtistDetail(
+                          artist: widget.album,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Text(
+                    widget.album.artist,
+                    maxLines: 1,
+                    overflow: TextOverflow.clip,
+                    style: TextStyle(color: Colors.red, fontSize: 16),
                   ),
                 ),
                 Text(

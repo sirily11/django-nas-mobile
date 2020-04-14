@@ -1,5 +1,6 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:django_nas_mobile/models/MusicProvider.dart';
+import 'package:django_nas_mobile/music/components/artist/ArtistDetail.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -61,12 +62,25 @@ class FullScreenPlayer extends StatelessWidget {
                       if (provider.currentPlayingMusic != null)
                         Padding(
                           padding: EdgeInsets.only(left: 10),
-                          child: Text(
-                            "${provider.currentPlayingMusic.metadata.artist}",
-                            style: Theme.of(context)
-                                .textTheme
-                                .headline6
-                                .copyWith(color: Colors.red),
+                          child: InkWell(
+                            onTap: () async {
+                              Navigator.pop(context);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (c) => ArtistDetail(
+                                      artist: provider
+                                          .currentPlayingMusic.metadata),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              "${provider.currentPlayingMusic.metadata.artist}",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline6
+                                  .copyWith(color: Colors.red),
+                            ),
                           ),
                         ),
                     ],

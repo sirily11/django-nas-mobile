@@ -265,7 +265,9 @@ class NasFile extends BaseElement {
       filename: json["filename"],
       cover: json['cover'],
       transcodeFilepath: json['transcode_filepath'],
-      metadata: MusicMetadata.fromJson(json['music_metadata']),
+      metadata: json['music_metadata'] != null
+          ? MusicMetadata.fromJson(json['music_metadata'])
+          : null,
       hasUploadedToCloud: json['has_uploaded_to_cloud']);
 
   Map<String, dynamic> toJson() => {

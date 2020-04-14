@@ -21,6 +21,9 @@ class InitLoadingProgressDialog extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   CircularProgressIndicator(),
+                  SizedBox(
+                    height: 10,
+                  ),
                   Text("Loading")
                 ],
               ),
