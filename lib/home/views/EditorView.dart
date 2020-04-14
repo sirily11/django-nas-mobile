@@ -1,3 +1,4 @@
+import 'package:django_nas_mobile/home/views/ImageDelegate.dart';
 import 'package:django_nas_mobile/models/Folder.dart';
 import 'package:django_nas_mobile/models/NasProvider.dart';
 import 'package:flutter/material.dart';
@@ -84,15 +85,12 @@ class EditorViewState extends State<EditorView> {
                 ? jsonDecode(snapshot.data.content)
                 : null;
             if (_controller == null) {
-              _controller = jsonData != null
-                  ? ZefyrController(
-                      NotusDocument.fromJson(
-                        convertFromQuill(jsonData),
-                      ),
+              var document = jsonData != null
+                  ? NotusDocument.fromJson(
+                      convertFromQuill(jsonData),
                     )
-                  : ZefyrController(
-                      NotusDocument(),
-                    );
+                  : NotusDocument();
+              _controller = ZefyrController(document);
             }
 
             return ZefyrScaffold(
@@ -123,6 +121,7 @@ class EditorViewState extends State<EditorView> {
                   ),
                 ),
                 child: ZefyrEditor(
+                  imageDelegate: CustomImageDelegate(),
                   mode: mode,
                   padding: EdgeInsets.all(16),
                   controller: _controller,
@@ -139,7 +138,7 @@ class EditorViewState extends State<EditorView> {
       try {
         final contents = jsonEncode(convertToQuill(_controller.document));
         NasProvider provider = Provider.of(context);
-        provider.updateDocument(contents, widget.id);
+        await provider.updateDocument(contents, widget.id);
         key.currentState.showSnackBar(
           SnackBar(
             content: Text("All changes saved"),

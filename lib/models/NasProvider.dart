@@ -12,8 +12,10 @@ String documentUrl = "/api/document/";
 String editorUrl = "/#/edit/";
 String systemUrl = "/system/";
 String s3Upload = "/s3/";
+String musicURL = '/api/music/';
+String musicMetadataURL = '/api/music-metadata/';
 
-class NasProvider extends ChangeNotifier {
+class NasProvider with ChangeNotifier {
   NasFolder currentFolder;
   bool isLoading = false;
   Dio networkProvider;

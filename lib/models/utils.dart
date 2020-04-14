@@ -50,12 +50,32 @@ String getSize(double size) {
 /// Convert quill data from Quill  to flutter quill data
 ///
 List<dynamic> convertFromQuill(List<dynamic> data) {
-  for (var entry in data) {
+  var index = 0;
+  while (index < data.length) {
+    var entry = data[index];
+    if (entry['insert'] is Map) {
+      var mapData = entry['insert'];
+      // is image
+      if (mapData['image'] != null) {
+        var imageSrc = mapData['image'];
+        data[index]['attributes'] = {
+          "embed": {"type": "image", "source": imageSrc}
+        };
+        data[index]['insert'] = "​";
+      } else {
+        data[index]['insert'] = "\n";
+      }
+      index += 1;
+      continue;
+    }
     if (entry.containsKey("attributes")) {
       Map<String, dynamic> attibutes = entry['attributes'];
       Map<String, dynamic> copy = Map.from(entry['attributes']);
       attibutes.forEach((k, v) {
         switch (k) {
+          case "image":
+            copy["image"] = v;
+            break;
           case "italic":
             copy['i'] = v;
             break;
@@ -81,16 +101,24 @@ List<dynamic> convertFromQuill(List<dynamic> data) {
         }
         copy.remove(k);
       });
+
       entry['attributes'] = copy;
     }
+    index += 1;
   }
+  if (data.last['insert'] != "\n\n") {
+    data.add({"insert": "\n\n"});
+  }
+
   return data;
 }
 
 /// Convert Quill flutter to Quill JS
 List<dynamic> convertToQuill(NotusDocument document) {
   List<dynamic> data = json.decode(json.encode(document));
-  for (var entry in data) {
+  var index = 0;
+  while (index < data.length) {
+    var entry = data[index];
     if (entry.containsKey("attributes")) {
       Map<String, dynamic> attibutes = entry['attributes'];
       Map<String, dynamic> copy = Map.from(entry['attributes']);
@@ -109,6 +137,15 @@ List<dynamic> convertToQuill(NotusDocument document) {
             copy['header'] = v;
             break;
 
+          case "embed":
+            var source = v['source'];
+            data[index] = {
+              "insert": {"image": source}
+            };
+
+            copy = null;
+            break;
+
           case "block":
             if (v == "ol") {
               copy['list'] = "ordered";
@@ -116,12 +153,15 @@ List<dynamic> convertToQuill(NotusDocument document) {
               copy['list'] = 'bullet';
             }
             break;
-            break;
         }
       });
-      entry['attributes'] = copy;
+      if (copy != null) {
+        entry['attributes'] = copy;
+      }
     }
+    index += 1;
   }
+
   return data;
 }
 
@@ -232,7 +272,7 @@ Future<void> onFileTap({@required NasFile file, BuildContext context}) async {
         context,
         MaterialPageRoute(
           builder: (c) => VideoView(
-            name: p.basename(file.filename),
+            name: p.basename(file.transcodeFilepath ?? file.filename),
             url: file.file,
           ),
         ),

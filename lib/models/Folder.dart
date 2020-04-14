@@ -5,6 +5,94 @@ class BaseElement {
   String name;
   String filename;
   BaseElement({this.id});
+
+  factory BaseElement.fromJSON(json) => BaseElement(id: json['id']);
+}
+
+class PaginationResult<T extends BaseElement> {
+  String next;
+  String previous;
+  int count;
+  int totalPages;
+  int currentPage;
+  List<T> results;
+
+  PaginationResult({
+    this.count,
+    this.next,
+    this.count,
+    this.currentPage,
+    this.totalPages,
+    this.results,
+    this.previous,
+  });
+
+  factory PaginationResult.fromJSON(
+          Map<String, dynamic> json, List<T> results) =>
+      PaginationResult(
+        count: json['count'],
+        currentPage: json['current_page'],
+        totalPages: json['total_pages'],
+        next: json['next'],
+        previous: json['previous'],
+        results: results,
+      );
+}
+
+class MusicMetadata extends BaseElement {
+  int id;
+  String title;
+  String album;
+  String artist;
+  DateTime year;
+  String genre;
+  int track;
+  String picture;
+  int duration;
+  int file;
+  bool like;
+
+  MusicMetadata({
+    this.id,
+    this.title,
+    this.album,
+    this.artist,
+    this.year,
+    this.genre,
+    this.track,
+    this.picture,
+    this.duration,
+    this.file,
+    this.like,
+  });
+
+  factory MusicMetadata.fromJson(Map<String, dynamic> json) => MusicMetadata(
+        id: json["id"],
+        title: json["title"],
+        album: json["album"],
+        artist: json["artist"],
+        year: DateTime.parse(json["year"]),
+        genre: json["genre"],
+        track: json["track"],
+        picture: json["picture"],
+        duration: json["duration"],
+        file: json["file"],
+        like: json["like"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "title": title,
+        "album": album,
+        "artist": artist,
+        "year": year.toIso8601String(),
+        "genre": genre,
+        "track": track,
+        "picture": picture,
+        "duration": duration,
+        "file": file,
+        "like": like,
+      };
 }
 
 class NasFolder extends BaseElement {
@@ -147,6 +235,7 @@ class NasFile extends BaseElement {
   String transcodeFilepath;
   String cover;
   bool hasUploadedToCloud;
+  MusicMetadata metadata;
 
   NasFile(
       {this.id,
@@ -161,7 +250,8 @@ class NasFile extends BaseElement {
       this.filename,
       this.transcodeFilepath,
       this.cover,
-      this.hasUploadedToCloud});
+      this.hasUploadedToCloud,
+      this.metadata});
 
   factory NasFile.fromJson(Map<String, dynamic> json) => NasFile(
       id: json["id"],
@@ -176,6 +266,7 @@ class NasFile extends BaseElement {
       filename: json["filename"],
       cover: json['cover'],
       transcodeFilepath: json['transcode_filepath'],
+      metadata: MusicMetadata.fromJson(json['music_metadata']),
       hasUploadedToCloud: json['has_uploaded_to_cloud']);
 
   Map<String, dynamic> toJson() => {
@@ -189,6 +280,7 @@ class NasFile extends BaseElement {
         "file": file,
         "object_type": objectType,
         "filename": filename,
+        "music_metadata": metadata.toJson(),
         "has_uploaded_to_cloud": hasUploadedToCloud
       };
 }
