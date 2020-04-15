@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:django_nas_mobile/models/MusicProvider.dart';
 import 'package:django_nas_mobile/models/NasProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -54,18 +55,22 @@ class _SettingPageState extends State<SettingPage> {
                 onPressed: () async {
                   try {
                     NasProvider provider = Provider.of(context);
+                    MusicProvider musicProvider = Provider.of(context);
                     await provider.setURL(controller.text);
+                    musicProvider.baseURL = controller.text;
                     showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                              content: Text("Server set"),
-                              actions: <Widget>[
-                                FlatButton(
-                                  child: Text("ok"),
-                                  onPressed: () => Navigator.pop(context),
-                                )
-                              ],
-                            ));
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        content: Text("Server set"),
+                        actions: <Widget>[
+                          FlatButton(
+                            child: Text("ok"),
+                            onPressed: () => Navigator.pop(context),
+                          )
+                        ],
+                      ),
+                    );
+                    FocusScope.of(context).requestFocus(FocusNode());
                   } catch (err) {
                     showDialog(
                       context: context,

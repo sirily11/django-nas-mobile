@@ -85,6 +85,15 @@ class MusicProvider extends ChangeNotifier {
     await audioPlayer.play(file.file);
     currentPlayingMusic = file;
     totalDuration = Duration(seconds: file.metadata.duration);
+    if (Platform.isIOS) {
+      await audioPlayer.setNotification(
+        title: "${file?.metadata?.title}",
+        artist: "${file.metadata.artist}",
+        albumTitle: "${file.metadata.album}",
+        imageUrl: "${file.metadata.picture}",
+        duration: totalDuration,
+      );
+    }
     notifyListeners();
   }
 

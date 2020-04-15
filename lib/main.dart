@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget {
           '/': (c) => HomePage(),
           '/music': (c) => MusicPage(),
           '/music-artist': (c) => ArtistPage(),
-          '/music-song': (c) => SongsPage()
+          '/music-song': (c) => SongsPage(),
         },
         initialRoute: '/',
       ),
