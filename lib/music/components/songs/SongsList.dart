@@ -48,10 +48,19 @@ class _SongsListState extends State<SongsList> {
           NasFile song = songList[i];
           return ListTile(
             onTap: () async {
-              await provider.play(song);
+              await provider.play(song, musicList: songList, currentIndex: i);
             },
             selected: song.id == provider.currentPlayingMusic?.id,
-            leading: Image.network(song.metadata.picture ?? ""),
+            leading: song.metadata.picture != null
+                ? Image.network(
+                    song.metadata.picture,
+                    width: 70,
+                    height: 70,
+                  )
+                : Container(
+                    height: 70,
+                    width: 70,
+                  ),
             title: Text(
               "${song.metadata.title}",
               maxLines: 1,

@@ -10,6 +10,8 @@ import 'package:path_provider/path_provider.dart';
 
 class MusicProvider extends ChangeNotifier {
   NasFile currentPlayingMusic;
+  List<NasFile> musicList = [];
+  int currentIndex;
   Duration totalDuration;
   Duration currentPosition;
   AudioPlayerState currentState = AudioPlayerState.STOPPED;
@@ -59,6 +61,7 @@ class MusicProvider extends ChangeNotifier {
       totalDuration = Duration(seconds: 0);
       currentPosition = Duration(seconds: 0);
     });
+    audioPlayer.startHeadlessService();
 
     audioPlayer.onAudioPositionChanged.listen((event) {
       currentPosition = event;
@@ -74,14 +77,35 @@ class MusicProvider extends ChangeNotifier {
       print("complete");
       if (releaseMode == ReleaseMode.LOOP) {
         await Future.delayed(Duration(milliseconds: 400));
-        await play(this.currentPlayingMusic);
+        await play(this.currentPlayingMusic,
+            currentIndex: currentIndex, musicList: musicList);
+      } else {
+        if (hasNext) {
+          await Future.delayed(Duration(milliseconds: 400));
+          await play(
+            this.musicList[currentIndex + 1],
+            currentIndex: currentIndex + 1,
+            musicList: musicList,
+          );
+        }
       }
     });
 
     audioPlayer.setReleaseMode(releaseMode);
   }
 
-  Future<void> play(NasFile file) async {
+  bool get hasNext =>
+      currentIndex != null && currentIndex < musicList.length - 1;
+
+  bool get hasPrevious => currentIndex != null && currentIndex > 0;
+
+  Future<void> play(
+    NasFile file, {
+    @required List<NasFile> musicList,
+    @required currentIndex,
+  }) async {
+    bool hasNext = currentIndex < musicList.length;
+    bool hasPrevious = currentIndex > 0;
     await audioPlayer.play(file.file);
     currentPlayingMusic = file;
     totalDuration = Duration(seconds: file.metadata.duration);
@@ -92,8 +116,12 @@ class MusicProvider extends ChangeNotifier {
         albumTitle: "${file.metadata.album}",
         imageUrl: "${file.metadata.picture}",
         duration: totalDuration,
+        hasNextTrack: hasNext,
+        hasPreviousTrack: hasPrevious,
       );
     }
+    this.currentIndex = currentIndex;
+    this.musicList = musicList;
     notifyListeners();
   }
 
@@ -162,7 +190,7 @@ class MusicProvider extends ChangeNotifier {
   Future<List<MusicMetadata>> getArtistDetail(String artist) async {
     var result = await this
         .networkProvider
-        .get("$baseURL${musicURL}album/?artist=$artist");
+        .get("$baseURL${musicURL}album/?album_artist=$artist");
     List<MusicMetadata> files =
         (result.data as List).map((e) => MusicMetadata.fromJson(e)).toList();
     return files;

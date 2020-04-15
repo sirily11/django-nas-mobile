@@ -23,6 +23,9 @@ Route dialogRoute() {
 }
 
 class BottomMusicPlayer extends StatelessWidget {
+  final double height;
+  BottomMusicPlayer({this.height});
+
   @override
   Widget build(BuildContext context) {
     MusicProvider provider = Provider.of(context);
@@ -34,7 +37,7 @@ class BottomMusicPlayer extends StatelessWidget {
         child: Container(
           color: Theme.of(context).cardColor,
           width: MediaQuery.of(context).size.width,
-          height: 90,
+          height: height ?? 70,
           child: Padding(
             padding: EdgeInsets.only(left: 10, bottom: 10, right: 10),
             child: Row(

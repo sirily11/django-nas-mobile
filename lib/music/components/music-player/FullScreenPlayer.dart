@@ -1,19 +1,29 @@
 import 'package:audioplayers/audioplayers.dart';
+import 'package:django_nas_mobile/home/HomePage.dart';
 import 'package:django_nas_mobile/models/MusicProvider.dart';
 import 'package:django_nas_mobile/music/components/artist/ArtistDetail.dart';
+import 'package:django_nas_mobile/music/components/music-list/MusicDetail.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class FullScreenPlayer extends StatelessWidget {
+class FullScreenPlayer extends StatefulWidget {
+  @override
+  _FullScreenPlayerState createState() => _FullScreenPlayerState();
+}
+
+class _FullScreenPlayerState extends State<FullScreenPlayer> {
   String formatTime(Duration time) {
     int sec = time.inSeconds.remainder(60);
     return "${time.inMinutes < 10 ? "0${time.inMinutes}" : time.inMinutes}:${sec < 10 ? "0$sec" : sec}";
   }
 
+  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
     MusicProvider provider = Provider.of(context);
     return Scaffold(
+      key: scaffoldKey,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,6 +86,35 @@ class FullScreenPlayer extends StatelessWidget {
                             },
                             child: Text(
                               "${provider.currentPlayingMusic.metadata.artist}",
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .headline6
+                                  .copyWith(color: Colors.red),
+                            ),
+                          ),
+                        ),
+                      if (provider.currentPlayingMusic != null)
+                        Padding(
+                          padding: EdgeInsets.only(left: 10),
+                          child: InkWell(
+                            onTap: () async {
+                              Navigator.pop(context);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (c) => MusicDetail(
+                                    album:
+                                        provider.currentPlayingMusic.metadata,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              "${provider.currentPlayingMusic.metadata.album}",
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               style: Theme.of(context)
                                   .textTheme
                                   .headline6
@@ -134,19 +173,20 @@ class FullScreenPlayer extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                provider.releaseMode == ReleaseMode.LOOP
-                    ? IconButton(
-                        onPressed: () async {
-                          await provider.loop(false);
-                        },
-                        icon: Icon(Icons.repeat_one),
-                      )
-                    : IconButton(
-                        onPressed: () async {
-                          await provider.loop(true);
-                        },
-                        icon: Icon(Icons.repeat),
-                      ),
+                if (provider.currentPlayingMusic != null)
+                  IconButton(
+                    onPressed: provider.hasPrevious
+                        ? () async {
+                            await provider.play(
+                              provider.musicList[provider.currentIndex - 1],
+                              musicList: provider.musicList,
+                              currentIndex: provider.currentIndex - 1,
+                            );
+                          }
+                        : null,
+                    iconSize: 60,
+                    icon: Icon(Icons.skip_previous),
+                  ),
                 if (provider.currentState == AudioPlayerState.PLAYING ||
                     provider.currentState == AudioPlayerState.COMPLETED)
                   IconButton(
@@ -164,9 +204,87 @@ class FullScreenPlayer extends StatelessWidget {
                       await provider.resume();
                     },
                   ),
+                if (provider.currentPlayingMusic != null)
+                  IconButton(
+                    onPressed: provider.hasNext
+                        ? () async {
+                            await provider.play(
+                              provider.musicList[provider.currentIndex + 1],
+                              musicList: provider.musicList,
+                              currentIndex: provider.currentIndex + 1,
+                            );
+                          }
+                        : null,
+                    iconSize: 60,
+                    icon: Icon(Icons.skip_next),
+                  ),
+              ],
+            ),
+            if (provider.currentPlayingMusic != null)
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  provider.releaseMode == ReleaseMode.LOOP
+                      ? IconButton(
+                          onPressed: () async {
+                            await provider.loop(false);
+                          },
+                          icon: Icon(Icons.repeat_one),
+                        )
+                      : IconButton(
+                          onPressed: () async {
+                            await provider.loop(true);
+                          },
+                          icon: Icon(Icons.repeat),
+                        ),
+                  IconButton(
+                    onPressed: () async {},
+                    icon: Icon(Icons.volume_mute),
+                  ),
+                ],
+              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: <Widget>[
                 IconButton(
-                  icon: Icon(Icons.volume_mute),
-                ),
+                  onPressed: () {
+                    scaffoldKey.currentState.showBottomSheet(
+                      (c) => Container(
+                        height: 100,
+                        color: Theme.of(context).popupMenuTheme.color,
+                        child: Column(
+                          children: <Widget>[
+                            ListTile(
+                              onTap: () {
+                                Navigator.pop(context);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (c) => HomePage(
+                                      folderID:
+                                          provider.currentPlayingMusic.parent,
+                                      name: provider.currentPlayingMusic.name,
+                                    ),
+                                  ),
+                                );
+                              },
+                              title: Text("Go to folder"),
+                              subtitle: Text(
+                                "${provider.currentPlayingMusic.filename}",
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            Divider(),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                  icon: Icon(Icons.more_horiz),
+                )
               ],
             )
           ],

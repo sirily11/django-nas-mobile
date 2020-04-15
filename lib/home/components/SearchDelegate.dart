@@ -190,7 +190,8 @@ class MusicSearch extends SearchDelegate {
           title: Text("${file.metadata.title}"),
           subtitle: Text("${file.metadata.artist}"),
           onTap: () async {
-            await musicProvider.play(file);
+            await musicProvider.play(file,
+                currentIndex: index, musicList: files);
           },
         );
       },

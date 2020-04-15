@@ -29,10 +29,13 @@ class _ArtistDetailState extends State<ArtistDetail> {
             header: BallPulseHeader(),
             firstRefresh: true,
             onRefresh: () async {
-              var res = await provider.getArtistDetail(widget.artist.artist);
-              setState(() {
-                albumList = res;
-              });
+              if (widget.artist.albumArtist != null) {
+                var res =
+                    await provider.getArtistDetail(widget.artist.albumArtist);
+                setState(() {
+                  albumList = res;
+                });
+              }
             },
             child: Padding(
               padding: const EdgeInsets.only(bottom: 80, left: 10, right: 10),
@@ -53,6 +56,13 @@ class _ArtistDetailState extends State<ArtistDetail> {
                     height: 20,
                   ),
                   Divider(),
+                  Text(
+                    "Albums from ${widget.artist.artist}",
+                    style: Theme.of(context).textTheme.subtitle1,
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
                   GridView.builder(
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(),
@@ -75,7 +85,9 @@ class _ArtistDetailState extends State<ArtistDetail> {
           ),
           Positioned(
             bottom: 0,
-            child: BottomMusicPlayer(),
+            child: BottomMusicPlayer(
+              height: 90,
+            ),
           )
         ],
       ),

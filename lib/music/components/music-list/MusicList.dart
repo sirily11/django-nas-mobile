@@ -111,7 +111,7 @@ class AlbumCard extends StatelessWidget {
             maxLines: 1,
           ),
           Text(
-            "${metadata.artist}",
+            "${metadata.albumArtist}",
             maxLines: 1,
             style: Theme.of(context).textTheme.caption,
           )

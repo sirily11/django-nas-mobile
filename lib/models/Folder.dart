@@ -50,6 +50,7 @@ class MusicMetadata extends BaseElement {
   int duration;
   int file;
   bool like;
+  String albumArtist;
 
   MusicMetadata({
     this.id,
@@ -63,6 +64,7 @@ class MusicMetadata extends BaseElement {
     this.duration,
     this.file,
     this.like,
+    this.albumArtist,
   });
 
   factory MusicMetadata.fromJson(Map<String, dynamic> json) => MusicMetadata(
@@ -77,6 +79,7 @@ class MusicMetadata extends BaseElement {
         duration: json["duration"],
         file: json["file"],
         like: json["like"],
+        albumArtist: json['album_artist'],
       );
 
   Map<String, dynamic> toJson() => {

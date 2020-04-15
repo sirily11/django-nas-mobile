@@ -48,38 +48,42 @@ class _MusicDetailState extends State<MusicDetail> {
                 children: <Widget>[
                   buildHeader(context),
                   Divider(),
-                  ListView.separated(
-                    separatorBuilder: (c, i) => Padding(
-                      padding: EdgeInsets.only(left: 70),
-                      child: Divider(),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 70),
+                    child: ListView.separated(
+                      separatorBuilder: (c, i) => Padding(
+                        padding: EdgeInsets.only(left: 70),
+                        child: Divider(),
+                      ),
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: musicList.length,
+                      itemBuilder: (c, i) {
+                        NasFile song = musicList[i];
+                        return ListTile(
+                          onTap: () async {
+                            await provider.play(song,
+                                musicList: musicList, currentIndex: i);
+                          },
+                          selected: provider.currentPlayingMusic?.id == song.id,
+                          leading: Text("${song.metadata.track}"),
+                          title: Text(
+                            song.metadata.title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          trailing: provider.currentPlayingMusic != null &&
+                                  provider.currentPlayingMusic.id == song.id
+                              ? IconButton(
+                                  onPressed: () async {
+                                    await provider.stop();
+                                  },
+                                  icon: Icon(Icons.stop),
+                                )
+                              : null,
+                        );
+                      },
                     ),
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: musicList.length,
-                    itemBuilder: (c, i) {
-                      NasFile song = musicList[i];
-                      return ListTile(
-                        onTap: () async {
-                          await provider.play(song);
-                        },
-                        selected: provider.currentPlayingMusic?.id == song.id,
-                        leading: Text("${i + 1}"),
-                        title: Text(
-                          song.metadata.title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        trailing: provider.currentPlayingMusic != null &&
-                                provider.currentPlayingMusic.id == song.id
-                            ? IconButton(
-                                onPressed: () async {
-                                  await provider.stop();
-                                },
-                                icon: Icon(Icons.stop),
-                              )
-                            : null,
-                      );
-                    },
                   )
                 ],
               ),
@@ -89,7 +93,9 @@ class _MusicDetailState extends State<MusicDetail> {
             bottom: 0,
             child: Hero(
               tag: "music-player",
-              child: BottomMusicPlayer(),
+              child: BottomMusicPlayer(
+                height: 90,
+              ),
             ),
           ),
         ],
@@ -137,9 +143,9 @@ class _MusicDetailState extends State<MusicDetail> {
                     );
                   },
                   child: Text(
-                    widget.album.artist,
+                    widget.album.albumArtist,
                     maxLines: 1,
-                    overflow: TextOverflow.clip,
+                    overflow: TextOverflow.ellipsis,
                     style: TextStyle(color: Colors.red, fontSize: 16),
                   ),
                 ),
