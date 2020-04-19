@@ -14,6 +14,8 @@ String systemUrl = "/system/";
 String s3Upload = "/s3/";
 String musicURL = '/api/music/';
 String musicMetadataURL = '/api/music-metadata/';
+String logsURL = '/api/logs/';
+String bookCollectionURL = '/api/book-collection/';
 
 class NasProvider with ChangeNotifier {
   NasFolder currentFolder;
@@ -72,16 +74,20 @@ class NasProvider with ChangeNotifier {
     }
   }
 
-  Future<void> deleteDocument(NasDocument document) async {
+  Future<NasDocument> deleteDocument(NasDocument document,
+      {bool isCollection = false}) async {
     try {
-      await DataFetcher(
+      var doc = await DataFetcher(
               url: documentUrl,
               networkProvider: this.networkProvider,
               baseURL: baseURL)
           .delete<NasDocument>(document.id);
-      currentFolder.documents.removeWhere((d) => d.id == document.id);
-    } catch (err) {} finally {
+      if (!isCollection)
+        currentFolder.documents.removeWhere((d) => d.id == document.id);
       notifyListeners();
+      return doc;
+    } catch (err) {
+      return null;
     }
   }
 
@@ -189,6 +195,49 @@ class NasProvider with ChangeNotifier {
     } catch (err) {}
   }
 
+  Future<PaginationResult<Logs>> fetchLogs({String url}) async {
+    try {
+      var response = await this.networkProvider.get(url ?? "$baseURL$logsURL");
+      List<Logs> result = (response.data['results'] as List)
+          .map((r) => Logs.fromJson(r))
+          .toList();
+      return PaginationResult.fromJSON(response.data, result);
+    } catch (err) {
+      print(err);
+      return null;
+    }
+  }
+
+  Future<List<BookCollection>> fetchBookCollections() async {
+    try {
+      var result =
+          await this.networkProvider.get<List>("$baseURL$bookCollectionURL");
+      return result.data.map((d) => BookCollection.fromJson(d)).toList();
+    } catch (err) {
+      print(err);
+      return null;
+    }
+  }
+
+  Future<BookCollection> fetchBookCollectionDetail({int id}) async {
+    try {
+      var result =
+          await this.networkProvider.get("$baseURL$bookCollectionURL$id/");
+      return BookCollection.fromJson(result.data);
+    } catch (err) {
+      print(err);
+      return null;
+    }
+  }
+
+  Future<void> updateBookCollection(int id, v) async {
+    await this.networkProvider.patch("$baseURL$bookCollectionURL$id/", data: v);
+  }
+
+  Future<void> createNewBookCollection(v) async {
+    await this.networkProvider.post("$baseURL$bookCollectionURL", data: v);
+  }
+
   Future<void> refresh(int id) async {
     try {
       isLoading = true;
@@ -292,14 +341,30 @@ class NasProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> createNewDocument(String name) async {
+  Future<NasDocument> createNewDocument(String name,
+      {bool isCollection = false, BookCollection collection}) async {
+    if (!isCollection) {
+      var data = await DataFetcher(
+              baseURL: this.baseURL,
+              url: documentUrl,
+              networkProvider: this.networkProvider)
+          .create<NasDocument>({"name": name, "parent": currentFolder.id});
+      this.currentFolder.documents.add(data);
+      notifyListeners();
+      return data;
+    }
     var data = await DataFetcher(
             baseURL: this.baseURL,
             url: documentUrl,
             networkProvider: this.networkProvider)
-        .create<NasDocument>({"name": name, "parent": currentFolder.id});
-    this.currentFolder.documents.add(data);
+        .create<NasDocument>({
+      "name": name,
+      "parent": null,
+      "collection": collection.id,
+      "show_in_folder": false
+    });
     notifyListeners();
+    return data;
   }
 
   Future<void> updateFolder(String name, int id) async {
@@ -328,9 +393,43 @@ class NasProvider with ChangeNotifier {
             url: documentUrl,
             networkProvider: this.networkProvider)
         .update<NasDocument>(id, {"content": content});
-    var document = this.currentFolder.documents.firstWhere((f) => f.id == id);
-    document = data;
+    // var document = this
+    //     .currentFolder
+    //     .documents
+    //     .firstWhere((f) => f.id == id, orElse: () => null);
+    // document = data;
     notifyListeners();
+  }
+
+  Future<List<Map<String, dynamic>>> fetchBookCollectionSchema() async {
+    try {
+      var result = await this.networkProvider.request(
+            "$baseURL$bookCollectionURL",
+            options: Options(method: "OPTIONS"),
+          );
+      return (result.data['fields'] as List)
+          .map((d) => d as Map<String, dynamic>)
+          .toList();
+    } catch (err) {
+      print(err);
+      return [];
+    }
+  }
+
+  Future<void> updateDocumentCollection(
+      int id, BookCollection collection) async {
+    try {
+      var data = await DataFetcher(
+              baseURL: this.baseURL,
+              url: documentUrl,
+              networkProvider: this.networkProvider)
+          .update<NasDocument>(
+        id,
+        {"collection": collection.id},
+      );
+    } catch (err) {
+      print(err);
+    }
   }
 
   void addFile(NasFile file, int parent) async {

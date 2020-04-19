@@ -9,7 +9,7 @@ class BaseElement {
   factory BaseElement.fromJSON(json) => BaseElement(id: json['id']);
 }
 
-class PaginationResult<T extends BaseElement> {
+class PaginationResult<T> {
   String next;
   String previous;
   int count;
@@ -36,6 +36,72 @@ class PaginationResult<T extends BaseElement> {
         previous: json['previous'],
         results: results,
       );
+}
+
+class BookCollection {
+  int id;
+  String name;
+  String description;
+  DateTime createdTime;
+  List<NasDocument> documents;
+
+  BookCollection(
+      {this.id, this.name, this.description, this.createdTime, this.documents});
+
+  factory BookCollection.fromJson(Map<String, dynamic> json) => BookCollection(
+        id: json["id"],
+        name: json["name"],
+        description: json["description"],
+        createdTime: DateTime.parse(json["created_time"]),
+        documents: json['documents'] != null
+            ? (json['documents'] as List)
+                .map((j) => NasDocument.fromJson(j))
+                .toList()
+            : [],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "name": name,
+        "description": description,
+        "created_time": createdTime.toIso8601String(),
+      };
+}
+
+class Logs {
+  int id;
+  String title;
+  DateTime time;
+  String content;
+  String logType;
+  String sender;
+
+  Logs({
+    this.id,
+    this.title,
+    this.time,
+    this.content,
+    this.logType,
+    this.sender,
+  });
+
+  factory Logs.fromJson(Map<String, dynamic> json) => Logs(
+        id: json["id"],
+        title: json["title"],
+        time: DateTime.parse(json["time"]),
+        content: json["content"],
+        logType: json["log_type"],
+        sender: json["sender"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "title": title,
+        "time": time.toIso8601String(),
+        "content": content,
+        "log_type": logType,
+        "sender": sender,
+      };
 }
 
 class MusicMetadata extends BaseElement {
@@ -184,6 +250,8 @@ class NasDocument extends BaseElement {
   DateTime modifiedAt;
   int parent;
   String content;
+  BookCollection bookCollection;
+  int collection;
 
   NasDocument({
     this.id,
@@ -194,6 +262,8 @@ class NasDocument extends BaseElement {
     this.modifiedAt,
     this.parent,
     this.content,
+    this.bookCollection,
+    this.collection,
   });
 
   factory NasDocument.fromJson(Map<String, dynamic> json) => NasDocument(
@@ -208,6 +278,10 @@ class NasDocument extends BaseElement {
             ? DateTime.parse(json["modified_at"])
             : null,
         parent: json["parent"],
+        collection: json['collection'],
+        bookCollection: json['book_collection'] != null
+            ? BookCollection.fromJson(json['book_collection'])
+            : null,
         content: json["content"],
       );
 
@@ -220,6 +294,8 @@ class NasDocument extends BaseElement {
         "modified_at": modifiedAt?.toIso8601String(),
         "parent": parent,
         "content": content,
+        'collection': collection,
+        "book_collection": bookCollection?.toJson()
       };
 }
 

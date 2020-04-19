@@ -238,7 +238,7 @@ Future onDragRename(
       title: "Name",
       editingController: controller,
       fieldName: "Name",
-      onSubmit: () async {
+      onSubmit: (v) async {
         if (data is NasFolder) {
           await nasProvider.updateFolder(controller.text, data.id);
         } else if (data is NasDocument) {

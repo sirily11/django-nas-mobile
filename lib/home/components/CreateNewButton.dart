@@ -28,7 +28,7 @@ class CreateNewButton extends StatelessWidget {
           editingController: controller,
           title: "Folder",
           fieldName: "Folder Name",
-          onSubmit: () async {
+          onSubmit: (v) async {
             await nasProvider.createNewFolder(controller.text);
           },
         ),
@@ -43,7 +43,7 @@ class CreateNewButton extends StatelessWidget {
           editingController: controller,
           title: "Document",
           fieldName: "Document Name",
-          onSubmit: () async {
+          onSubmit: (v) async {
             await nasProvider.createNewDocument(controller.text);
           },
         ),
@@ -102,7 +102,7 @@ class CreateNewButton extends StatelessWidget {
           editingController: controller,
           title: "Folder",
           fieldName: "Folder Name",
-          onSubmit: () async {
+          onSubmit: (v) async {
             await nasProvider.createNewFolder(controller.text);
           },
         ),
@@ -115,7 +115,7 @@ class CreateNewButton extends StatelessWidget {
           editingController: controller,
           title: "Document",
           fieldName: "Document Name",
-          onSubmit: () async {
+          onSubmit: (v) async {
             await nasProvider.createNewDocument(controller.text);
           },
         ),

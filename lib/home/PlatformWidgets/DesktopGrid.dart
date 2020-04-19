@@ -7,7 +7,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:provider/provider.dart';
 
-class DesktopFileGrid extends StatelessWidget {
+class DesktopFileGrid extends StatefulWidget {
+  @override
+  _DesktopFileGridState createState() => _DesktopFileGridState();
+}
+
+class _DesktopFileGridState extends State<DesktopFileGrid> {
+  @override
+  void initState() {
+    NasProvider nasProvider = Provider.of(context, listen: false);
+    nasProvider.fetchFolder(null);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     NasProvider nasProvider = Provider.of(context);

@@ -40,7 +40,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future fetch() async {
-    NasProvider provider = Provider.of(context);
+    NasProvider provider = Provider.of(context, listen: false);
     if (provider.box == null) {
       await provider.initBox();
     }
@@ -122,8 +122,10 @@ class _HomePageState extends State<HomePage> {
         onPressed: () async {
           DesktopController controller = Provider.of(context);
           controller.selectedElement = null;
-          Navigator.pop(context);
-          await provider.backToPrev();
+          if (Navigator.canPop(context)) {
+            Navigator.pop(context);
+            await provider.backToPrev();
+          }
         },
       );
     }
@@ -152,7 +154,7 @@ class _HomePageState extends State<HomePage> {
                 icon: Icon(Icons.arrow_back_ios),
               ),
         actions: <Widget>[
-          buildDownloadAll(context),
+          if (Platform.isMacOS) buildDownloadAll(context),
           IconButton(
             color: Theme.of(context).textTheme.button.color,
             icon: Icon(Icons.refresh),

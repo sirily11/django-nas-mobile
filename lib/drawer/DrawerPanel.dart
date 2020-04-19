@@ -10,12 +10,20 @@ class DrawerPanel extends StatelessWidget {
             child: Center(child: Text("Open App")),
           ),
           ListTile(
-            title: Text("Home"),
+            title: Text("Nas"),
             onTap: () => Navigator.pushReplacementNamed(context, "/"),
           ),
           ListTile(
             title: Text("Music"),
             onTap: () => Navigator.pushReplacementNamed(context, "/music"),
+          ),
+          ListTile(
+            title: Text("Books"),
+            onTap: () => Navigator.pushReplacementNamed(context, "/books"),
+          ),
+          ListTile(
+            title: Text("Logs"),
+            onTap: () => Navigator.pushReplacementNamed(context, "/logs"),
           )
         ],
       ),

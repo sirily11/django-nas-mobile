@@ -138,26 +138,30 @@ class _FullScreenPlayerState extends State<FullScreenPlayer> {
               ],
             ),
             if (provider.currentPlayingMusic != null)
-              Slider.adaptive(
-                min: 0,
-                max: provider.totalDuration?.inSeconds?.toDouble() ?? 10000,
-                value: provider.currentPosition?.inSeconds?.toDouble() ?? 0,
-                onChangeStart: (e) async {
-                  await provider.pause();
-                },
-                onChangeEnd: (v) async {
+              Listener(
+                onPointerUp: (e) async {
                   await provider.seek(
-                    Duration(seconds: v.toInt()),
+                    provider.currentPosition,
                     shouldSet: true,
                   );
+                  await Future.delayed(Duration(milliseconds: 200));
                   await provider.resume();
                 },
-                onChanged: (double value) async {
-                  await provider.seek(
-                    Duration(seconds: value.toInt()),
-                    shouldSet: false,
-                  );
+                onPointerDown: (e) async {
+                  await provider.pause();
                 },
+                child: Slider.adaptive(
+                  min: 0,
+                  max: provider.totalDuration?.inSeconds?.toDouble() ?? 10000,
+                  value: provider.currentPosition?.inSeconds?.toDouble() ?? 0,
+                  onChangeEnd: (v) async {},
+                  onChanged: (double value) async {
+                    await provider.seek(
+                      Duration(seconds: value.toInt()),
+                      shouldSet: false,
+                    );
+                  },
+                ),
               ),
             if (provider.currentPlayingMusic != null)
               Padding(
@@ -242,51 +246,49 @@ class _FullScreenPlayerState extends State<FullScreenPlayer> {
                     onPressed: () async {},
                     icon: Icon(Icons.volume_mute),
                   ),
+                  IconButton(
+                    onPressed: () {
+                      showBottomMenu(context, provider);
+                    },
+                    icon: Icon(Icons.more_horiz),
+                  )
                 ],
               ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: <Widget>[
-                IconButton(
-                  onPressed: () {
-                    scaffoldKey.currentState.showBottomSheet(
-                      (c) => Container(
-                        height: 100,
-                        color: Theme.of(context).popupMenuTheme.color,
-                        child: Column(
-                          children: <Widget>[
-                            ListTile(
-                              onTap: () {
-                                Navigator.pop(context);
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (c) => HomePage(
-                                      folderID:
-                                          provider.currentPlayingMusic.parent,
-                                      name: provider.currentPlayingMusic.name,
-                                    ),
-                                  ),
-                                );
-                              },
-                              title: Text("Go to folder"),
-                              subtitle: Text(
-                                "${provider.currentPlayingMusic.filename}",
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            Divider(),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                  icon: Icon(Icons.more_horiz),
-                )
-              ],
-            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  PersistentBottomSheetController showBottomMenu(
+      BuildContext context, MusicProvider provider) {
+    return scaffoldKey.currentState.showBottomSheet(
+      (c) => Container(
+        height: 100,
+        color: Theme.of(context).popupMenuTheme.color,
+        child: Column(
+          children: <Widget>[
+            ListTile(
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (c) => HomePage(
+                      folderID: provider.currentPlayingMusic.parent,
+                      name: provider.currentPlayingMusic.name,
+                    ),
+                  ),
+                );
+              },
+              title: Text("Go to folder"),
+              subtitle: Text(
+                "${provider.currentPlayingMusic.filename}",
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Divider(),
           ],
         ),
       ),

@@ -19,7 +19,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  provider: ^3.2.0
+  provider: ^4.0.1
   shimmer: ^1.0.1
   dio: ^3.0.7
   path_provider: ^1.5.1
@@ -33,7 +33,7 @@ dependencies:
       ref: develop
   sliding_up_panel: ^1.0.2
   webview_flutter: ^0.3.17
-  json_schema_form: ^0.6.8
+  json_schema_form: ^1.0.0
   flutter_slidable: ^0.5.4
   image_picker: ^0.6.3
   url_launcher: ^5.4.1
@@ -42,9 +42,13 @@ dependencies:
   liquid_pull_to_refresh: ^1.1.1
   flutter_staggered_grid_view: ^0.3.0
   flutter_video_compress: ^0.3.7+8
-  multi_image_picker: ^4.6.1
+  multi_image_picker: ^4.6.6
   community_material_icon: 3.5.95
   flutter_easyrefresh: ^2.0.9
+  flutter_markdown: ^0.3.4
+  timeline_list:
+    git:
+      url: https://github.com/sirily11/timeline_list
   flutter_widgets: ^0.1.11
   hive:
   hive_flutter:

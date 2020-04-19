@@ -97,7 +97,7 @@ void main() {
         MultiProvider(
           providers: [
             ChangeNotifierProvider(
-              builder: (_) => nasProvider,
+              create: (_) => nasProvider,
             ),
           ],
           child: MaterialApp(
@@ -122,7 +122,7 @@ void main() {
         MultiProvider(
           providers: [
             ChangeNotifierProvider(
-              builder: (_) => nasProvider,
+              create: (_) => nasProvider,
             ),
           ],
           child: MaterialApp(
@@ -178,7 +178,7 @@ void main() {
         MultiProvider(
           providers: [
             ChangeNotifierProvider(
-              builder: (_) => nasProvider,
+              create: (_) => nasProvider,
             ),
           ],
           child: MaterialApp(
@@ -216,11 +216,10 @@ void main() {
         MultiProvider(
           providers: [
             ChangeNotifierProvider(
-              builder: (_) => nasProvider,
+              create: (_) => nasProvider,
             ),
           ],
           child: MaterialApp(
-          
             home: Material(
               child: FileListWidget(
                 currentFolder: subFolder,

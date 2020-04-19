@@ -51,22 +51,25 @@ class FileSearch extends SearchDelegate {
   @override
   Widget buildResults(BuildContext context) {
     NasProvider nasProvider = Provider.of(context);
-    return FutureBuilder<List<NasFile>>(
-      future: nasProvider.search(query),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Center(
-            child: Text("${snapshot.error.toString()}"),
+    print("Searching: $query");
+    if (query.isEmpty) return Container();
+    if (query.isNotEmpty)
+      return FutureBuilder<List<NasFile>>(
+        future: nasProvider.search(query),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(
+              child: Text("${snapshot.error.toString()}"),
+            );
+          }
+          return AnimatedSwitcher(
+            duration: Duration(milliseconds: 200),
+            child: !snapshot.hasData
+                ? LoadingShimmerList()
+                : buildList(snapshot.data),
           );
-        }
-        return AnimatedSwitcher(
-          duration: Duration(milliseconds: 200),
-          child: !snapshot.hasData
-              ? LoadingShimmerList()
-              : buildList(snapshot.data),
-        );
-      },
-    );
+        },
+      );
   }
 
   @override
@@ -155,22 +158,24 @@ class MusicSearch extends SearchDelegate {
   @override
   Widget buildResults(BuildContext context) {
     MusicProvider musicProvider = Provider.of(context);
-    return FutureBuilder<PaginationResult<NasFile>>(
-      future: musicProvider.search(query),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return Center(
-            child: Text("${snapshot.error.toString()}"),
+    if (query.isEmpty) return Container();
+    if (query.isNotEmpty)
+      return FutureBuilder<PaginationResult<NasFile>>(
+        future: musicProvider.search(query),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(
+              child: Text("${snapshot.error.toString()}"),
+            );
+          }
+          return AnimatedSwitcher(
+            duration: Duration(milliseconds: 200),
+            child: !snapshot.hasData
+                ? LoadingShimmerList()
+                : buildList(snapshot.data.results, context),
           );
-        }
-        return AnimatedSwitcher(
-          duration: Duration(milliseconds: 200),
-          child: !snapshot.hasData
-              ? LoadingShimmerList()
-              : buildList(snapshot.data.results, context),
-        );
-      },
-    );
+        },
+      );
   }
 
   @override

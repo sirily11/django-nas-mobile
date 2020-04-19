@@ -90,8 +90,6 @@ class MusicProvider extends ChangeNotifier {
         }
       }
     });
-
-    audioPlayer.setReleaseMode(releaseMode);
   }
 
   bool get hasNext =>
@@ -106,6 +104,7 @@ class MusicProvider extends ChangeNotifier {
   }) async {
     bool hasNext = currentIndex < musicList.length;
     bool hasPrevious = currentIndex > 0;
+    await audioPlayer.setReleaseMode(releaseMode);
     await audioPlayer.play(file.file);
     currentPlayingMusic = file;
     totalDuration = Duration(seconds: file.metadata.duration);
@@ -131,7 +130,7 @@ class MusicProvider extends ChangeNotifier {
     } else {
       releaseMode = ReleaseMode.STOP;
     }
-    await audioPlayer.setReleaseMode(releaseMode);
+    // await audioPlayer.setReleaseMode(releaseMode);
     notifyListeners();
   }
 
