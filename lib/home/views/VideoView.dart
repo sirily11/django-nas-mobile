@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_ijkplayer/flutter_ijkplayer.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:video_player/video_player.dart';
 
 class VideoView extends StatefulWidget {
   final String name;
@@ -14,16 +15,38 @@ class VideoView extends StatefulWidget {
 
 class _VideoViewState extends State<VideoView> {
   IjkMediaController controller = IjkMediaController();
+  bool canPlay = false;
+  VideoPlayerController videoPlayerController;
 
   @override
   void initState() {
     super.initState();
-    controller.setNetworkDataSource(widget.url);
+    controller.setNetworkDataSource(widget.url).then((value) {
+      setState(() {
+        canPlay = true;
+      });
+    }).catchError((e) => print(e));
+
+    controller.setIjkPlayerOptions(
+      [
+        TargetPlatform.iOS,
+      ],
+      [
+        IjkOption(IjkOptionCategory.player, "videotoolbox", 0),
+      ],
+    );
+    // videoPlayerController = VideoPlayerController.network(widget.url)
+    //   ..initialize().then((_) {
+    //     // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
+    //     setState(() {});
+    //     print("Init");
+    //   }).catchError((e) => print(e));
   }
 
   @override
   void dispose() {
     controller.dispose();
+    // videoPlayerController.dispose();
     super.dispose();
   }
 
@@ -48,12 +71,39 @@ class _VideoViewState extends State<VideoView> {
         child: Container(
           height: MediaQuery.of(context).size.height,
           child: Center(
-            child: IjkPlayer(
-              mediaController: controller,
-            ),
+            child: canPlay
+                ? IjkPlayer(
+                    mediaController: controller,
+                  )
+                : Container(),
           ),
         ),
       ),
     );
+    // return Scaffold(
+    //   appBar: AppBar(),
+    //   body: Center(
+    //     child: videoPlayerController.value.initialized
+    //         ? AspectRatio(
+    //             aspectRatio: videoPlayerController.value.aspectRatio,
+    //             child: VideoPlayer(videoPlayerController),
+    //           )
+    //         : Container(),
+    //   ),
+    //   floatingActionButton: FloatingActionButton(
+    //     onPressed: () {
+    //       setState(() {
+    //         videoPlayerController.value.isPlaying
+    //             ? videoPlayerController.pause()
+    //             : videoPlayerController.play();
+    //       });
+    //     },
+    //     child: Icon(
+    //       videoPlayerController.value.isPlaying
+    //           ? Icons.pause
+    //           : Icons.play_arrow,
+    //     ),
+    //   ),
+    // );
   }
 }

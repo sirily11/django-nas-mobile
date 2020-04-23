@@ -4,9 +4,9 @@ import 'package:django_nas_mobile/music/components/music-player/FullScreenPlayer
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-Route dialogRoute() {
+Route dialogRoute(Widget page) {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => FullScreenPlayer(),
+    pageBuilder: (context, animation, secondaryAnimation) => page,
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var begin = Offset(0.0, 1.0);
       var end = Offset.zero;
@@ -32,7 +32,7 @@ class BottomMusicPlayer extends StatelessWidget {
     return Material(
       child: InkWell(
         onTap: () {
-          Navigator.push(context, dialogRoute());
+          Navigator.push(context, dialogRoute(FullScreenPlayer()));
         },
         child: Container(
           color: Theme.of(context).cardColor,

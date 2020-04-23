@@ -53,15 +53,14 @@ class MusicProvider extends ChangeNotifier {
       totalDuration = d;
       notifyListeners();
     });
-
-    audioPlayer.monitorNotificationStateChanges(x);
+    if (Platform.isIOS) audioPlayer.monitorNotificationStateChanges(x);
 
     audioPlayer.onPlayerError.listen((msg) {
       currentState = AudioPlayerState.STOPPED;
       totalDuration = Duration(seconds: 0);
       currentPosition = Duration(seconds: 0);
     });
-    audioPlayer.startHeadlessService();
+    if (Platform.isIOS) audioPlayer.startHeadlessService();
 
     audioPlayer.onAudioPositionChanged.listen((event) {
       currentPosition = event;
@@ -104,7 +103,7 @@ class MusicProvider extends ChangeNotifier {
   }) async {
     bool hasNext = currentIndex < musicList.length;
     bool hasPrevious = currentIndex > 0;
-    await audioPlayer.setReleaseMode(releaseMode);
+    // await audioPlayer.setReleaseMode(releaseMode);
     await audioPlayer.play(file.file);
     currentPlayingMusic = file;
     totalDuration = Duration(seconds: file.metadata.duration);
@@ -228,6 +227,37 @@ class MusicProvider extends ChangeNotifier {
     var paginationResult =
         PaginationResult<NasFile>.fromJSON(result.data, files);
     return paginationResult;
+  }
+
+  Future getMusicDataSchema() async {
+    try {
+      var url = "$baseURL$musicMetadataURL";
+
+      var response = await this.networkProvider.request(
+            url,
+            options: Options(method: "OPTIONS"),
+          );
+      return (response.data['fields'] as List)
+          .map((e) => e as Map<String, dynamic>)
+          .where(
+            (e) => !['duration', 'track', 'file', 'like', 'picture']
+                .contains(e['label']),
+          )
+          .toList();
+    } catch (err) {
+      print(err);
+    }
+  }
+
+  Future<void> updateMusicMetadata(int id, Map<String, dynamic> value) async {
+    try {
+      var url = "$baseURL$musicMetadataURL$id/";
+      var resp = await this.networkProvider.patch(url, data: value);
+      this.currentPlayingMusic.metadata = MusicMetadata.fromJson(resp.data);
+      notifyListeners();
+    } catch (err) {
+      print(err);
+    }
   }
 
   /// Press like button

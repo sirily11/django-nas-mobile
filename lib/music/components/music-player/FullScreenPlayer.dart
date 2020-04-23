@@ -1,10 +1,16 @@
+import 'dart:math';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:django_nas_mobile/home/HomePage.dart';
 import 'package:django_nas_mobile/models/MusicProvider.dart';
 import 'package:django_nas_mobile/music/components/artist/ArtistDetail.dart';
+import 'package:django_nas_mobile/music/components/metadata/MetadataEditPage.dart';
 import 'package:django_nas_mobile/music/components/music-list/MusicDetail.dart';
+import 'package:django_nas_mobile/music/components/music-player/LyricsView.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import 'BottomMusicPlayer.dart';
 
 class FullScreenPlayer extends StatefulWidget {
   @override
@@ -25,241 +31,283 @@ class _FullScreenPlayerState extends State<FullScreenPlayer> {
     return Scaffold(
       key: scaffoldKey,
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            IconButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: Icon(Icons.close),
-            ),
-            Center(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: provider.currentPlayingMusic != null
-                    ? AnimatedContainer(
-                        height: provider.currentState == AudioPlayerState.PAUSED
-                            ? 300
-                            : 350,
-                        duration: Duration(milliseconds: 200),
-                        child: Image.network(
-                          provider.currentPlayingMusic.metadata.picture ?? "",
-                          fit: BoxFit.cover,
-                        ),
-                      )
-                    : Container(
-                        height: 300,
-                        width: 300,
-                        color: Colors.black,
-                      ),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: Icon(Icons.close),
+                  ),
+                  if (provider.currentPlayingMusic != null)
+                    IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (c) => MetadataEditPage(
+                              metadata: provider.currentPlayingMusic.metadata,
+                            ),
+                          ),
+                        );
+                      },
+                      icon: Icon(Icons.edit),
+                    ),
+                ],
               ),
-            ),
-            SizedBox(
-              height: 30,
-            ),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: <Widget>[
-                      Padding(
-                        padding: EdgeInsets.only(left: 10),
-                        child: provider.currentPlayingMusic != null
-                            ? Text(
-                                "${provider.currentPlayingMusic.metadata.title}",
-                                style: Theme.of(context).textTheme.headline6,
-                              )
-                            : Text("No Music Playing"),
-                      ),
-                      if (provider.currentPlayingMusic != null)
-                        Padding(
-                          padding: EdgeInsets.only(left: 10),
-                          child: InkWell(
-                            onTap: () async {
-                              Navigator.pop(context);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (c) => ArtistDetail(
-                                      artist: provider
-                                          .currentPlayingMusic.metadata),
-                                ),
-                              );
-                            },
-                            child: Text(
-                              "${provider.currentPlayingMusic.metadata.artist}",
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline6
-                                  .copyWith(color: Colors.red),
-                            ),
+              Center(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: provider.currentPlayingMusic != null
+                      ? AnimatedContainer(
+                          height:
+                              provider.currentState == AudioPlayerState.PAUSED
+                                  ? 300
+                                  : 350,
+                          duration: Duration(milliseconds: 200),
+                          child: Image.network(
+                            provider.currentPlayingMusic.metadata.picture ?? "",
+                            fit: BoxFit.cover,
                           ),
+                        )
+                      : Container(
+                          height: 300,
+                          width: 300,
+                          color: Colors.black,
                         ),
-                      if (provider.currentPlayingMusic != null)
+                ),
+              ),
+              SizedBox(
+                height: 30,
+              ),
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
                         Padding(
                           padding: EdgeInsets.only(left: 10),
-                          child: InkWell(
-                            onTap: () async {
-                              Navigator.pop(context);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (c) => MusicDetail(
-                                    album:
-                                        provider.currentPlayingMusic.metadata,
+                          child: provider.currentPlayingMusic != null
+                              ? Text(
+                                  "${provider.currentPlayingMusic.metadata.title}",
+                                  style: Theme.of(context).textTheme.headline6,
+                                )
+                              : Text("No Music Playing"),
+                        ),
+                        if (provider.currentPlayingMusic != null)
+                          Padding(
+                            padding: EdgeInsets.only(left: 10),
+                            child: InkWell(
+                              onTap: () async {
+                                Navigator.pop(context);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (c) => ArtistDetail(
+                                        artist: provider
+                                            .currentPlayingMusic.metadata),
                                   ),
-                                ),
-                              );
-                            },
-                            child: Text(
-                              "${provider.currentPlayingMusic.metadata.album}",
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline6
-                                  .copyWith(color: Colors.red),
+                                );
+                              },
+                              child: Text(
+                                "${provider.currentPlayingMusic.metadata.artist}",
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline6
+                                    .copyWith(color: Colors.red),
+                              ),
                             ),
                           ),
-                        ),
+                        if (provider.currentPlayingMusic != null)
+                          Padding(
+                            padding: EdgeInsets.only(left: 10),
+                            child: InkWell(
+                              onTap: () async {
+                                Navigator.pop(context);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (c) => MusicDetail(
+                                      album:
+                                          provider.currentPlayingMusic.metadata,
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: Text(
+                                "${provider.currentPlayingMusic.metadata.album}",
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .headline6
+                                    .copyWith(color: Colors.red),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  if (provider.currentPlayingMusic != null)
+                    IconButton(
+                      onPressed: () async {
+                        await provider.like(provider.currentPlayingMusic);
+                      },
+                      icon: Icon(Icons.favorite,
+                          color: provider.currentPlayingMusic.metadata.like
+                              ? Colors.red
+                              : null),
+                    )
+                ],
+              ),
+              if (provider.currentPlayingMusic != null)
+                Listener(
+                  onPointerUp: (e) async {
+                    await provider.seek(
+                      provider.currentPosition,
+                      shouldSet: true,
+                    );
+                    await Future.delayed(Duration(milliseconds: 200));
+                    await provider.resume();
+                  },
+                  onPointerDown: (e) async {
+                    await provider.pause();
+                  },
+                  child: Slider.adaptive(
+                    min: 0,
+                    max: provider.totalDuration?.inSeconds?.toDouble() ?? 10000,
+                    value: min(
+                      provider.currentPosition?.inSeconds?.toDouble() ?? 0,
+                      provider.totalDuration?.inSeconds?.toDouble() ?? 10000,
+                    ),
+                    onChangeEnd: (v) async {},
+                    onChanged: (double value) async {
+                      await provider.seek(
+                        Duration(seconds: value.toInt()),
+                        shouldSet: false,
+                      );
+                    },
+                  ),
+                ),
+              if (provider.currentPlayingMusic != null &&
+                  provider.currentPosition != null &&
+                  provider.totalDuration != null)
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: Row(
+                    children: <Widget>[
+                      Text(formatTime(provider.currentPosition)),
+                      Spacer(),
+                      Text(formatTime(provider.totalDuration))
                     ],
                   ),
                 ),
-                if (provider.currentPlayingMusic != null)
-                  IconButton(
-                    onPressed: () async {
-                      await provider.like(provider.currentPlayingMusic);
-                    },
-                    icon: Icon(Icons.favorite,
-                        color: provider.currentPlayingMusic.metadata.like
-                            ? Colors.red
-                            : null),
-                  )
-              ],
-            ),
-            if (provider.currentPlayingMusic != null)
-              Listener(
-                onPointerUp: (e) async {
-                  await provider.seek(
-                    provider.currentPosition,
-                    shouldSet: true,
-                  );
-                  await Future.delayed(Duration(milliseconds: 200));
-                  await provider.resume();
-                },
-                onPointerDown: (e) async {
-                  await provider.pause();
-                },
-                child: Slider.adaptive(
-                  min: 0,
-                  max: provider.totalDuration?.inSeconds?.toDouble() ?? 10000,
-                  value: provider.currentPosition?.inSeconds?.toDouble() ?? 0,
-                  onChangeEnd: (v) async {},
-                  onChanged: (double value) async {
-                    await provider.seek(
-                      Duration(seconds: value.toInt()),
-                      shouldSet: false,
-                    );
-                  },
-                ),
-              ),
-            if (provider.currentPlayingMusic != null)
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
-                child: Row(
-                  children: <Widget>[
-                    Text(formatTime(provider.currentPosition)),
-                    Spacer(),
-                    Text(formatTime(provider.totalDuration))
-                  ],
-                ),
-              ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                if (provider.currentPlayingMusic != null)
-                  IconButton(
-                    onPressed: provider.hasPrevious
-                        ? () async {
-                            await provider.play(
-                              provider.musicList[provider.currentIndex - 1],
-                              musicList: provider.musicList,
-                              currentIndex: provider.currentIndex - 1,
-                            );
-                          }
-                        : null,
-                    iconSize: 60,
-                    icon: Icon(Icons.skip_previous),
-                  ),
-                if (provider.currentState == AudioPlayerState.PLAYING ||
-                    provider.currentState == AudioPlayerState.COMPLETED)
-                  IconButton(
-                    iconSize: 60,
-                    icon: Icon(Icons.pause),
-                    onPressed: () async {
-                      await provider.pause();
-                    },
-                  ),
-                if (provider.currentState == AudioPlayerState.PAUSED)
-                  IconButton(
-                    iconSize: 60,
-                    icon: Icon(Icons.play_arrow),
-                    onPressed: () async {
-                      await provider.resume();
-                    },
-                  ),
-                if (provider.currentPlayingMusic != null)
-                  IconButton(
-                    onPressed: provider.hasNext
-                        ? () async {
-                            await provider.play(
-                              provider.musicList[provider.currentIndex + 1],
-                              musicList: provider.musicList,
-                              currentIndex: provider.currentIndex + 1,
-                            );
-                          }
-                        : null,
-                    iconSize: 60,
-                    icon: Icon(Icons.skip_next),
-                  ),
-              ],
-            ),
-            if (provider.currentPlayingMusic != null)
               Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  provider.releaseMode == ReleaseMode.LOOP
-                      ? IconButton(
-                          onPressed: () async {
-                            await provider.loop(false);
-                          },
-                          icon: Icon(Icons.repeat_one),
-                        )
-                      : IconButton(
-                          onPressed: () async {
-                            await provider.loop(true);
-                          },
-                          icon: Icon(Icons.repeat),
-                        ),
-                  IconButton(
-                    onPressed: () async {},
-                    icon: Icon(Icons.volume_mute),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      showBottomMenu(context, provider);
-                    },
-                    icon: Icon(Icons.more_horiz),
-                  )
+                  if (provider.currentPlayingMusic != null)
+                    IconButton(
+                      onPressed: provider.hasPrevious
+                          ? () async {
+                              await provider.play(
+                                provider.musicList[provider.currentIndex - 1],
+                                musicList: provider.musicList,
+                                currentIndex: provider.currentIndex - 1,
+                              );
+                            }
+                          : null,
+                      iconSize: 60,
+                      icon: Icon(Icons.skip_previous),
+                    ),
+                  if (provider.currentState == AudioPlayerState.PLAYING ||
+                      provider.currentState == AudioPlayerState.COMPLETED)
+                    IconButton(
+                      iconSize: 60,
+                      icon: Icon(Icons.pause),
+                      onPressed: () async {
+                        await provider.pause();
+                      },
+                    ),
+                  if (provider.currentState == AudioPlayerState.PAUSED)
+                    IconButton(
+                      iconSize: 60,
+                      icon: Icon(Icons.play_arrow),
+                      onPressed: () async {
+                        await provider.resume();
+                      },
+                    ),
+                  if (provider.currentPlayingMusic != null)
+                    IconButton(
+                      onPressed: provider.hasNext
+                          ? () async {
+                              await provider.play(
+                                provider.musicList[provider.currentIndex + 1],
+                                musicList: provider.musicList,
+                                currentIndex: provider.currentIndex + 1,
+                              );
+                            }
+                          : null,
+                      iconSize: 60,
+                      icon: Icon(Icons.skip_next),
+                    ),
                 ],
               ),
-          ],
+              if (provider.currentPlayingMusic != null)
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    IconButton(
+                      tooltip: "Lyrics",
+                      icon: Icon(Icons.comment),
+                      onPressed:
+                          provider.currentPlayingMusic?.metadata?.lyrics != null
+                              ? () => Navigator.push(
+                                    context,
+                                    dialogRoute(
+                                      LyricsView(
+                                          lyrics: provider.currentPlayingMusic
+                                              .metadata.lyrics),
+                                    ),
+                                  )
+                              : null,
+                    ),
+                    provider.releaseMode == ReleaseMode.LOOP
+                        ? IconButton(
+                            onPressed: () async {
+                              await provider.loop(false);
+                            },
+                            icon: Icon(Icons.repeat_one),
+                          )
+                        : IconButton(
+                            onPressed: () async {
+                              await provider.loop(true);
+                            },
+                            icon: Icon(Icons.repeat),
+                          ),
+                    IconButton(
+                      onPressed: () async {},
+                      icon: Icon(Icons.volume_mute),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        showBottomMenu(context, provider);
+                      },
+                      icon: Icon(Icons.more_horiz),
+                    )
+                  ],
+                ),
+            ],
+          ),
         ),
       ),
     );
@@ -269,7 +317,7 @@ class _FullScreenPlayerState extends State<FullScreenPlayer> {
       BuildContext context, MusicProvider provider) {
     return scaffoldKey.currentState.showBottomSheet(
       (c) => Container(
-        height: 100,
+        height: 200,
         color: Theme.of(context).popupMenuTheme.color,
         child: Column(
           children: <Widget>[
@@ -294,6 +342,12 @@ class _FullScreenPlayerState extends State<FullScreenPlayer> {
               ),
             ),
             Divider(),
+            ListTile(
+              title: Text("Close"),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            )
           ],
         ),
       ),

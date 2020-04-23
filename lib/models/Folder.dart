@@ -117,6 +117,7 @@ class MusicMetadata extends BaseElement {
   int file;
   bool like;
   String albumArtist;
+  String lyrics;
 
   MusicMetadata({
     this.id,
@@ -131,6 +132,7 @@ class MusicMetadata extends BaseElement {
     this.file,
     this.like,
     this.albumArtist,
+    this.lyrics,
   });
 
   factory MusicMetadata.fromJson(Map<String, dynamic> json) => MusicMetadata(
@@ -146,6 +148,7 @@ class MusicMetadata extends BaseElement {
         file: json["file"],
         like: json["like"],
         albumArtist: json['album_artist'],
+        lyrics: json['lyrics'],
       );
 
   Map<String, dynamic> toJson() => {
@@ -155,11 +158,12 @@ class MusicMetadata extends BaseElement {
         "artist": artist,
         "year": year,
         "genre": genre,
-        "track": track,
+        "track": track.toString(),
         "picture": picture,
-        "duration": duration,
+        "duration": duration.toString(),
         "file": file,
         "like": like,
+        "lyrics": lyrics
       };
 }
 
