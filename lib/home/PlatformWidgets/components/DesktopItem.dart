@@ -52,8 +52,8 @@ class DesktopFolderItem extends StatelessWidget {
   }
 
   Widget buildFolder(BuildContext context, {bool isSelected}) {
-    DesktopController controller = Provider.of(context);
-    NasProvider provider = Provider.of(context);
+    DesktopController controller = Provider.of(context, listen: false);
+    NasProvider provider = Provider.of(context, listen: false);
 
     return Listener(
       onPointerDown: (_) {
@@ -133,7 +133,7 @@ class DesktopFileItem extends StatelessWidget {
   }
 
   Widget buildFile(BuildContext context, {bool isSelected}) {
-    DesktopController controller = Provider.of(context);
+    DesktopController controller = Provider.of(context, listen: false);
 
     Widget _renderIcon({String path}) {
       if (IMAGES.contains(p.extension(path).toLowerCase())) {
@@ -242,7 +242,7 @@ class DesktopDocumentItem extends StatelessWidget {
   }
 
   Widget buildDocument(BuildContext context, {bool isSelected}) {
-    DesktopController controller = Provider.of(context);
+    DesktopController controller = Provider.of(context, listen: false);
 
     return Listener(
       onPointerDown: (_) {

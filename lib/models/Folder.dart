@@ -252,6 +252,7 @@ class NasDocument extends BaseElement {
   String content;
   BookCollection bookCollection;
   int collection;
+  bool showInFolder;
 
   NasDocument({
     this.id,
@@ -264,10 +265,12 @@ class NasDocument extends BaseElement {
     this.content,
     this.bookCollection,
     this.collection,
+    this.showInFolder,
   });
 
   factory NasDocument.fromJson(Map<String, dynamic> json) => NasDocument(
         id: json["id"],
+        showInFolder: json['show_in_folder'],
         createdAt: json["created_at"] != null
             ? DateTime.parse(json["created_at"])
             : null,

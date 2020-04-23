@@ -38,13 +38,18 @@ class _FullScreenPlayerState extends State<FullScreenPlayer> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: provider.currentPlayingMusic != null
-                    ? Image.network(
-                        provider.currentPlayingMusic.metadata.picture ?? "",
-                        height: 250,
-                        width: 300,
+                    ? AnimatedContainer(
+                        height: provider.currentState == AudioPlayerState.PAUSED
+                            ? 300
+                            : 350,
+                        duration: Duration(milliseconds: 200),
+                        child: Image.network(
+                          provider.currentPlayingMusic.metadata.picture ?? "",
+                          fit: BoxFit.cover,
+                        ),
                       )
                     : Container(
-                        height: 250,
+                        height: 300,
                         width: 300,
                         color: Colors.black,
                       ),

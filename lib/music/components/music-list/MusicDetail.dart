@@ -80,7 +80,12 @@ class _MusicDetailState extends State<MusicDetail> {
                                   },
                                   icon: Icon(Icons.stop),
                                 )
-                              : null,
+                              : song.metadata.like
+                                  ? Icon(
+                                      Icons.favorite,
+                                      color: Colors.red,
+                                    )
+                                  : null,
                         );
                       },
                     ),
@@ -138,12 +143,13 @@ class _MusicDetailState extends State<MusicDetail> {
                       MaterialPageRoute(
                         builder: (c) => ArtistDetail(
                           artist: widget.album,
+                          useAlbumArtist: true,
                         ),
                       ),
                     );
                   },
                   child: Text(
-                    widget.album.albumArtist,
+                    "${widget.album.albumArtist ?? ""}",
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(color: Colors.red, fontSize: 16),

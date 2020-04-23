@@ -195,6 +195,7 @@ class NasProvider with ChangeNotifier {
     } catch (err) {}
   }
 
+  /// Fetch list of logs
   Future<PaginationResult<Logs>> fetchLogs({String url}) async {
     try {
       var response = await this.networkProvider.get(url ?? "$baseURL$logsURL");
@@ -208,6 +209,7 @@ class NasProvider with ChangeNotifier {
     }
   }
 
+  /// Fetch list of book collections
   Future<List<BookCollection>> fetchBookCollections() async {
     try {
       var result =
@@ -219,6 +221,7 @@ class NasProvider with ChangeNotifier {
     }
   }
 
+  /// Fetch book collection details. This will include the documents it contains
   Future<BookCollection> fetchBookCollectionDetail({int id}) async {
     try {
       var result =
@@ -230,12 +233,50 @@ class NasProvider with ChangeNotifier {
     }
   }
 
+  /// Update book collection detail.
   Future<void> updateBookCollection(int id, v) async {
     await this.networkProvider.patch("$baseURL$bookCollectionURL$id/", data: v);
   }
 
+  /// create new book collection with value [v]
   Future<void> createNewBookCollection(v) async {
     await this.networkProvider.post("$baseURL$bookCollectionURL", data: v);
+  }
+
+  /// Delete book collection by id
+  Future<void> deleteBookCollection(int id) async {
+    await this.networkProvider.delete("$baseURL$bookCollectionURL$id/");
+  }
+
+  /// Add log
+  Future<void> addLog(v) async {
+    await this.networkProvider.post("$baseURL$logsURL", data: v);
+  }
+
+  /// Delete log by id
+  Future<void> deleteLog(int id) async {
+    await this.networkProvider.delete("$baseURL$logsURL$id/");
+  }
+
+  Future<Logs> getLog(int id) async {
+    var res = await this.networkProvider.get("$baseURL$logsURL$id/");
+    return Logs.fromJson(res.data);
+  }
+
+  /// get log schema
+  Future<List> getLogSchema() async {
+    var response = await this.networkProvider.request(
+          "$baseURL$logsURL",
+          options: Options(method: "OPTIONS"),
+        );
+    return (response.data['fields'] as List)
+        .map((e) => e as Map<String, dynamic>)
+        .toList();
+  }
+
+  /// Update current log based on [id]
+  Future<void> updateLog(int id, v) async {
+    await this.networkProvider.patch("$baseURL$logsURL$id/", data: v);
   }
 
   Future<void> refresh(int id) async {

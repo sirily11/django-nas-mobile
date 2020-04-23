@@ -18,7 +18,7 @@ class _InfoPageState extends State<InfoPage> {
   void initState() {
     super.initState();
     timer = Timer.periodic(Duration(seconds: 20), (timer) async {
-      SystemProvider systemProvider = Provider.of(context);
+      SystemProvider systemProvider = Provider.of(context, listen: false);
       await systemProvider.getData();
     });
   }

@@ -1,3 +1,4 @@
+import 'package:django_nas_mobile/home/components/ConfirmDialog.dart';
 import 'package:django_nas_mobile/home/components/CreateNewDialog.dart';
 import 'package:django_nas_mobile/home/components/UpdateDialog.dart';
 import 'package:django_nas_mobile/home/views/EditorView.dart';
@@ -67,7 +68,23 @@ class _BookDetailState extends State<BookDetail> {
               );
               await fetchDetail(provider);
             },
-          )
+          ),
+          FlatButton(
+            child: Text("Delete"),
+            onPressed: () async {
+              showDialog(
+                context: context,
+                builder: (c) => ConfirmDialog(
+                  title: "Do you want to delete?",
+                  content: "There is no way to go back.",
+                  onConfirm: () async {
+                    await provider.deleteBookCollection(widget.collection.id);
+                    Navigator.pop(context);
+                  },
+                ),
+              );
+            },
+          ),
         ],
       ),
       body: EasyRefresh(

@@ -52,7 +52,7 @@ class _HomePageState extends State<HomePage> {
 
   /// build body based on currentIndex
   Widget _renderBody() {
-    SelectionProvider selectionProvider = Provider.of(context);
+    SelectionProvider selectionProvider = Provider.of(context, listen: false);
 
     switch (selectionProvider.currentIndex) {
       case 1:
@@ -77,8 +77,9 @@ class _HomePageState extends State<HomePage> {
 
   Widget buildDownloadAll(BuildContext context) {
     // DesktopController desktopController = Provider.of(context);
-    NasProvider nasProvider = Provider.of(context);
-    UploadDownloadProvider uploadDownloadProvider = Provider.of(context);
+    NasProvider nasProvider = Provider.of(context, listen: false);
+    UploadDownloadProvider uploadDownloadProvider =
+        Provider.of(context, listen: false);
 
     return IconButton(
       tooltip: "Download All",
@@ -107,7 +108,7 @@ class _HomePageState extends State<HomePage> {
         key: Key("back button"),
         color: Theme.of(context).textTheme.button.color,
         onPressed: () async {
-          DesktopController controller = Provider.of(context);
+          DesktopController controller = Provider.of(context, listen: false);
           controller.selectedElement = null;
           await provider.backToPrev();
         },
@@ -120,7 +121,7 @@ class _HomePageState extends State<HomePage> {
         key: Key("back button"),
         color: Theme.of(context).textTheme.button.color,
         onPressed: () async {
-          DesktopController controller = Provider.of(context);
+          DesktopController controller = Provider.of(context, listen: false);
           controller.selectedElement = null;
           if (Navigator.canPop(context)) {
             Navigator.pop(context);

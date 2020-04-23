@@ -186,10 +186,10 @@ class MusicProvider extends ChangeNotifier {
   }
 
   /// get list of albums based on the artist name
-  Future<List<MusicMetadata>> getArtistDetail(String artist) async {
-    var result = await this
-        .networkProvider
-        .get("$baseURL${musicURL}album/?album_artist=$artist");
+  Future<List<MusicMetadata>> getArtistDetail(
+      String artist, bool useAlbumArtist) async {
+    var result = await this.networkProvider.get(
+        "$baseURL${musicURL}album/?${useAlbumArtist ? "album_artist" : "artist"}=$artist");
     List<MusicMetadata> files =
         (result.data as List).map((e) => MusicMetadata.fromJson(e)).toList();
     return files;

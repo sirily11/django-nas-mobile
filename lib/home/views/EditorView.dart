@@ -93,41 +93,45 @@ class EditorViewState extends State<EditorView> {
               _controller = ZefyrController(document);
             }
 
-            return ZefyrScaffold(
-              child: ZefyrTheme(
-                data: ZefyrThemeData.fallback(context).copyWith(
-                  cursorColor: Theme.of(context).cursorColor,
-                  paragraphTheme:
-                      StyleTheme(textStyle: Theme.of(context).textTheme.body1),
-                  headingTheme: HeadingTheme(
-                    level1: StyleTheme(
-                      textStyle: Theme.of(context)
-                          .textTheme
-                          .title
-                          .copyWith(fontSize: 30),
+            return Stack(
+              children: <Widget>[
+                ZefyrScaffold(
+                  child: ZefyrTheme(
+                    data: ZefyrThemeData.fallback(context).copyWith(
+                      cursorColor: Theme.of(context).cursorColor,
+                      paragraphTheme: StyleTheme(
+                          textStyle: Theme.of(context).textTheme.body1),
+                      headingTheme: HeadingTheme(
+                        level1: StyleTheme(
+                          textStyle: Theme.of(context)
+                              .textTheme
+                              .title
+                              .copyWith(fontSize: 30),
+                        ),
+                        level2: StyleTheme(
+                          textStyle: Theme.of(context)
+                              .textTheme
+                              .subtitle
+                              .copyWith(fontSize: 24),
+                        ),
+                        level3: StyleTheme(
+                          textStyle: Theme.of(context)
+                              .textTheme
+                              .subtitle
+                              .copyWith(fontSize: 20),
+                        ),
+                      ),
                     ),
-                    level2: StyleTheme(
-                      textStyle: Theme.of(context)
-                          .textTheme
-                          .subtitle
-                          .copyWith(fontSize: 24),
-                    ),
-                    level3: StyleTheme(
-                      textStyle: Theme.of(context)
-                          .textTheme
-                          .subtitle
-                          .copyWith(fontSize: 20),
+                    child: ZefyrEditor(
+                      imageDelegate: CustomImageDelegate(),
+                      mode: mode,
+                      padding: EdgeInsets.all(16),
+                      controller: _controller,
+                      focusNode: _focusNode,
                     ),
                   ),
                 ),
-                child: ZefyrEditor(
-                  imageDelegate: CustomImageDelegate(),
-                  mode: mode,
-                  padding: EdgeInsets.all(16),
-                  controller: _controller,
-                  focusNode: _focusNode,
-                ),
-              ),
+              ],
             );
           }),
     );

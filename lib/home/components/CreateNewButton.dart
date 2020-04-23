@@ -17,8 +17,8 @@ class CreateNewButton extends StatelessWidget {
   CreateNewButton({this.color});
 
   void _onSelected(int selection, BuildContext context) async {
-    UploadDownloadProvider uploadProvider = Provider.of(context);
-    NasProvider nasProvider = Provider.of(context);
+    UploadDownloadProvider uploadProvider = Provider.of(context, listen: false);
+    NasProvider nasProvider = Provider.of(context, listen: false);
     // new folder
     if (selection == 0) {
       TextEditingController controller = TextEditingController();
@@ -91,8 +91,8 @@ class CreateNewButton extends StatelessWidget {
   }
 
   void _onSelectedDesktop(int selection, BuildContext context) async {
-    UploadDownloadProvider uploadProvider = Provider.of(context);
-    NasProvider nasProvider = Provider.of(context);
+    UploadDownloadProvider uploadProvider = Provider.of(context, listen: false);
+    NasProvider nasProvider = Provider.of(context, listen: false);
 
     if (selection == 0) {
       TextEditingController controller = TextEditingController();

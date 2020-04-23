@@ -4,6 +4,7 @@ PODS:
   - barcode_scan (0.0.1):
     - Flutter
     - MTBBarcodeScanner
+    - SwiftProtobuf
   - BSGridCollectionViewLayout (1.2.5)
   - BSImagePicker (2.10.3):
     - BSGridCollectionViewLayout (= 1.2.5)
@@ -42,6 +43,7 @@ PODS:
     - Flutter
   - shared_preferences_web (0.0.1):
     - Flutter
+  - SwiftProtobuf (1.8.0)
   - url_launcher (0.0.1):
     - Flutter
   - url_launcher_macos (0.0.1):
@@ -81,6 +83,7 @@ SPEC REPOS:
     - FlutterIJK
     - MTBBarcodeScanner
     - Regift
+    - SwiftProtobuf
 
 EXTERNAL SOURCES:
   audioplayers:
@@ -126,7 +129,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   audioplayers: 84f968cea3f2deab00ec4f8ff53358b3c0b3992c
-  barcode_scan: 33f586d02270046fc6559135038b34b5754eaa4f
+  barcode_scan: a5c27959edfafaa0c771905bad0b29d6d39e4479
   BSGridCollectionViewLayout: 333dcb457a5a3bdd9212607ab5756553dcfe06cb
   BSImagePicker: 07404254f2fcdaf5a2eb403c0f8c337267ce8738
   BSImageView: a149459433a2687157d034c78e059d30ac7f2544
@@ -147,6 +150,7 @@ SPEC CHECKSUMS:
   shared_preferences: 430726339841afefe5142b9c1f50cb6bd7793e01
   shared_preferences_macos: f3f29b71ccbb56bf40c9dd6396c9acf15e214087
   shared_preferences_web: 141cce0c3ed1a1c5bf2a0e44f52d31eeb66e5ea9
+  SwiftProtobuf: 2cbd9409689b7df170d82a92a33443c8e3e14a70
   url_launcher: a1c0cc845906122c4784c542523d8cacbded5626
   url_launcher_macos: fd7894421cd39320dce5f292fc99ea9270b2a313
   url_launcher_web: e5527357f037c87560776e36436bf2b0288b965c

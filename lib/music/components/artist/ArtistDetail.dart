@@ -9,7 +9,8 @@ import 'package:provider/provider.dart';
 
 class ArtistDetail extends StatefulWidget {
   final MusicMetadata artist;
-  ArtistDetail({this.artist});
+  final bool useAlbumArtist;
+  ArtistDetail({this.artist, this.useAlbumArtist = false});
 
   @override
   _ArtistDetailState createState() => _ArtistDetailState();
@@ -29,9 +30,15 @@ class _ArtistDetailState extends State<ArtistDetail> {
             header: BallPulseHeader(),
             firstRefresh: true,
             onRefresh: () async {
-              if (widget.artist.albumArtist != null) {
-                var res =
-                    await provider.getArtistDetail(widget.artist.albumArtist);
+              if (widget.artist.albumArtist != null && widget.useAlbumArtist) {
+                var res = await provider.getArtistDetail(
+                    widget.artist.albumArtist, widget.useAlbumArtist);
+                setState(() {
+                  albumList = res;
+                });
+              } else {
+                var res = await provider.getArtistDetail(
+                    widget.artist.artist, widget.useAlbumArtist);
                 setState(() {
                   albumList = res;
                 });
@@ -47,7 +54,9 @@ class _ArtistDetailState extends State<ArtistDetail> {
                     height: 10,
                   ),
                   Text(
-                    widget.artist.artist,
+                    widget.useAlbumArtist
+                        ? widget.artist.albumArtist
+                        : widget.artist.artist,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: Theme.of(context).textTheme.headline5,
@@ -57,7 +66,7 @@ class _ArtistDetailState extends State<ArtistDetail> {
                   ),
                   Divider(),
                   Text(
-                    "Albums from ${widget.artist.artist}",
+                    "Albums from ${widget.useAlbumArtist ? widget.artist.albumArtist : widget.artist.artist}",
                     style: Theme.of(context).textTheme.subtitle1,
                   ),
                   SizedBox(

@@ -88,7 +88,7 @@ class FileRow extends StatelessWidget {
                   title: "Do you want to delete this file",
                   content: "You cannot undo this action",
                   onConfirm: () async {
-                    NasProvider provider = Provider.of(context);
+                    NasProvider provider = Provider.of(context, listen: false);
                     await provider.deleteFile(file);
                   },
                 ),
@@ -116,7 +116,8 @@ class FileRow extends StatelessWidget {
                     actions: <Widget>[
                       FlatButton(
                         onPressed: () async {
-                          NasProvider provider = Provider.of(context);
+                          NasProvider provider =
+                              Provider.of(context, listen: false);
                           await provider.updateFileName(file,
                               controller.text + p.extension(file.filename));
                           Navigator.pop(context);
@@ -131,7 +132,8 @@ class FileRow extends StatelessWidget {
             IconSlideAction(
               onTap: () async {
                 await downloadFile(context,
-                    uploadDownloadProvider: Provider.of(context), file: file);
+                    uploadDownloadProvider: Provider.of(context, listen: false),
+                    file: file);
               },
               icon: Icons.file_download,
               caption: "Download",
@@ -164,7 +166,7 @@ class FolderRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return DragTarget<BaseElement>(
       onAccept: (data) async {
-        NasProvider nasProvider = Provider.of(context);
+        NasProvider nasProvider = Provider.of(context, listen: false);
         try {
           await onDragMoveTo(
               data: data, nasProvider: nasProvider, element: folder);
@@ -210,7 +212,7 @@ class FolderRow extends StatelessWidget {
                   title: "Do you want to delete this folder",
                   content: "You cannot undo this action",
                   onConfirm: () async {
-                    NasProvider provider = Provider.of(context);
+                    NasProvider provider = Provider.of(context, listen: false);
                     await provider.deleteFolder(folder);
                   },
                 ),
@@ -235,7 +237,8 @@ class FolderRow extends StatelessWidget {
                   actions: <Widget>[
                     FlatButton(
                       onPressed: () async {
-                        NasProvider provider = Provider.of(context);
+                        NasProvider provider =
+                            Provider.of(context, listen: false);
                         await provider.updateFolder(controller.text, folder.id);
                         Navigator.pop(context);
                       },
@@ -306,7 +309,7 @@ class DocumentRow extends StatelessWidget {
                   title: "Do you want to delete this document",
                   content: "You cannot undo this action",
                   onConfirm: () async {
-                    NasProvider provider = Provider.of(context);
+                    NasProvider provider = Provider.of(context, listen: false);
                     await provider.deleteDocument(document);
                   },
                 ),
@@ -331,7 +334,8 @@ class DocumentRow extends StatelessWidget {
                   actions: <Widget>[
                     FlatButton(
                       onPressed: () async {
-                        NasProvider provider = Provider.of(context);
+                        NasProvider provider =
+                            Provider.of(context, listen: false);
                         await provider.updateDocumentName(
                             controller.text, document.id);
                         Navigator.pop(context);

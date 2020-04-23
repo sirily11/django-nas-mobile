@@ -71,10 +71,10 @@ class _BookPageState extends State<BookPage> {
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
+                crossAxisCount: 2,
                 crossAxisSpacing: 10,
                 mainAxisSpacing: 10,
-                childAspectRatio: 0.6,
+                childAspectRatio: 0.8,
               ),
               itemCount: collections.length,
               itemBuilder: (c, i) {
@@ -82,8 +82,8 @@ class _BookPageState extends State<BookPage> {
                 return Container(
                   height: 600,
                   child: InkWell(
-                    onTap: () {
-                      Navigator.push(
+                    onTap: () async {
+                      await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (c) => BookDetail(
@@ -92,6 +92,7 @@ class _BookPageState extends State<BookPage> {
                           ),
                         ),
                       );
+                      await fetch(provider);
                     },
                     child: Card(
                       child: Center(

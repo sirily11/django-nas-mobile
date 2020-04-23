@@ -1,4 +1,5 @@
 import 'package:django_nas_mobile/drawer/DrawerPanel.dart';
+import 'package:django_nas_mobile/logs/CreateAndUpdatePage.dart';
 import 'package:django_nas_mobile/models/Folder.dart';
 import 'package:django_nas_mobile/models/NasProvider.dart';
 import 'package:django_nas_mobile/music/components/InitProgressDialog.dart';
@@ -24,20 +25,29 @@ class _LogsPageState extends State<LogsPage> {
   Widget build(BuildContext context) {
     NasProvider provider = Provider.of(context);
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        actions: <Widget>[
+          IconButton(
+            onPressed: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (c) => CreateAndUpdatePage(),
+                ),
+              );
+              await fetch(provider);
+            },
+            icon: Icon(Icons.edit),
+          )
+        ],
+      ),
       drawer: DrawerPanel(),
       body: EasyRefresh(
         firstRefresh: true,
         firstRefreshWidget: InitLoadingProgressDialog(),
         header: BallPulseHeader(),
         onRefresh: () async {
-          var response = await provider.fetchLogs();
-          if (response != null) {
-            setState(() {
-              result = response;
-              logs = response.results;
-            });
-          }
+          await fetch(provider);
         },
         onLoad: () async {
           if (result?.next != null) {
@@ -60,8 +70,8 @@ class _LogsPageState extends State<LogsPage> {
             return TimelineModel(
               Card(
                 child: ListTile(
-                  onTap: () {
-                    Navigator.push(
+                  onTap: () async {
+                    await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (c) => LogsDetail(
@@ -69,6 +79,7 @@ class _LogsPageState extends State<LogsPage> {
                         ),
                       ),
                     );
+                    await fetch(provider);
                   },
                   title: Text("${log.title}"),
                   subtitle: Text("${log.logType}\n${log.sender}"),
@@ -83,5 +94,15 @@ class _LogsPageState extends State<LogsPage> {
         ),
       ),
     );
+  }
+
+  Future fetch(NasProvider provider) async {
+    var response = await provider.fetchLogs();
+    if (response != null) {
+      setState(() {
+        result = response;
+        logs = response.results;
+      });
+    }
   }
 }

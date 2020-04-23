@@ -19,11 +19,9 @@ class _SettingPageState extends State<SettingPage> {
   void initState() {
     super.initState();
     controller = TextEditingController();
-    Future.delayed(Duration(milliseconds: 30), () {
-      NasProvider provider = Provider.of(context);
-      setState(() {
-        controller = TextEditingController(text: provider.baseURL);
-      });
+    NasProvider provider = Provider.of(context, listen: false);
+    setState(() {
+      controller = TextEditingController(text: provider.baseURL);
     });
   }
 
@@ -54,8 +52,9 @@ class _SettingPageState extends State<SettingPage> {
                 child: Text("Submit"),
                 onPressed: () async {
                   try {
-                    NasProvider provider = Provider.of(context);
-                    MusicProvider musicProvider = Provider.of(context);
+                    NasProvider provider = Provider.of(context, listen: false);
+                    MusicProvider musicProvider =
+                        Provider.of(context, listen: false);
                     await provider.setURL(controller.text);
                     musicProvider.baseURL = controller.text;
                     showDialog(

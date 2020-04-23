@@ -50,7 +50,7 @@ class FileSearch extends SearchDelegate {
 
   @override
   Widget buildResults(BuildContext context) {
-    NasProvider nasProvider = Provider.of(context);
+    NasProvider nasProvider = Provider.of(context, listen: false);
     print("Searching: $query");
     if (query.isEmpty) return Container();
     if (query.isNotEmpty)
@@ -74,7 +74,7 @@ class FileSearch extends SearchDelegate {
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    NasProvider nasProvider = Provider.of(context);
+    NasProvider nasProvider = Provider.of(context, listen: false);
     var files = nasProvider.currentFolder.files
         .where(
           (f) => f.name?.toLowerCase()?.contains(query) ?? false,
@@ -157,7 +157,7 @@ class MusicSearch extends SearchDelegate {
 
   @override
   Widget buildResults(BuildContext context) {
-    MusicProvider musicProvider = Provider.of(context);
+    MusicProvider musicProvider = Provider.of(context, listen: false);
     if (query.isEmpty) return Container();
     if (query.isNotEmpty)
       return FutureBuilder<PaginationResult<NasFile>>(
@@ -184,7 +184,7 @@ class MusicSearch extends SearchDelegate {
   }
 
   Widget buildList(List<NasFile> files, BuildContext context) {
-    MusicProvider musicProvider = Provider.of(context);
+    MusicProvider musicProvider = Provider.of(context, listen: false);
     return ListView.builder(
       itemCount: files.length,
       itemBuilder: (context, index) {
