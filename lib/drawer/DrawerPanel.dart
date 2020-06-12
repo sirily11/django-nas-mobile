@@ -24,6 +24,10 @@ class DrawerPanel extends StatelessWidget {
           ListTile(
             title: Text("Logs"),
             onTap: () => Navigator.pushReplacementNamed(context, "/logs"),
+          ),
+          ListTile(
+            title: Text("Help"),
+            onTap: () => Navigator.pushReplacementNamed(context, "/help"),
           )
         ],
       ),

@@ -1,4 +1,5 @@
 import 'package:django_nas_mobile/book/BookPage.dart';
+import 'package:django_nas_mobile/help/HelpDocView.dart';
 import 'package:django_nas_mobile/logs/LogsPage.dart';
 import 'package:django_nas_mobile/models/DesktopController.dart';
 import 'package:django_nas_mobile/models/MusicProvider.dart';
@@ -57,7 +58,11 @@ class MyApp extends StatelessWidget {
           '/music-artist': (c) => ArtistPage(),
           '/music-song': (c) => SongsPage(),
           '/logs': (c) => LogsPage(),
-          '/books': (c) => BookPage()
+          '/books': (c) => BookPage(),
+          '/help': (c) => HelpDocView(
+                path: "/static/docs/index.xml",
+                isRoot: true,
+              )
         },
         initialRoute: '/',
       ),

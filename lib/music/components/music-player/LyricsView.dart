@@ -6,6 +6,7 @@ class LyricsView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List<String> lines = lyrics.split("\n");
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -18,16 +19,18 @@ class LyricsView extends StatelessWidget {
         ),
       ),
       body: Scrollbar(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Text(
-              "$lyrics",
+          child: ListView.builder(
+        itemCount: lines.length,
+        itemBuilder: (c, i) {
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SelectableText(
+              "${lines[i]}",
               style: TextStyle(fontSize: 20),
             ),
-          ),
-        ),
-      ),
+          );
+        },
+      )),
     );
   }
 }

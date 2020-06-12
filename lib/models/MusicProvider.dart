@@ -114,8 +114,7 @@ class MusicProvider extends ChangeNotifier {
         albumTitle: "${file.metadata.album}",
         imageUrl: "${file.metadata.picture}",
         duration: totalDuration,
-        hasNextTrack: hasNext,
-        hasPreviousTrack: hasPrevious,
+        elapsedTime: currentPosition,
       );
     }
     this.currentIndex = currentIndex;

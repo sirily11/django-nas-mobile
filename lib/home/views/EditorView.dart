@@ -97,31 +97,7 @@ class EditorViewState extends State<EditorView> {
               children: <Widget>[
                 ZefyrScaffold(
                   child: ZefyrTheme(
-                    data: ZefyrThemeData.fallback(context).copyWith(
-                      cursorColor: Theme.of(context).cursorColor,
-                      paragraphTheme: StyleTheme(
-                          textStyle: Theme.of(context).textTheme.body1),
-                      headingTheme: HeadingTheme(
-                        level1: StyleTheme(
-                          textStyle: Theme.of(context)
-                              .textTheme
-                              .title
-                              .copyWith(fontSize: 30),
-                        ),
-                        level2: StyleTheme(
-                          textStyle: Theme.of(context)
-                              .textTheme
-                              .subtitle
-                              .copyWith(fontSize: 24),
-                        ),
-                        level3: StyleTheme(
-                          textStyle: Theme.of(context)
-                              .textTheme
-                              .subtitle
-                              .copyWith(fontSize: 20),
-                        ),
-                      ),
-                    ),
+                    data: ZefyrThemeData(),
                     child: ZefyrEditor(
                       imageDelegate: CustomImageDelegate(),
                       mode: mode,
@@ -141,7 +117,7 @@ class EditorViewState extends State<EditorView> {
     if (_controller != null) {
       try {
         final contents = jsonEncode(convertToQuill(_controller.document));
-        NasProvider provider = Provider.of(context);
+        NasProvider provider = Provider.of(context, listen: false);
         await provider.updateDocument(contents, widget.id);
         key.currentState.showSnackBar(
           SnackBar(
